@@ -99,12 +99,20 @@ ne generički SMTP server.
 - `.env`: `MAIL_MAILER=resend`, `RESEND_KEY=` (API ključ iz Resend dashboarda,
   čuva se kao GitHub Secret za produkciju, nikad u repou).
 - **Domain verifikacija** (preduslov, radi se jednom u Resend dashboardu
-  prije Faze 0.5): dodati `imel.cloud` (ili poddomenu `homeos.imel.cloud`)
-  kao verifikovan domen u Resendu — SPF/DKIM DNS zapisi moraju biti dodani
-  prije nego što se šalju pravi emailovi, inače Resend šalje samo test
-  primaocima ili emailovi padaju u spam.
-- `MAIL_FROM_ADDRESS` mora biti na verifikovanom domenu (`homeos@imel.cloud`
-  ili `homeos@homeos.imel.cloud`).
+  prije Faze 0.5): dodati **`homeos.imel.cloud`** (poddomenu, ne root
+  `imel.cloud`) kao verifikovan domen u Resendu — Resend i sam preporučuje
+  slanje sa poddomene radi izolacije reputacije, a ovdje dodatno znači da
+  se ne dira dio DNS zone koji utiče na ostale firmine sajtove. **DNS je
+  autoritativno hostovan na Hurricane Electric (`ns1-ns5.he.net`), ne
+  lokalno na serveru** — iako server ima svoj Virtualmin/BIND, taj lokalni
+  zapis internet ne konsultuje. SPF/DKIM zapisi (tačne vrijednosti
+  generisane po domenu u Resend dashboardu) se dodaju direktno kroz
+  Hurricane Electric DNS management ekran (dns.he.net), koristeći pune
+  nazive relativne na `imel.cloud` (npr. `send.homeos.imel.cloud`, ne
+  skraćeno `send`). Bez ovoga se email notifikacije neće moći pouzdano
+  testirati u produkciji.
+- `MAIL_FROM_ADDRESS` mora biti na verifikovanom domenu:
+  `notifications@homeos.imel.cloud`.
 - Lokalni dev **ne koristi Resend** — ostaje na `mailhog`/`mailpit` iz
   `docker-compose.override.yml` (tačka Faza 0 u `ROADMAP.md`), da se ne
   troši Resend kvota i da se ne šalju testni emailovi stvarnim adresama.

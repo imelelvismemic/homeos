@@ -185,7 +185,7 @@ SESSION_DRIVER=redis
 
 MAIL_MAILER=resend
 RESEND_KEY=
-MAIL_FROM_ADDRESS="homeos@imel.cloud"
+MAIL_FROM_ADDRESS="notifications@homeos.imel.cloud"
 MAIL_FROM_NAME="${APP_NAME}"
 # Lokalni dev: MAIL_MAILER=smtp, MAIL_HOST=mailpit (vidi CLAUDE.md tačku 3)
 
