@@ -115,9 +115,18 @@ modul-po-modul usput, što bi vodilo nekonzistentnom sistemu.
 - Rani probni deploy (prazan skeleton, prije platform jezgra) namjerno
   urađen u Fazi 0.5 roadmap-a — da se problemi sa serverom/SSL-om/CI-jem
   otkriju prije nego je sistem izgrađen, ne poslije.
-- **Live URL:** [POPUNITI nakon Faze 0.5]
-- **CI/CD:** GitHub Actions, automatski deploy na push u `main`, sa
-  testiranim rollback-om (Faza 8)
+- **Live URL:** https://homeos.imel.cloud (prazan skeleton uživo — login,
+  registracija, kreiranje domaćinstva, pozivanje člana, reset lozinke sa
+  email obavještenjem preko Resend-a)
+- **CI/CD:** GitHub Actions — CI (Pint + Pest) na svaki push/PR; deploy se
+  automatski pokreće tek nakon zelenog CI-ja na `main` (SSH → git pull →
+  `docker compose -f docker-compose.prod.yml up -d --build` → migrate →
+  health-check na internom portu). Testirani rollback dolazi u Fazi 8.
+- **Mrežna arhitektura:** Docker stack izložen samo na `127.0.0.1:8091`;
+  postojeći Apache/Virtualmin drži SSL i reverse-proxya na taj port. Baza je
+  postojeći hostov MariaDB (bez kontejnerizovane baze u produkciji), dostupan
+  kontejnerima preko `host.docker.internal`. Potpuno izolovano od ostalih
+  domena na serveru.
 
 ---
 
@@ -134,7 +143,23 @@ primjer i (ako je moguće) kratak snimak/screenshot postupka.
 
 ## Status projekta
 
-**Faza 0 završena** (Laravel 13 + Filament v3 skeleton, Docker Compose lokalni
+**Faza 0 završena** — Laravel 13 + Filament v3 skeleton, Docker Compose lokalni
 dev, `Household`/`HouseholdMember` modeli, Filament auth + tenant registracija
-+ invite-member UI, GitHub Actions CI, Pest testovi) — čeka potvrdu prije
-Faze 0.5.
++ invite-member UI, GitHub Actions CI, Pest testovi. Kroz lokalno testiranje
+dorađeno: custom-tema/Tailwind, dev performanse (vendor van bind mounta,
+opcache), bosanski prijevodi (forme, tabela, email), automatsko generisanje
+APP_KEY-a.
+
+**Faza 0.5 završena** — prazan skeleton uspješno deployan na
+`https://homeos.imel.cloud` i potvrđena cijela produkcijska putanja:
+- Docker produkcijski stack (`docker-compose.prod.yml`) bez kontejnerizovane
+  baze — koristi hostov MariaDB preko `host.docker.internal`; Nginx samo na
+  `127.0.0.1:8091`, Apache/Virtualmin SSL + reverse proxy.
+- Automatski deploy (`deploy.yml`) radi kraj-do-kraja: push na `main` → CI
+  zeleno → deploy zeleno (git pull → build → migrate → health-check), bez
+  uticaja na ostale domene.
+- Uživo provjereno: registracija, kreiranje domaćinstva, pozivanje člana,
+  reset lozinke + dostava emaila preko Resend-a.
+
+Sljedeće: **Faza 1** (platform jezgro — event bus, notifikacije, sharing,
+scheduler, global search) — čeka potvrdu prije početka.
