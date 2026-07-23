@@ -19,7 +19,10 @@ return [
     ],
 
     'resend' => [
-        'key' => env('RESEND_API_KEY'),
+        // Env var je RESEND_KEY (CLAUDE.md §3, DATA_MODEL.md §7), ne default
+        // RESEND_API_KEY iz Laravel skeletona — inače ključ ostane null i slanje
+        // preko Resend transporta tiho ne prođe ("No activity" na Resend-u).
+        'key' => env('RESEND_KEY'),
     ],
 
     'ses' => [
