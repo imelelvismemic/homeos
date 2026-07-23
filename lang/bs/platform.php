@@ -18,6 +18,8 @@ return [
         'navigation_label' => 'Članovi domaćinstva',
         'user' => 'Registrovani korisnik',
         'user_helper' => 'Unesite email adresu korisnika koji je već registrovan u sistemu.',
+        'column_user' => 'Korisnik',
+        'column_email' => 'E-mail adresa',
         'role' => 'Uloga',
         'role_owner' => 'Vlasnik',
         'role_member' => 'Član',

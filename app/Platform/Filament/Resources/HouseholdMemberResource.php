@@ -34,11 +34,13 @@ class HouseholdMemberResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('user.name')
-                    ->label(__('platform.members.label'))
+                    ->label(__('platform.members.column_user'))
                     ->searchable(),
                 TextColumn::make('user.email')
+                    ->label(__('platform.members.column_email'))
                     ->searchable(),
                 TextColumn::make('role')
+                    ->label(__('platform.members.role'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => __("platform.members.role_{$state}")),
                 TextColumn::make('joined_at')
