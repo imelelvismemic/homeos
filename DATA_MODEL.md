@@ -168,7 +168,7 @@ DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
 DB_DATABASE=homeos
-DB_USERNAME=homeos_user
+DB_USERNAME=homeosdb
 DB_PASSWORD=
 
 REDIS_HOST=redis
@@ -201,10 +201,10 @@ APP_INTERNAL_PORT=8091
 ```
 
 **Napomena o produkciji:** `DB_DATABASE`/`DB_USERNAME` u produkciji moraju
-biti potpuno odvojeni od baza koje već koriste postojeći vhost-ovi
-(`pulse.imel.cloud`, `webimel.imel.cloud`, `evijece*.imel.cloud` i ostali)
-na istom Contabo serveru — nov, izolovan MySQL user sa pristupom samo
-`homeos` bazi (vidi CLAUDE.md tačku 10).
+biti potpuno odvojeni od baza koje već koriste postojeći produkcijski
+vhost-ovi (interna lista, ne navodi se u ovom javnom repou) na istom
+Contabo serveru — nov, izolovan MySQL user sa pristupom samo `homeos`
+bazi (vidi CLAUDE.md tačku 10).
 
 ---
 

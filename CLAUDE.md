@@ -428,11 +428,10 @@ izostavljeno.
   interfejs (Service klasu ili event).
 - Ne hardkodovati listu modula u dashboard/search/navigaciji — uvijek čitati
   iz `config/homeos-apps.php`.
-- Ne dirati postojeće produkcijske vhost-ove na serveru (potvrđeno preko
-  Virtualmin-a: `pulse.imel.cloud`, `webimel.imel.cloud`,
-  `evijece*.imel.cloud` i ostale desetine domena koje Apache/Virtualmin
-  već servira) — Home OS ima svoje izolovane kontejnere, portove i
-  bazu/user.
+- Ne dirati postojeće produkcijske vhost-ove na serveru (server već
+  hostuje desetine drugih domena kroz Apache/Virtualmin — puna lista je
+  interna, ne navodi se u ovom javnom repou) — Home OS ima svoje izolovane
+  kontejnere, portove i bazu/user.
 - Ne slati email mimo Notification sistema.
 - Ne praviti privatno/dijeljeno polje mimo Shareable mehanizma.
 - Ne raditi ručni household-scoping (`where('household_id', ...)`) mimo
