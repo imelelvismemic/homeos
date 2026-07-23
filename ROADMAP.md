@@ -77,31 +77,28 @@ Ovo su infrastrukturni koraci koje radi čovjek (ne Claude Code) — Faza 0 i
 zbog DNS propagacije i mogućih instalacionih problema:
 
 **Večeras (prije Dana 1):**
-- [ ] **Docker Desktop instaliran** na Windows laptopu (WSL2 backend) —
+- [x] **Docker Desktop instaliran** na Windows laptopu (WSL2 backend) —
   potrebno za lokalno pokretanje/testiranje `docker compose` prije deploya.
 - [ ] **Resend nalog kreiran**, domen dodat, SPF/DKIM DNS zapisi uneseni —
   raditi večeras zbog propagacije, ne sutra ujutro uz ostatak DNS-a.
-- [ ] **GitHub repo kreiran** (privatan), Claude Code ima pristup.
+- [x] **GitHub repo kreiran**, Claude Code ima pristup. (Provjeriti
+  vidljivost — repo trenutno javan, sadrži nazive internih domena firme;
+  odlučiti da li ostaje javan ili se prebacuje na privatan.)
 
 **Sutra ujutro (prije Dana 1, ili kao prvi zadatak Dana 1):**
-- [ ] **Docker instaliran na Contabo serveru** — server je Debian/Ubuntu
-  (potvrđeno preko `apache2` naziva servisa, ne `httpd`), pa instalacija
-  ide preko zvaničnog Docker repoa za Debian/Ubuntu (`apt`), ne `dnf`:
-  ```
-  sudo apt update
-  sudo apt install ca-certificates curl gnupg
-  # dodati Docker-ov zvanični apt repo (docs.docker.com/engine/install/debian
-  # ili /ubuntu — provjeriti tačnu distribuciju sa `cat /etc/os-release`)
-  sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
-  ```
-  Provjeriti prvo `docker --version` da nije već instaliran.
-- [ ] Virtualmin virtual server za `homeos.imel.cloud` kreiran, SSL
-  sertifikat postavljen kroz Virtualmin, probni `index.html` dostupan na
-  portu 80 i 443 — potvrđuje da domena i SSL rade prije nego Claude Code
-  počne s pravom aplikacijom.
-- [ ] Izolovan MySQL korisnik (`homeos_user`) i baza (`homeos`) kreirani,
+- [x] **Docker instaliran na Contabo serveru** (Ubuntu 24.04, zvanični
+  Docker CE repo), potvrđeno `docker run hello-world`.
+- [x] Virtualmin virtual server za `homeos.imel.cloud` kreiran, SSL
+  sertifikat postavljen kroz Virtualmin.
+- [x] Apache proxy moduli (`proxy_module`, `proxy_http_module`) potvrđeni
+  aktivni — nije trebala dodatna izmjena.
+- [x] Izolovan MySQL korisnik (`homeosdb`) i baza (`homeos`) kreirani,
   pristup ograničen samo na tu bazu (vidi `DATA_MODEL.md` napomenu o
-  produkciji).
+  produkciji) — **provjeriti** `SHOW GRANTS FOR 'homeosdb'@'localhost';`
+  da su prava zaista ograničena na `homeos.*`, ne `*.*`.
+- [x] Probni `index.html` dostupan na `homeos.imel.cloud` portu 80 i 443
+  (potvrđeno — trenutno Virtualmin default placeholder stranica, što je
+  dovoljno da se potvrdi da DNS/SSL/webserver rade)
 - [ ] Provjeriti koji interni (loopback) portovi su već zauzeti na serveru
   (`sudo ss -tlnp | grep 127.0.0.1`) da se izabere slobodan port za Docker
   stack (vidi `CLAUDE.md` tačku 3a).
