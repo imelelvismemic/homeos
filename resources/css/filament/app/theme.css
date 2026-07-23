@@ -1,7 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@tailwind variants;
-@import '../../../../vendor/filament/filament/resources/css/base.css';
-
-@config './tailwind.config.js';
+/*
+ * Placeholder za custom Filament temu (Faza 0 tačka 9 — build pipeline mora
+ * postojati od početka). Trenutno se NE učitava u panel: Filament v3 zahtijeva
+ * Tailwind v3, a projekt je na Tailwind v4, pa se prava tema (token sistem iz
+ * CLAUDE.md tačke 6 + ->viteTheme(...) u HomePanelProvider) postavlja u Fazi 2
+ * uz odgovarajući Tailwind v3 toolchain. Do tada panel koristi Filament-ov
+ * ispravan pre-kompajlirani CSS.
+ *
+ * Fajl je namjerno minimalan i validan da `npm run build` (Docker build korak)
+ * prolazi zeleno.
+ */
+@import 'tailwindcss';

@@ -33,7 +33,10 @@ class HomePanelProvider extends PanelProvider
             ->passwordReset()
             ->tenant(Household::class)
             ->tenantRegistration(RegisterHousehold::class)
-            ->viteTheme('resources/css/filament/app/theme.css')
+            // Custom Filament tema (Tailwind v3 + token sistem iz CLAUDE.md tačke 6)
+            // se aktivira u Fazi 2 preko ->viteTheme(...). Do tada panel koristi
+            // Filament-ov ispravan pre-kompajlirani CSS. Build scaffold za temu
+            // (resources/css/filament/app/*) već postoji radi Faza 0 tačke 9.
             ->colors([
                 'primary' => Color::Amber,
             ])

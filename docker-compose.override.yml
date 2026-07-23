@@ -10,6 +10,12 @@ services:
       MAIL_PORT: 1025
     volumes:
       - .:/var/www/html
+      # Keep these off the (slow, on Windows) host bind mount — served from the
+      # image / a fast native volume instead. Without this a single request reads
+      # thousands of vendor files over the bind mount (php artisan boot ~36s).
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
+      - dev-storage:/var/www/html/storage/framework
     depends_on:
       - mailpit
 
@@ -23,6 +29,9 @@ services:
       MAIL_PORT: 1025
     volumes:
       - .:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
+      - dev-storage:/var/www/html/storage/framework
     depends_on:
       - mailpit
 
@@ -36,6 +45,9 @@ services:
       MAIL_PORT: 1025
     volumes:
       - .:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
+      - dev-storage:/var/www/html/storage/framework
     depends_on:
       - mailpit
 
@@ -44,3 +56,6 @@ services:
     ports:
       - "127.0.0.1:8025:8025"
       - "127.0.0.1:1025:1025"
+
+volumes:
+  dev-storage:

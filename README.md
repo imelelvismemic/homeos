@@ -43,6 +43,14 @@ tačku 7).
 Mailpit (hvata testne emailove umjesto slanja na prave adrese) je dostupan
 na `http://localhost:8025`.
 
+> **Napomena (samo lokalni dev):** kod bind-mount-a cijelog projekta preko
+> `docker-compose.override.yml`, PHP opcache ne provjerava da li se fajlovi
+> promijenili na svaki request (`opcache.validate_timestamps=0`) — na
+> Windows-u je provjera stotina vendor fajlova preko bind mounta inače
+> dovoljno spora da request traje i preko 40 sekundi. Posljedica: nakon
+> izmjene PHP koda potrebno je `docker compose restart app` (i
+> `queue-worker`/`scheduler` ako su njih dirali) da se izmjena vidi.
+
 ### Korisne komande
 
 ```bash

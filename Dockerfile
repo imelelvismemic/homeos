@@ -19,6 +19,23 @@ RUN composer install \
 COPY . .
 RUN composer dump-autoload --optimize --no-dev
 
+# --- Stage 1b: dev dependencies (Pest, Pint, ...) for the local dev image only ---
+# Kept separate so the production runtime stays --no-dev, while the dev image
+# can serve a full vendor/ from a fast Docker volume (see docker-compose.override.yml).
+FROM composer:2 AS vendor-dev
+
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+RUN composer install \
+        --no-scripts \
+        --no-interaction \
+        --prefer-dist \
+        --ignore-platform-reqs
+
+COPY . .
+RUN composer dump-autoload
+
 # --- Stage 2: front-end assets (Filament custom theme, Tailwind build) ---
 FROM node:22-alpine AS assets
 
@@ -79,6 +96,12 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS linux-headers \
     && apk del .build-deps
 
 COPY docker/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+COPY docker/opcache-dev.ini /usr/local/etc/php/conf.d/zz-opcache-dev.ini
+
+# Full vendor/ (incl. dev deps: Pest, Pint) so tools run inside the container and
+# so the anonymous vendor volume in docker-compose.override.yml is seeded from a
+# fast image layer instead of the slow Windows bind mount.
+COPY --from=vendor-dev /app/vendor ./vendor
 
 # Local dev bind-mounts the host source over /var/www/html (docker-compose.override.yml),
 # which arrives owned by root — run the FPM pool as root too so it can write to

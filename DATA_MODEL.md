@@ -177,7 +177,11 @@ DB_HOST=mysql
 DB_PORT=3306
 DB_DATABASE=homeosdb
 DB_USERNAME=homeos
-DB_PASSWORD=
+DB_PASSWORD=secret
+# `secret` je throwaway lokalna dev lozinka — kontejnerizovani MySQL (lokalni
+# dev) se inicijalizuje istom vrijednošću preko docker-compose.yml, tako da
+# `cp .env.example .env && docker compose up` radi bez ručnog podešavanja.
+# Produkcija koristi pravu lozinku iz server .env / GitHub Secret, nikad iz repoa.
 
 REDIS_HOST=redis
 REDIS_PORT=6379

@@ -1,0 +1,12 @@
+{
+    "Hello!": "Zdravo!",
+    "Whoops!": "Ups!",
+    "Regards,": "Srdačan pozdrav,",
+    "All rights reserved.": "Sva prava zadržana.",
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "Ako imate problema s klikom na dugme \":actionText\", kopirajte i zalijepite donji URL\nu svoj web preglednik:",
+    "Reset your password": "Resetujte svoju šifru",
+    "Reset Password": "Resetuj šifru",
+    "You are receiving this email because we received a password reset request for your account.": "Primili ste ovaj email jer smo dobili zahtjev za resetovanje šifre za vaš nalog.",
+    "This password reset link will expire in :count minutes.": "Ovaj link za resetovanje šifre ističe za :count minuta.",
+    "If you did not request a password reset, no further action is required.": "Ako niste zatražili resetovanje šifre, nije potrebno ništa dodatno preduzimati."
+}
