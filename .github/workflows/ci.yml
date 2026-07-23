@@ -12,9 +12,14 @@ jobs:
     services:
       mysql:
         image: mysql:8.4
+        # Kredencijali usklađeni sa .env.example (homeos / secret) da CI ne mora
+        # prepisivati DB_USERNAME/DB_PASSWORD — mysql image daje MYSQL_USER pun
+        # pristup na MYSQL_DATABASE, pa `homeos` može migrirati homeos_test.
         env:
           MYSQL_DATABASE: homeos_test
-          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_USER: homeos
+          MYSQL_PASSWORD: secret
+          MYSQL_ROOT_PASSWORD: secret
         ports:
           - 3306:3306
         options: >-
@@ -68,11 +73,12 @@ jobs:
             $env = file_get_contents(".env");
             $env = str_replace("DB_HOST=mysql", "DB_HOST=127.0.0.1", $env);
             $env = str_replace("DB_DATABASE=homeosdb", "DB_DATABASE=homeos_test", $env);
-            $env = str_replace("DB_USERNAME=homeos", "DB_USERNAME=root", $env);
             $env = str_replace("REDIS_HOST=redis", "REDIS_HOST=127.0.0.1", $env);
             $env = str_replace("MAIL_MAILER=resend", "MAIL_MAILER=array", $env);
             file_put_contents(".env", $env);
           '
+          # DB_USERNAME=homeos i DB_PASSWORD=secret iz .env.example se poklapaju sa
+          # mysql servisom iznad — ne diramo ih.
 
       - name: Run migrations
         run: php artisan migrate --force
