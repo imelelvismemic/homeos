@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: homeos_test
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, pdo_mysql, pdo_sqlite, redis, bcmath, intl, zip
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Copy .env
+        run: cp .env.example .env
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build front-end assets
+        run: npm run build
+
+      - name: Generate app key
+        run: php artisan key:generate
+
+      - name: Configure environment for CI
+        run: |
+          php -r '
+            $env = file_get_contents(".env");
+            $env = str_replace("DB_HOST=mysql", "DB_HOST=127.0.0.1", $env);
+            $env = str_replace("DB_DATABASE=homeosdb", "DB_DATABASE=homeos_test", $env);
+            $env = str_replace("DB_USERNAME=homeos", "DB_USERNAME=root", $env);
+            $env = str_replace("REDIS_HOST=redis", "REDIS_HOST=127.0.0.1", $env);
+            $env = str_replace("MAIL_MAILER=resend", "MAIL_MAILER=array", $env);
+            file_put_contents(".env", $env);
+          '
+
+      - name: Run migrations
+        run: php artisan migrate --force
+
+      - name: Lint (Pint)
+        run: vendor/bin/pint --test
+
+      - name: Test (Pest)
+        run: vendor/bin/pest

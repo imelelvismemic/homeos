@@ -134,5 +134,7 @@ primjer i (ako je moguće) kratak snimak/screenshot postupka.
 
 ## Status projekta
 
-[POPUNITI usput — trenutna faza iz ROADMAP.md, npr. "Faza 2 završena,
-Faza 3 u toku"]
+**Faza 0 završena** (Laravel 13 + Filament v3 skeleton, Docker Compose lokalni
+dev, `Household`/`HouseholdMember` modeli, Filament auth + tenant registracija
++ invite-member UI, GitHub Actions CI, Pest testovi) — čeka potvrdu prije
+Faze 0.5.

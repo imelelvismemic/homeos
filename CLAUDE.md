@@ -66,7 +66,7 @@ portove — umjesto toga:
   za sve ostale.
 - **Baza podataka je postojeći MariaDB na hostu** (`mariadbd` na
   `127.0.0.1:3306`, potvrđeno provjerom porta), NE kontejnerizovana baza
-  u produkciji — `homeos` baza i `homeosdb` korisnik su već kreirani tamo.
+  u produkciji — `homeosdb` baza i `homeos` korisnik su već kreirani tamo.
   Docker `docker-compose.prod.yml` stack (app + nginx + redis +
   queue-worker + scheduler) NEMA mysql servis; app kontejner se povezuje
   na hostovu bazu preko `host.docker.internal` (zahtijeva `extra_hosts:

@@ -79,7 +79,7 @@ zbog DNS propagacije i mogućih instalacionih problema:
 **Večeras (prije Dana 1):**
 - [x] **Docker Desktop instaliran** na Windows laptopu (WSL2 backend) —
   potrebno za lokalno pokretanje/testiranje `docker compose` prije deploya.
-- [ ] **Resend nalog kreiran**, domen dodat, SPF/DKIM DNS zapisi uneseni —
+- [x] **Resend nalog kreiran**, domen dodat, SPF/DKIM DNS zapisi uneseni —
   raditi večeras zbog propagacije, ne sutra ujutro uz ostatak DNS-a.
 - [x] **GitHub repo kreiran**, Claude Code ima pristup. (Provjeriti
   vidljivost — repo trenutno javan, sadrži nazive internih domena firme;
@@ -92,9 +92,9 @@ zbog DNS propagacije i mogućih instalacionih problema:
   sertifikat postavljen kroz Virtualmin.
 - [x] Apache proxy moduli (`proxy_module`, `proxy_http_module`) potvrđeni
   aktivni — nije trebala dodatna izmjena.
-- [x] Izolovan MySQL korisnik (`homeosdb`) i baza (`homeos`) kreirani,
+- [x] Izolovan MySQL korisnik (`homeos`) i baza (`homeosdb`) kreirani,
   pristup ograničen samo na tu bazu (vidi `DATA_MODEL.md` napomenu o
-  produkciji) — **provjeriti** `SHOW GRANTS FOR 'homeosdb'@'localhost';`
+  produkciji) — **provjeriti** `SHOW GRANTS FOR 'homeos'@'localhost';`
   da su prava zaista ograničena na `homeos.*`, ne `*.*`.
 - [x] Probni `index.html` dostupan na `homeos.imel.cloud` portu 80 i 443
   (potvrđeno — trenutno Virtualmin default placeholder stranica, što je
@@ -160,7 +160,7 @@ pristupom sada, ne nakon što je sve izgrađeno.
 3. Produkcijski `docker-compose.prod.yml` — Nginx (interni, bez SSL) +
    PHP-FPM + Redis + queue-worker + scheduler, sa restart policy i
    resource limits. **Bez MySQL kontejnera** — baza je već postojeći
-   MariaDB na hostu (`homeos` baza, `homeosdb` korisnik, potvrđeno na
+   MariaDB na hostu (`homeosdb` baza, `homeos` korisnik, potvrđeno na
    `127.0.0.1:3306`); app kontejner se povezuje preko
    `host.docker.internal` (`extra_hosts: host.docker.internal:
    host-gateway`). Nginx servis mapiran isključivo na `127.0.0.1:8091`

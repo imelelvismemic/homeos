@@ -1,0 +1,46 @@
+services:
+  app:
+    build:
+      target: dev
+    user: root
+    environment:
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - mailpit
+
+  queue-worker:
+    build:
+      target: dev
+    user: root
+    environment:
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - mailpit
+
+  scheduler:
+    build:
+      target: dev
+    user: root
+    environment:
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - mailpit
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:8025:8025"
+      - "127.0.0.1:1025:1025"

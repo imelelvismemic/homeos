@@ -161,7 +161,10 @@ APP_KEY=
 APP_DEBUG=true
 APP_TIMEZONE=Europe/Sarajevo
 APP_LOCALE=bs
-APP_URL=http://localhost
+APP_URL=http://localhost:8091
+# Mora se poklapati sa APP_INTERNAL_PORT niže — Laravel generiše apsolutne
+# URL-ove (redirect, reset lozinke...) iz APP_URL, pa bez porta linkovi ne bi
+# vodili na stvarni interni port na kom Nginx sluša.
 # Produkcija: APP_URL=https://homeos.imel.cloud (postavlja se u deploy.yml / server .env, ne u repo)
 
 DB_CONNECTION=mysql
@@ -172,8 +175,8 @@ DB_HOST=mysql
 # servisu da kontejner uopšte može doći do hostovog loopback-a. Lokalni dev
 # i dalje koristi kontejnerizovan MySQL servis (DB_HOST=mysql).
 DB_PORT=3306
-DB_DATABASE=homeos
-DB_USERNAME=homeosdb
+DB_DATABASE=homeosdb
+DB_USERNAME=homeos
 DB_PASSWORD=
 
 REDIS_HOST=redis
@@ -208,7 +211,7 @@ APP_INTERNAL_PORT=8091
 **Napomena o produkciji:** `DB_DATABASE`/`DB_USERNAME` u produkciji moraju
 biti potpuno odvojeni od baza koje već koriste postojeći produkcijski
 vhost-ovi (interna lista, ne navodi se u ovom javnom repou) na istom
-Contabo serveru — nov, izolovan MySQL user sa pristupom samo `homeos`
+Contabo serveru — nov, izolovan MySQL user sa pristupom samo `homeosdb`
 bazi (vidi CLAUDE.md tačku 10). Baza je već kreirana na postojećem
 MariaDB procesu na hostu (potvrđeno: `mariadbd` sluša na
 `127.0.0.1:3306`) — Docker stack u produkciji NEMA sopstveni MySQL
