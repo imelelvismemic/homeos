@@ -1,0 +1,122 @@
+# Produkcijski stack za homeos.imel.cloud (vidi CLAUDE.md tačku 3a, ROADMAP Faza 0.5).
+#
+# Pokreće se EKSPLICITNO: `docker compose -f docker-compose.prod.yml up -d --build`
+# — tako se docker-compose.override.yml (lokalni dev) NE učitava.
+#
+# Ključne razlike od lokalnog dev-a:
+#  - NEMA mysql servisa: baza je postojeći MariaDB na hostu (127.0.0.1:3306),
+#    kontejner mu pristupa preko host.docker.internal (extra_hosts niže).
+#  - Koristi `runtime` build target (bez Xdebug-a, bez bind mounta izvornog koda).
+#  - Nginx je mapiran ISKLJUČIVO na 127.0.0.1:8091 — nikad javni port. SSL i javne
+#    portove (80/443) drži Apache/Virtualmin, koji radi reverse proxy ka ovom portu.
+#  - APP_KEY, DB kredencijali, RESEND_KEY i APP_URL dolaze iz server .env fajla
+#    (env_file niže) — nikad iz repoa. APP_KEY se postavlja JEDNOM ručno; produkcija
+#    ga ne regeneriše (RUN_MIGRATIONS=false → entrypoint ne dira ključ).
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      RUN_MIGRATIONS: "false"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "9000"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${APP_INTERNAL_PORT:-8091}:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      # Server git checkout sadrži commitane statičke assete (public/css|js/filament).
+      # Panel ne koristi Vite /build u produkciji (uklonili smo ->viteTheme() u Fazi 0),
+      # pa je bind mount checkout-a dovoljan; app kontejner izvršava public/index.php iz
+      # svog image-a. Serviranje asseta se revidira u Fazi 8 ako moduli uvedu Vite.
+      - ./public:/var/www/html/public:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis-data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  queue-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    restart: unless-stopped
+    command: php artisan queue:work redis --tries=3 --backoff=3 --max-time=3600
+    env_file: .env
+    environment:
+      RUN_MIGRATIONS: "false"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    restart: unless-stopped
+    command: php artisan schedule:work
+    env_file: .env
+    environment:
+      RUN_MIGRATIONS: "false"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+volumes:
+  redis-data:

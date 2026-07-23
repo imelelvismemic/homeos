@@ -1,0 +1,61 @@
+name: Deploy
+
+# Deploy tek NAKON što CI (lint + testovi) prođe zeleno na main — tako main
+# ostaje "uvijek spreman za produkciju" (CLAUDE.md §17). Nikad se ne deploya
+# crveni build.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Deploy preko SSH-a na Contabo server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_SSH_HOST }}
+          username: ${{ secrets.DEPLOY_SSH_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+
+            echo "==> git pull"
+            git pull --ff-only origin main
+
+            echo "==> build + up (produkcijski stack, interni port 127.0.0.1:8091)"
+            docker compose -f docker-compose.prod.yml up -d --build
+
+            echo "==> čekam da app kontejner postane healthy"
+            cid=$(docker compose -f docker-compose.prod.yml ps -q app)
+            for i in $(seq 1 30); do
+              status=$(docker inspect --format '{{.State.Health.Status}}' "$cid" 2>/dev/null || echo starting)
+              echo "  app health: $status"
+              [ "$status" = "healthy" ] && break
+              [ "$i" = "30" ] && { echo "app nije postao healthy"; docker compose -f docker-compose.prod.yml logs --tail 50 app; exit 1; }
+              sleep 5
+            done
+
+            echo "==> migracije"
+            docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
+
+            echo "==> health-check na internom portu (ne preko javnog URL-a / Apache-a)"
+            for i in $(seq 1 12); do
+              code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8091/login || true)
+              echo "  http $code"
+              [ "$code" = "200" ] && { echo "deploy OK"; exit 0; }
+              sleep 5
+            done
+            echo "health-check nije uspio"
+            docker compose -f docker-compose.prod.yml logs --tail 50
+            exit 1
