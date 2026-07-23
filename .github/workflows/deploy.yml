@@ -8,6 +8,9 @@ on:
     workflows: ["CI"]
     types: [completed]
     branches: [main]
+  # Ručno pokretanje iz GitHub Actions UI (Deploy → Run workflow) — korisno za
+  # redeploy bez novog commita ili kad treba ponoviti nakon server izmjene.
+  workflow_dispatch:
 
 concurrency:
   group: production-deploy
@@ -16,7 +19,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # Ručni workflow_dispatch nema workflow_run kontekst — pusti ga; inače deploy
+    # samo ako je CI prošao zeleno.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Deploy preko SSH-a na Contabo server
