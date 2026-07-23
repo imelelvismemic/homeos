@@ -166,6 +166,11 @@ APP_URL=http://localhost
 
 DB_CONNECTION=mysql
 DB_HOST=mysql
+# Produkcija: DB_HOST=host.docker.internal — baza je VEĆ POSTOJEĆI MariaDB
+# na hostu (127.0.0.1:3306), ne kontejnerizovana baza. docker-compose.prod.yml
+# mora imati "extra_hosts: - host.docker.internal:host-gateway" na app
+# servisu da kontejner uopšte može doći do hostovog loopback-a. Lokalni dev
+# i dalje koristi kontejnerizovan MySQL servis (DB_HOST=mysql).
 DB_PORT=3306
 DB_DATABASE=homeos
 DB_USERNAME=homeosdb
@@ -204,7 +209,10 @@ APP_INTERNAL_PORT=8091
 biti potpuno odvojeni od baza koje već koriste postojeći produkcijski
 vhost-ovi (interna lista, ne navodi se u ovom javnom repou) na istom
 Contabo serveru — nov, izolovan MySQL user sa pristupom samo `homeos`
-bazi (vidi CLAUDE.md tačku 10).
+bazi (vidi CLAUDE.md tačku 10). Baza je već kreirana na postojećem
+MariaDB procesu na hostu (potvrđeno: `mariadbd` sluša na
+`127.0.0.1:3306`) — Docker stack u produkciji NEMA sopstveni MySQL
+kontejner, povezuje se na hostovu bazu preko `host.docker.internal`.
 
 ---
 

@@ -99,9 +99,12 @@ zbog DNS propagacije i mogućih instalacionih problema:
 - [x] Probni `index.html` dostupan na `homeos.imel.cloud` portu 80 i 443
   (potvrđeno — trenutno Virtualmin default placeholder stranica, što je
   dovoljno da se potvrdi da DNS/SSL/webserver rade)
-- [ ] Provjeriti koji interni (loopback) portovi su već zauzeti na serveru
-  (`sudo ss -tlnp | grep 127.0.0.1`) da se izabere slobodan port za Docker
-  stack (vidi `CLAUDE.md` tačku 3a).
+- [x] Provjeriti koji interni (loopback) portovi su već zauzeti na serveru
+  (`sudo ss -tlnp | grep 127.0.0.1`) — potvrđeno: **port 8091 slobodan**,
+  koristi se za Docker app stack. Usput potvrđeno: postojeći MariaDB već
+  sluša na `127.0.0.1:3306` (isti proces na kom je kreirana `homeos` baza)
+  — produkcija se na njega povezuje direktno, bez zasebnog MySQL
+  kontejnera (vidi `CLAUDE.md` tačku 3a i `DATA_MODEL.md`).
 
 Kad je ova lista gotova, Faza 0.5 se svodi na povezivanje ovih već
 postojećih komada (Docker stack na internom portu + Apache reverse proxy
@@ -155,15 +158,18 @@ pristupom sada, ne nakon što je sve izgrađeno.
    podesiti SPF/DKIM DNS zapise (vidi `CLAUDE.md` tačku 3) — bez ovoga
    se email notifikacije neće moći pouzdano testirati u produkciji.
 3. Produkcijski `docker-compose.prod.yml` — Nginx (interni, bez SSL) +
-   PHP-FPM + MySQL + Redis + queue-worker + scheduler, sa restart policy i
-   resource limits. Nginx servis mapiran isključivo na
-   `127.0.0.1:<interni-port>` (vidi `CLAUDE.md` tačku 3a) — nikad na javni
-   port, jer Apache/Virtualmin već drži 80/443 za sve domene na serveru.
-   Odvojen MySQL kontejner ili odvojena baza/user u postojećem MySQL-u.
+   PHP-FPM + Redis + queue-worker + scheduler, sa restart policy i
+   resource limits. **Bez MySQL kontejnera** — baza je već postojeći
+   MariaDB na hostu (`homeos` baza, `homeosdb` korisnik, potvrđeno na
+   `127.0.0.1:3306`); app kontejner se povezuje preko
+   `host.docker.internal` (`extra_hosts: host.docker.internal:
+   host-gateway`). Nginx servis mapiran isključivo na `127.0.0.1:8091`
+   (port potvrđen slobodan, vidi Preduslove) — nikad na javni port, jer
+   Apache/Virtualmin već drži 80/443 za sve domene na serveru.
 4. Apache reverse proxy direktiva za `homeos.imel.cloud` dodana kroz
-   Virtualmin "Edit Directives" (ProxyPass/ProxyPassReverse ka internom
-   portu iz koraka 3) — ovo je jedini korak koji dira postojeću Virtualmin
-   konfiguraciju, i radi se pažljivo/ručno, ne automatizovano.
+   Virtualmin "Edit Directives" (`ProxyPass`/`ProxyPassReverse` ka
+   `http://127.0.0.1:8091/`) — ovo je jedini korak koji dira postojeću
+   Virtualmin konfiguraciju, i radi se pažljivo/ručno, ne automatizovano.
 5. GitHub Actions `deploy.yml` (osnovna verzija):
    - build → SSH na Contabo server → `git pull` →
      `docker compose -f docker-compose.prod.yml up -d --build` →

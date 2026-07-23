@@ -64,12 +64,19 @@ portove — umjesto toga:
   administriran ručno (izvan Claude Code-a, vidi `ROADMAP.md` Preduslove).
   Virtualmin/Apache drži SSL sertifikat i javne portove za tu domenu, kao
   za sve ostale.
-- Docker `docker-compose` stack (app + nginx + mysql + redis +
-  queue-worker + scheduler) **nikad** ne mapira port na `0.0.0.0:80` ili
-  `0.0.0.0:443` — jedini eksponirani port je interni web servis (Nginx pred
-  PHP-FPM), mapiran isključivo na loopback, npr. `127.0.0.1:8091:80`.
-  Konkretan broj porta se bira nakon provjere da nije već zauzet
-  (`sudo ss -tlnp | grep 127.0.0.1`) — ne pretpostavljati slobodan port.
+- **Baza podataka je postojeći MariaDB na hostu** (`mariadbd` na
+  `127.0.0.1:3306`, potvrđeno provjerom porta), NE kontejnerizovana baza
+  u produkciji — `homeos` baza i `homeosdb` korisnik su već kreirani tamo.
+  Docker `docker-compose.prod.yml` stack (app + nginx + redis +
+  queue-worker + scheduler) NEMA mysql servis; app kontejner se povezuje
+  na hostovu bazu preko `host.docker.internal` (zahtijeva `extra_hosts:
+  host.docker.internal:host-gateway` na app servisu). Lokalni dev
+  (`docker-compose.yml`) i dalje ima svoj kontejnerizovan MySQL servis —
+  razlika postoji samo u produkciji.
+- Docker stack **nikad** ne mapira port na `0.0.0.0:80` ili `0.0.0.0:443`
+  — jedini eksponirani port je interni web servis (Nginx pred PHP-FPM),
+  mapiran isključivo na loopback: **`127.0.0.1:8091:80`** (port 8091
+  potvrđen slobodan provjerom `ss -tlnp`).
 - Apache vhost za `homeos.imel.cloud` je reverse proxy ka tom internom
   portu (`ProxyPass`/`ProxyPassReverse` na `http://127.0.0.1:8091/`).
   Ovo se dodaje kroz Virtualmin "Website Options → Edit Directives" (ili
