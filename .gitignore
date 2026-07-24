@@ -25,3 +25,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Vite 8 (rolldown) ima platform-specifične native binarke; commitani lock
+# uvijek fali binarku za drugu platformu (npm#4828). Koristimo npm install.
+/package-lock.json

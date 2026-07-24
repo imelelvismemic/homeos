@@ -59,10 +59,10 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Install Node dependencies
-        # `npm install`, ne `npm ci`: Vite 8 (rolldown) ima platform-specifične
-        # native binarke, a package-lock.json je generisan na Alpine (musl) pa
-        # nema resolved glibc (gnu) unos — `npm ci` bi na Ubuntu runneru pao. npm
-        # install razriješi ispravnu binarku za platformu. (isto u Dockerfile-u)
+        # npm install bez commitanog lock-a: Vite 8 (rolldown) ima platform-
+        # specifične native binarke, a bilo koji commitani lock fali binarku za
+        # drugu platformu (npm#4828) — pucalo bi na Ubuntu runneru. npm install
+        # razriješi ispravnu binarku za platformu (gnu ovdje). (isto u Dockerfile-u)
         run: npm install --no-audit --no-fund
 
       - name: Build front-end assets
