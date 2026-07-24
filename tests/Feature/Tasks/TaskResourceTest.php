@@ -83,6 +83,45 @@ it('overdue filter shows only past-due, incomplete tasks', function () {
         ->assertCanNotSeeTableRecords([$future, $noDue, $doneButPast]);
 });
 
+it('table search matches title, assignee name, and tag names', function () {
+    [$household, $owner, $members] = makeHousehold(extraMembers: 1);
+    test()->actingAs($owner->user);
+    Filament::setTenant($household);
+    $assignee = $members[0];
+
+    $mk = fn (string $title, ?int $assignedTo = null) => Task::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => $title,
+        'priority' => Priority::Medium,
+        'status' => TaskStatus::Todo,
+        'assigned_to' => $assignedTo,
+    ]);
+
+    $byTitle = $mk('Kupiti mlijeko');
+    $byAssignee = $mk('Nevezani naslov', $assignee->id);
+    $byTag = $mk('Treći zadatak');
+    $byTag->tag(['hitno-oznaka']);
+
+    // Po imenu odgovorne osobe
+    Livewire::test(ListTasks::class)
+        ->searchTable($assignee->user->name)
+        ->assertCanSeeTableRecords([$byAssignee])
+        ->assertCanNotSeeTableRecords([$byTitle, $byTag]);
+
+    // Po nazivu oznake
+    Livewire::test(ListTasks::class)
+        ->searchTable('hitno-oznaka')
+        ->assertCanSeeTableRecords([$byTag])
+        ->assertCanNotSeeTableRecords([$byTitle, $byAssignee]);
+
+    // Po naslovu
+    Livewire::test(ListTasks::class)
+        ->searchTable('mlijeko')
+        ->assertCanSeeTableRecords([$byTitle])
+        ->assertCanNotSeeTableRecords([$byAssignee, $byTag]);
+});
+
 it('never shows a task to a member of another household', function () {
     [$householdA, $ownerA] = makeHousehold();
     [$householdB, $ownerB] = makeHousehold();

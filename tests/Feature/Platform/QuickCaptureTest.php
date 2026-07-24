@@ -1,9 +1,8 @@
 <?php
 
-use App\Platform\Filament\QuickCapture;
 use App\Platform\QuickCapture\QuickCaptureRegistry;
 use Filament\Facades\Filament;
-use Livewire\Livewire;
+use Illuminate\Support\Str;
 
 it('has no capture options when no modules are registered', function () {
     config()->set('homeos-apps', []);
@@ -32,10 +31,10 @@ it('exposes a capture option registered by a module', function () {
     expect($items->first()['url'])->toBe('https://homeos.test/tasks/create');
 });
 
-it('resolves capture hrefs (with tenant segment) at mount so they survive tenant-less updates', function () {
-    // Route-name url za panel rutu koja traži {tenant}. Prije ispravke,
-    // href se računao pri otvaranju modala (Livewire update bez tenant
-    // konteksta) i ispadao bez {tenant} segmenta → 404.
+it('resolves a panel-route capture href with the tenant segment at page render', function () {
+    // "Brzo dodaj" je običan dropdown linkova renderovan u topbar render hooku
+    // (bez Livewire modala) — href se razrješava dok je tenant kontekst dostupan.
+    // Ranije je route() padao bez {tenant} segmenta → 404/419 na /livewire/update.
     config()->set('homeos-apps', [
         'tasks' => [
             'enabled' => true,
@@ -53,8 +52,19 @@ it('resolves capture hrefs (with tenant segment) at mount so they survive tenant
     test()->actingAs($owner->user);
     Filament::setTenant($household);
 
-    $items = Livewire::test(QuickCapture::class)->get('items');
+    // Replicira logiku render hooka (HomePanelProvider).
+    $tenant = Filament::getTenant();
+    $items = app(QuickCaptureRegistry::class)->items()
+        ->map(function (array $item) use ($tenant): array {
+            $item['href'] = Str::startsWith($item['url'], ['http', '/'])
+                ? $item['url']
+                : route($item['url'], $tenant ? ['tenant' => $tenant] : []);
 
-    expect($items)->toHaveCount(1);
-    expect($items[0]['href'])->toContain("/{$household->getRouteKey()}/tasks/create");
+            return $item;
+        });
+
+    $html = view('filament.platform.quick-capture', ['items' => $items])->render();
+
+    expect($html)->toContain("/{$household->getRouteKey()}/tasks/create");
+    expect($html)->toContain('Novi zadatak');
 });

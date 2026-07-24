@@ -170,13 +170,23 @@ class TaskResource extends Resource
                 TextColumn::make('assignee.user.name')
                     ->label(__('tasks.fields.assigned_to'))
                     ->toggleable()
+                    // Pretraga tabele po imenu/prezimenu odgovorne osobe.
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->orWhereHas(
+                        'assignee.user',
+                        fn (Builder $q) => $q->where('name', 'like', "%{$search}%"),
+                    ))
                     ->placeholder('—'),
 
                 TextColumn::make('tags.name')
                     ->label(__('tasks.fields.tags'))
                     ->badge()
                     ->separator(',')
-                    ->toggleable(),
+                    ->toggleable()
+                    // Pretraga tabele po nazivima dodijeljenih oznaka.
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->orWhereHas(
+                        'tags',
+                        fn (Builder $q) => $q->where('name', 'like', "%{$search}%"),
+                    )),
             ])
             ->defaultSort('due_date')
             ->filters([

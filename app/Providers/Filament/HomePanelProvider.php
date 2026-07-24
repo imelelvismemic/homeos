@@ -5,6 +5,8 @@ namespace App\Providers\Filament;
 use App\Platform\Filament\Pages\Dashboard;
 use App\Platform\Filament\Pages\RegisterHousehold;
 use App\Platform\Models\Household;
+use App\Platform\QuickCapture\QuickCaptureRegistry;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -18,7 +20,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class HomePanelProvider extends PanelProvider
@@ -57,9 +59,26 @@ class HomePanelProvider extends PanelProvider
             // config/homeos-apps.php), ne default Filament promo widgeti.
             ->widgets([])
             // Quick capture launcher u topbaru — dostupan sa svake stranice.
+            // Običan Filament dropdown linkova (bez Livewire komponente/modala):
+            // otvara se client-side (Alpine), pa nema /livewire/update zahtjeva
+            // koji je van panel tenant middleware-a znao vraćati 419/404. URL-ovi
+            // se razrješavaju ovdje, pri renderu stranice, dok je tenant dostupan.
             ->renderHook(
                 PanelsRenderHook::TOPBAR_END,
-                fn (): string => Blade::render('@livewire(\App\Platform\Filament\QuickCapture::class)'),
+                function (): string {
+                    $tenant = Filament::getTenant();
+
+                    $items = app(QuickCaptureRegistry::class)->items()
+                        ->map(function (array $item) use ($tenant): array {
+                            $item['href'] = Str::startsWith($item['url'], ['http', '/'])
+                                ? $item['url']
+                                : route($item['url'], $tenant ? ['tenant' => $tenant] : []);
+
+                            return $item;
+                        });
+
+                    return view('filament.platform.quick-capture', ['items' => $items])->render();
+                },
             )
             ->middleware([
                 EncryptCookies::class,
