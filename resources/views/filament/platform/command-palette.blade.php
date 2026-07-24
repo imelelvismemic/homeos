@@ -20,7 +20,11 @@
             if (query.length < 2) { this.groups = []; this.loading = false; return; }
             this.loading = true;
             try {
-                const res = await fetch(this.url + '?q=' + encodeURIComponent(query), {
+                // this.url već sadrži ?h=... — koristi URL API da ispravno doda q
+                // (ranije je '?q=' pravio dvostruki '?' pa q nije parsiran → prazno).
+                const endpoint = new URL(this.url, window.location.origin);
+                endpoint.searchParams.set('q', query);
+                const res = await fetch(endpoint, {
                     headers: { 'Accept': 'application/json' },
                     credentials: 'same-origin',
                 });
