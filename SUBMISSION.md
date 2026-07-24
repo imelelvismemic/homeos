@@ -183,5 +183,26 @@ in-app + email obavještenje (uz poštovanje preferenci) — bez ijedne linije k
 u modulu. Testirano: 18 testova / 63 assertiona; CI zeleno; deployano na
 produkciju (aditivne migracije).
 
-Sljedeće: **Faza 2** (Dashboard — dizajn token sistem, "Today" prikaz, widget
-agregacija, quick capture) — čeka potvrdu prije početka.
+**Faza 2 završena** — Dashboard, custom vizuelni identitet i quick capture
+(`CLAUDE.md` §6):
+- **Dizajn token sistem** (zaključan, izbor vlasnika): paleta "Topli dom"
+  (terakota primarna, topli neutralni tonovi, semantic boje), Fraunces (naslovi)
+  + Inter (tekst). Riješena i Filament v3 / Tailwind v3 tema (odgođena iz Faze 0):
+  zaseban Tailwind v3 toolchain kompajlovan u Docker build koraku.
+- **"Today" dashboard** sa signature elementom — dnevni-brief hero (pozdrav
+  ovisno o dobu dana, datum na bosanskom, jednolinijski sažetak) iznad widget
+  mreže; renderuje se čisto i sa 0 modula.
+- **Widget agregacija** — `DashboardWidgetRegistry` čita `dashboard_widget` iz
+  `config/homeos-apps.php` (bez upita u tuđe tabele).
+- **Quick capture** — proširiv launcher u topbaru (render hook + registry),
+  dostupan sa svake stranice; graceful prazno stanje.
+- Bosanski svuda, pristupačnost (vidljiv focus, `prefers-reduced-motion`).
+
+Testirano: 24 testa / 78 assertiona (uklj. dashboard sa 0 modula); Pint čist;
+deployano i vizuelno potvrđeno na produkciji. Usput riješen i cross-platform
+build (Vite 8 rolldown native binarke, npm#4828) i serviranje kompajliranih
+asseta u produkciji.
+
+Sljedeće: **Faza 3** (Zadaci + Kanban + Kalendar — glavni dokaz "sve je
+povezano", i izdvajanje reusable skilla za nove module) — čeka potvrdu prije
+početka.
