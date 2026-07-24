@@ -1,12 +1,27 @@
-/*
- * Placeholder za custom Filament temu (Faza 0 tačka 9 — build pipeline mora
- * postojati od početka). Trenutno se NE učitava u panel: Filament v3 zahtijeva
- * Tailwind v3, a projekt je na Tailwind v4, pa se prava tema (token sistem iz
- * CLAUDE.md tačke 6 + ->viteTheme(...) u HomePanelProvider) postavlja u Fazi 2
- * uz odgovarajući Tailwind v3 toolchain. Do tada panel koristi Filament-ov
- * ispravan pre-kompajlirani CSS.
- *
- * Fajl je namjerno minimalan i validan da `npm run build` (Docker build korak)
- * prolazi zeleno.
- */
-@import 'tailwindcss';
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import url('https://fonts.bunny.net/css?family=fraunces:400,500,600,700');
+
+@config './tailwind.config.js';
+
+@layer base {
+    /*
+     * Display font (Fraunces) — suzdržano, samo glavni naslovi i hero
+     * (CLAUDE.md §6). Body font (Inter) postavlja panel preko ->font('Inter').
+     */
+    .fi-header-heading,
+    .homeos-display {
+        font-family: 'Fraunces', ui-serif, Georgia, serif;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+
+    /* Pristupačnost: vidljiv keyboard focus + poštovanje reduced-motion. */
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}

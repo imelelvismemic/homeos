@@ -1,20 +1,14 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
-import { bunny } from 'laravel-vite-plugin/fonts';
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js', 'resources/css/filament/app/theme.css'],
+            // Filament custom tema (Tailwind v3, kompajlirana preko PostCSS-a —
+            // vidi postcss.config.js). app.js ostaje za eventualni ne-Filament JS.
+            input: ['resources/js/app.js', 'resources/css/filament/app/theme.css'],
             refresh: true,
-            fonts: [
-                bunny('Instrument Sans', {
-                    weights: [400, 500, 600],
-                }),
-            ],
         }),
-        tailwindcss(),
     ],
     server: {
         watch: {

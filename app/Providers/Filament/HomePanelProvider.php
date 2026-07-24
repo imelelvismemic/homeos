@@ -2,22 +2,23 @@
 
 namespace App\Providers\Filament;
 
+use App\Platform\Filament\Pages\Dashboard;
 use App\Platform\Filament\Pages\RegisterHousehold;
 use App\Platform\Models\Household;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class HomePanelProvider extends PanelProvider
@@ -33,23 +34,33 @@ class HomePanelProvider extends PanelProvider
             ->passwordReset()
             ->tenant(Household::class)
             ->tenantRegistration(RegisterHousehold::class)
-            // Custom Filament tema (Tailwind v3 + token sistem iz CLAUDE.md tačke 6)
-            // se aktivira u Fazi 2 preko ->viteTheme(...). Do tada panel koristi
-            // Filament-ov ispravan pre-kompajlirani CSS. Build scaffold za temu
-            // (resources/css/filament/app/*) već postoji radi Faza 0 tačke 9.
+            // Custom tema "Topli dom" (CLAUDE.md §6). Paleta kroz ->colors()
+            // (Filament generiše CSS varijable); Fraunces/Inter i signature
+            // stilovi u resources/css/filament/app/theme.css (Tailwind v3).
+            ->viteTheme('resources/css/filament/app/theme.css')
+            ->font('Inter')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::hex('#BF6A44'), // terakota
+                'gray' => Color::Stone,             // topli neutralni tonovi (krem)
+                'success' => Color::hex('#4E8D5B'),
+                'warning' => Color::hex('#D99A3C'),
+                'danger' => Color::hex('#B23B2E'),
+                'info' => Color::hex('#3E7C8C'),
             ])
             ->discoverResources(in: app_path('Platform/Filament/Resources'), for: 'App\\Platform\\Filament\\Resources')
             ->discoverPages(in: app_path('Platform/Filament/Pages'), for: 'App\\Platform\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Platform/Filament/Widgets'), for: 'App\\Platform\\Filament\\Widgets')
-            ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
-            ])
+            // Dashboard widgete kontroliše naš Dashboard (registry iz
+            // config/homeos-apps.php), ne default Filament promo widgeti.
+            ->widgets([])
+            // Quick capture launcher u topbaru — dostupan sa svake stranice.
+            ->renderHook(
+                PanelsRenderHook::TOPBAR_END,
+                fn (): string => Blade::render('@livewire(\App\Platform\Filament\QuickCapture::class)'),
+            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

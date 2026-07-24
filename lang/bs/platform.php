@@ -33,6 +33,25 @@ return [
         'empty_state_description' => 'Pozovite prvog člana svog domaćinstva da biste počeli dijeliti obaveze.',
     ],
 
+    'dashboard' => [
+        'title' => 'Danas',
+        'greeting' => [
+            'morning' => 'Dobro jutro, :name',
+            'day' => 'Dobar dan, :name',
+            'evening' => 'Dobro veče, :name',
+        ],
+        'summary_prefix' => 'Danas:',
+        'empty_summary' => 'Danas nema ništa hitno — uživajte u mirnom danu kod kuće.',
+        'no_widgets' => 'Još nema instaliranih aplikacija. Kako dodajete module (zadaci, kalendar, računi...), njihovi sažeci se pojavljuju ovdje.',
+    ],
+
+    'quick_capture' => [
+        'button' => 'Brzo dodaj',
+        'heading' => 'Šta želite dodati?',
+        'close' => 'Zatvori',
+        'empty' => 'Još nema opcija za brzo dodavanje. Kako instalirate module (zadaci, bilješke, računi...), pojavljuju se ovdje.',
+    ],
+
     'visibility' => [
         'private' => 'Privatno',
         'household' => 'Cijelo domaćinstvo',
