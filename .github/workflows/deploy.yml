@@ -51,6 +51,13 @@ jobs:
               sleep 5
             done
 
+            echo "==> kopiram kompajlirane asete (public/build) iz image-a za Nginx"
+            # public/build je gitignoran i postoji samo u app image-u (build korak).
+            # Nginx servira host checkout ./public, pa mu build treba izvučen ovdje —
+            # inače Filament tema (->viteTheme) vraća 404 i stranica je nestilizovana.
+            rm -rf public/build
+            docker compose -f docker-compose.prod.yml cp app:/var/www/html/public/build public/build
+
             echo "==> migracije"
             docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
 
