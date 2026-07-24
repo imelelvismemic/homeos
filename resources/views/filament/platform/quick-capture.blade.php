@@ -1,8 +1,11 @@
 {{-- "Brzo dodaj" (ROADMAP Faza 2.4). Alpine modal nad trenutnom stranicom
      (zamagljena pozadina): korisnik izabere tip i doda minimalne podatke; snimi
      šalje fetch POST na /brzo/{key}, modal se zatvori i korisnik ostaje gdje je
-     bio (bez navigacije, bez Livewire → bez 419). Tipovi/polja dolaze iz
-     QuickCaptureRegistry; snimanje ide kroz registrovani handler. --}}
+     bio (bez navigacije, bez Livewire → bez 419). Tipovi/polja iz
+     QuickCaptureRegistry; ikone su native Filament ikone (renderovane server-side).
+     Datum koristi flatpickr (d.m.Y H:i, 24h) radi PRAVILA.md §6. --}}
+@vite('resources/js/quick-capture.js')
+
 <div
     x-data="{
         open: false,
@@ -23,7 +26,21 @@
             this.form = {};
             this.errors = {};
             this.saved = false;
-            this.$nextTick(() => this.$root.querySelector('[data-qc-field]')?.focus());
+            this.$nextTick(() => {
+                this.$root.querySelectorAll('[data-qc-datetime]').forEach((el) => {
+                    if (el._flatpickr || ! window.flatpickr) return;
+                    const name = el.getAttribute('data-qc-datetime');
+                    window.flatpickr(el, {
+                        enableTime: true,
+                        time_24hr: true,
+                        dateFormat: 'Y-m-d H:i',
+                        altInput: true,
+                        altFormat: 'd.m.Y H:i',
+                        onChange: (dates, str) => { this.form[name] = str; },
+                    });
+                });
+                this.$root.querySelector('[data-qc-field]')?.focus();
+            });
         },
         async submit() {
             if (this.saving) return;
@@ -81,28 +98,26 @@
                 </div>
 
                 <div class="p-4">
-                    {{-- Izbor tipa --}}
-                    <template x-if="! activeItem">
-                        <div>
-                            <template x-if="items.length === 0">
-                                <p class="py-4 text-center text-sm text-gray-500 dark:text-gray-400">{{ __('platform.quick_capture.empty') }}</p>
-                            </template>
-                            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                                <template x-for="item in items" :key="item.key">
-                                    <button
-                                        type="button"
-                                        x-on:click="pick(item.key)"
-                                        class="flex items-center gap-3 rounded-xl border border-gray-200 p-4 text-start transition hover:border-primary-500 hover:bg-primary-50 dark:border-gray-700 dark:hover:bg-primary-500/10"
-                                    >
-                                        <span class="font-medium text-gray-950 dark:text-white" x-text="item.label"></span>
-                                    </button>
-                                </template>
-                            </div>
-                        </div>
-                    </template>
+                    {{-- Izbor tipa — dugmad renderovana server-side radi native ikona (iz registryja). --}}
+                    <div x-show="activeKey === null">
+                        @forelse ($items as $item)
+                            <button
+                                type="button"
+                                x-on:click="pick(@js($item['key']))"
+                                class="mb-2 flex w-full items-center gap-3 rounded-xl border border-gray-200 p-4 text-start transition hover:border-primary-500 hover:bg-primary-50 dark:border-gray-700 dark:hover:bg-primary-500/10"
+                            >
+                                @if ($item['icon'])
+                                    <x-filament::icon :icon="$item['icon']" class="h-6 w-6 shrink-0 text-primary-600 dark:text-primary-400" />
+                                @endif
+                                <span class="font-medium text-gray-950 dark:text-white">{{ $item['label'] }}</span>
+                            </button>
+                        @empty
+                            <p class="py-4 text-center text-sm text-gray-500 dark:text-gray-400">{{ __('platform.quick_capture.empty') }}</p>
+                        @endforelse
+                    </div>
 
                     {{-- Forma izabranog tipa --}}
-                    <template x-if="activeItem">
+                    <template x-if="activeKey !== null">
                         <form x-on:submit.prevent="submit()" class="space-y-4">
                             <template x-for="(field, index) in activeItem.fields" :key="field.name">
                                 <div>
@@ -118,9 +133,10 @@
                                     </template>
                                     <template x-if="field.type === 'datetime'">
                                         <input
-                                            type="datetime-local"
+                                            type="text"
                                             data-qc-field
-                                            x-model="form[field.name]"
+                                            x-bind:data-qc-datetime="field.name"
+                                            placeholder="dd.mm.gggg ss:mm"
                                             class="block w-full rounded-lg border-none bg-white text-sm text-gray-950 shadow-sm ring-1 ring-gray-950/10 focus:ring-2 focus:ring-primary-500 dark:bg-white/5 dark:text-white dark:ring-white/20"
                                         />
                                     </template>
@@ -149,7 +165,7 @@
                                 </button>
                                 <div class="flex items-center gap-2">
                                     <span x-show="saved" class="text-sm font-medium text-success-600 dark:text-success-400">{{ __('platform.quick_capture.saved') }}</span>
-                                    <x-filament::button type="submit" size="sm" color="primary" x-bind:disabled="saving" tag="button">
+                                    <x-filament::button type="submit" size="sm" color="primary" x-bind:disabled="saving">
                                         {{ __('platform.quick_capture.save') }}
                                     </x-filament::button>
                                 </div>
