@@ -33,4 +33,17 @@ return [
         'empty_state_description' => 'Pozovite prvog člana svog domaćinstva da biste počeli dijeliti obaveze.',
     ],
 
+    'visibility' => [
+        'private' => 'Privatno',
+        'household' => 'Cijelo domaćinstvo',
+        'specific' => 'Određeni članovi',
+    ],
+
+    'notifications' => [
+        'shared_with_you' => [
+            'subject' => 'Nešto je podijeljeno sa vama',
+            'line' => 'Podijeljeno je sa vama: :title',
+        ],
+    ],
+
 ];

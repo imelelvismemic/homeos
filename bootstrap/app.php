@@ -1,5 +1,7 @@
 <?php
 
+use App\Platform\Scheduling\ModuleSchedule;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -11,6 +13,18 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    // Event/Listener auto-discovery (CLAUDE.md §9): Laravel skenira ove foldere,
+    // mapira listener po tipu u handle() i registruje ga — modul dodaje listener
+    // u svoj Listeners/ folder i reaguje na tuđe evente bez diranja core-a.
+    ->withEvents(discover: [
+        __DIR__.'/../app/Platform/Listeners',
+        ...(glob(__DIR__.'/../app/Modules/*/Listeners', GLOB_ONLYDIR) ?: []),
+    ])
+    // Centralni Scheduler (ROADMAP Faza 1.4): modul dodaje periodične zadatke
+    // preko app/Modules/<Ime>/routes/schedule.php — bez diranja core-a.
+    ->withSchedule(function (Schedule $schedule): void {
+        ModuleSchedule::register($schedule, ModuleSchedule::moduleScheduleFiles());
+    })
     ->withMiddleware(function (Middleware $middleware): void {
         // Iza lanca Apache (SSL terminacija) → Nginx → PHP-FPM (CLAUDE.md §3a).
         // Bez ovoga Laravel vidi interni http saobraćaj i generiše http redirect
