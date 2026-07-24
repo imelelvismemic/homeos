@@ -272,6 +272,23 @@ se na dashboardu, (2) pojavljuje se u kalendaru, (3) vidljivo je na kanban
 tabli — bez ručnog povezivanja u svakom modulu. Skill fajl postoji u repou
 i naredni modul ga stvarno koristi kao polaznu tačku.
 
+**Napomene uz realizaciju Faze 3 (svjesne odluke, ne tiha improvizacija):**
+
+- *Kalendar — pull agregacija umjesto listener push.* Tačka 3 gore je
+  predviđala da kalendar "sluša" `TaskCreated`/`TaskDueDateChanged` i tako
+  sazna za zadatke. Umjesto toga uveden je `CalendarSourceContract`
+  (`app/Platform`): kalendar pri renderu POVLAČI događaje iz svih registrovanih
+  izvora (`config/homeos-apps.php` → `calendar_source`). Rezultat je jači nego
+  push varijanta — nema NIKAKVOG dupliranja task podataka (kalendar čita živ
+  Task, ne kopiju), a Kalendar i dalje ne zna za Tasks. Zadaci ipak emituju te
+  evente (za druge buduće slušatelje). DoD je ispunjen identično.
+- *FullCalendar — self-hosted umjesto community Filament plugina.* Planirani
+  `saade/filament-fullcalendar` podržava samo Laravel ≤12, a projekt je na
+  Laravel 13 (Composer odbija instalaciju). Uz odobrenje vlasnika, FullCalendar
+  v6 je ugrađen direktno preko npm-a i bundlan Viteom (`resources/js/calendar.js`),
+  a hrani se istim `CalendarService` agregiranim događajima. Ista UX (mjesec/
+  sedmica/lista, bosanski locale), bez nekompatibilne zavisnosti.
+
 ---
 
 ## Faza 4 — Podsjetnici i Bilješke

@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    // Artisan komande modula (npr. tasks:notify-due-soon) — svaki modul ih drži
+    // u svom Console/ folderu; core ih pokupi bez hardkodovane liste.
+    ->withCommands(glob(__DIR__.'/../app/Modules/*/Console', GLOB_ONLYDIR) ?: [])
     // Event/Listener auto-discovery (CLAUDE.md §9): Laravel skenira ove foldere,
     // mapira listener po tipu u handle() i registruje ga — modul dodaje listener
     // u svoj Listeners/ folder i reaguje na tuđe evente bez diranja core-a.

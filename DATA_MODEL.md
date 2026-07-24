@@ -100,15 +100,28 @@ tasks
   assigned_to        nullable FK → household_members.id
   title              string
   description        text, nullable
-  priority           enum: low, medium, high
+  priority           enum: low, medium, high      (default medium)
+  status             enum: todo, in_progress, done (default todo) — Kanban kolone
   due_date           nullable datetime
-  completed_at       nullable datetime
-  parent_task_id     nullable FK → tasks.id   (sub-tasks)
-  recurrence_rule    nullable string           (RFC5545 RRULE ili slično)
+  completed_at       nullable datetime            (postavlja se kad status = done)
+  parent_task_id     nullable FK → tasks.id        (sub-tasks)
+  board_id           nullable FK → tasks_boards.id (na kojoj Kanban tabli)
+  recurrence_rule    nullable string              (RFC5545 RRULE ili slično)
+  position           unsigned int, default 0      (redoslijed u koloni)
   timestamps
 
-tasks_tags        (id, task_id, name)   -- ili generički tags paket
+tasks_boards       (id, household_id, created_by, name, position, timestamps)
 ```
+
+Oznake: NE `tasks_tags` — koristi generički platform tag mehanizam (vidi §9),
+isto kao Shareable. Zadaci ga koriste sad, Bilješke (Faza 4) isti mehanizam.
+
+Napomene na Task:
+- `status` i `completed_at` su usklađeni: prelazak na `done` postavlja
+  `completed_at`, povratak s `done` ga briše.
+- Ponavljajući zadatak (`recurrence_rule`): kad se označi završenim, sistem
+  kreira SLJEDEĆU instancu s pomjerenim `due_date` (nema materijalizacije
+  budućih instanci unaprijed).
 
 Ovo je referentni primjer kako izgleda "modul entitet" koji poštuje tačku 3
 — svaki naredni modul (Bill, Reminder, Note) prati isti obrazac.
@@ -229,3 +242,39 @@ Svaki put kad Faza 3+ uvede novi "glavni" entitet modula (Bill, Note,
 Reminder...), njegova šema se dopisuje ovdje po obrascu iz tačke 4, PRIJE
 pisanja migracije — ne retroaktivno. Ovo održava dokument kao izvor istine
 za cijelu šemu, ne samo za Fazu 0-1.
+
+---
+
+## 9. Generičke oznake (tagovi) — platform mehanizam (Faza 3, `app/Platform`)
+
+Kao i Sharing (§2), oznake su generičke i polimorfne — svaki modul ih koristi
+preko `Taggable` traita, niko ne pravi svoju `*_tags` tabelu.
+
+### `tags`
+- `id`
+- `household_id` → `households.id` (oznake su po domaćinstvu)
+- `name` (string)
+- `timestamps`
+- unique(`household_id`, `name`)
+
+### `taggables` (polimorfni pivot)
+- `id`
+- `tag_id` → `tags.id`
+- `taggable_type` (string, npr. `App\Modules\Tasks\Models\Task`)
+- `taggable_id` (unsigned big int)
+- unique(`tag_id`, `taggable_type`, `taggable_id`)
+
+**Pravilo:** model koji treba oznake ima `use Taggable;` trait — `tag()`,
+`untag()`, `syncTags()`, scope `tagged()`. Bilješke (Faza 4) koriste isti
+mehanizam.
+
+---
+
+## 10. Kalendar izvori (Faza 3, `CalendarSourceContract`)
+
+Kalendar ne duplira tuđe podatke niti importuje tuđe modele. Modul koji ima
+datume za prikaz (Zadaci: `due_date`; kasnije Računi, Podsjetnici) implementira
+`App\Platform\Contracts\CalendarSourceContract` i registruje ga u
+`config/homeos-apps.php` pod `calendar_source`. `CalendarService` agregira sve
+izvore za dati raspon i domaćinstvo. Tasks pritom i dalje emituje evente
+(`TaskCreated`/`TaskDueDateChanged`/`TaskCompleted`) — CLAUDE.md §9.

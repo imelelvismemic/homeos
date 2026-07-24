@@ -203,6 +203,36 @@ deployano i vizuelno potvrđeno na produkciji. Usput riješen i cross-platform
 build (Vite 8 rolldown native binarke, npm#4828) i serviranje kompajliranih
 asseta u produkciji.
 
-Sljedeće: **Faza 3** (Zadaci + Kanban + Kalendar — glavni dokaz "sve je
-povezano", i izdvajanje reusable skilla za nove module) — čeka potvrdu prije
-početka.
+**Faza 3 završena** — Zadaci + Kanban + Kalendar, glavni dokaz principa "sve
+je povezano" i prvi modul-građanin izgrađen na platformi iz Faze 1/2:
+
+- **Modul Zadaci** — pun Filament Resource (CRUD): rokovi, prioriteti, status
+  (za uraditi / u toku / završeno), odgovorna osoba, podzadaci (relation
+  manager), oznake (dijeljeni platform tagovi preko `Taggable`), ponavljajući
+  zadaci. Prati cijelu §14 checklistu: `Shareable` privatnost, `TaskPolicy`,
+  household tenancy (ownership preko relacije na zapisu, bez coupling-a Platform→modul),
+  bosanski stringovi, migracije s `tasks_` prefiksom.
+- **Ponavljanje** — završetak ponavljajućeg zadatka kroz `TaskCompleted` event →
+  `SpawnRecurringTask` listener kreira sljedeću instancu s pomjerenim rokom
+  (odluka: "sljedeća na završetak", bez materijalizacije budućih). RRULE podskup
+  (FREQ + INTERVAL) u `RecurrenceService`.
+- **Kanban** — custom Filament stranica, kolone = statusi, filter po tabli;
+  drag & drop (HTML5 + Alpine) mijenja `Task.status`, uz touch-friendly padajući
+  izbornik po kartici (CLAUDE §6). Isti Task podaci, bez zasebnog entiteta.
+- **Kalendar** — mjesečni/sedmični/lista prikaz (FullCalendar v6, self-hosted
+  preko Vitea — community plugin ne podržava Laravel 13, vidi napomenu u
+  `ROADMAP.md`). Događaje agregira platforma preko `CalendarSourceContract`; ne
+  duplira task podatke i ne zna za Tasks.
+- **Obavještenja** — `task_assigned` (event → listener) i `task_due_soon`
+  (centralni scheduler → `tasks:notify-due-soon`), oba kroz `HouseholdNotification`.
+- **Reusable skill** — obrazac modula izdvojen u
+  `.claude/skills/homeos-new-module/SKILL.md` za sve naredne module.
+
+Dokaz "sve je povezano" (Definition of done): zadatak s rokom se AUTOMATSKI
+pojavi na dashboardu, kalendaru, kanban tabli i u pretrazi — bez ijedne linije
+ručnog povezivanja u tim modulima (svi čitaju isti Task preko registryja /
+`CalendarSourceContract`). Pokriveno integracijskim testom.
+
+Testirano: **44 testa / 129 assertiona** (cijeli paket, uklj. 18 novih za
+Fazu 3 — CRUD, svaki event, sharing/privacy kroz Resource, ponavljanje,
+obavještenja, i integracija dashboard+kalendar+kanban+pretraga); Pint čist.
