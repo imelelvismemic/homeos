@@ -2,9 +2,9 @@
 
 namespace App\Providers\Filament;
 
-use App\Platform\Filament\CommandPalette;
 use App\Platform\Filament\Pages\Dashboard;
 use App\Platform\Filament\Pages\RegisterHousehold;
+use App\Platform\Http\SearchController;
 use App\Platform\Models\Household;
 use App\Platform\QuickCapture\QuickCaptureRegistry;
 use Filament\Facades\Filament;
@@ -21,9 +21,9 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Livewire\Livewire;
 
 class HomePanelProvider extends PanelProvider
 {
@@ -38,6 +38,11 @@ class HomePanelProvider extends PanelProvider
             ->passwordReset()
             ->tenant(Household::class)
             ->tenantRegistration(RegisterHousehold::class)
+            // JSON endpoint univerzalne pretrage (command palette ga zove fetch-om).
+            // Ruta panela → ima auth + tenant + serving middleware (Filament kontekst).
+            ->routes(function (): void {
+                Route::get('/pretraga', SearchController::class)->name('search');
+            })
             // Custom tema "Topli dom" (CLAUDE.md §6). Paleta kroz ->colors()
             // (Filament generiše CSS varijable); Fraunces/Inter i signature
             // stilovi u resources/css/filament/app/theme.css (Tailwind v3).
@@ -61,12 +66,21 @@ class HomePanelProvider extends PanelProvider
             // config/homeos-apps.php), ne default Filament promo widgeti.
             ->widgets([])
             // Univerzalna pretraga (command palette, Ctrl/Cmd+K) na početku topbara,
-            // ispred hamburgera na tabletu/mobilnom. Custom Livewire komponenta;
-            // Filament kontekst (panel/tenant) se uspostavlja u njenom boot()-u pa
-            // /livewire/update ne pada na 419 (getUrl treba current panel).
+            // ispred hamburgera na tabletu/mobilnom. Čisti Alpine modal + fetch ka
+            // /pretraga (bez Livewire → nema /livewire/update ni 419).
             ->renderHook(
                 PanelsRenderHook::TOPBAR_START,
-                fn (): string => Livewire::mount(CommandPalette::class),
+                function (): string {
+                    $tenant = Filament::getTenant();
+
+                    if (! $tenant) {
+                        return '';
+                    }
+
+                    return view('filament.platform.command-palette', [
+                        'searchUrl' => route('filament.app.search', ['h' => $tenant->getKey()]),
+                    ])->render();
+                },
             )
             // Quick capture launcher u topbaru — dostupan sa svake stranice.
             // Običan Filament dropdown linkova (bez Livewire komponente/modala):
