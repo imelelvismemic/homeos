@@ -26,6 +26,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class TaskResource extends Resource
 {
@@ -61,6 +62,43 @@ class TaskResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->visibleTo(auth()->user());
+    }
+
+    // Univerzalna pretraga = Filament globalna pretraga (topbar, Ctrl+K). Pretražuje
+    // vlastiti tekst zadatka; household-scope i privatnost naslijeđeni iz
+    // getEloquentQuery() (tenancy + visibleTo). Osoba/oznake su u search boxu liste.
+    protected static int $globalSearchResultsLimit = 10;
+
+    /**
+     * @return array<int, string>
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'description'];
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        return $record->title;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        $details = [__('tasks.fields.status') => $record->status->label()];
+
+        if ($record->due_date) {
+            $details[__('tasks.fields.due_date')] = $record->due_date->translatedFormat('d.m.Y.');
+        }
+
+        return $details;
+    }
+
+    public static function getGlobalSearchResultUrl(Model $record): string
+    {
+        return static::getUrl('edit', ['record' => $record]);
     }
 
     public static function form(Form $form): Form

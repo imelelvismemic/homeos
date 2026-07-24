@@ -195,9 +195,11 @@ ekstenzionih tačaka koje modul koristi bez izmjene postojećeg koda (`CLAUDE.md
   `routes/schedule.php`, centralni `ModuleSchedule` ga pokupi.
 - **Pretraga** — `SearchProviderContract` + `SearchService` agregira providere
   iz `config/homeos-apps.php` (uz `DashboardWidgetContract` za Fazu 2).
-  Univerzalna pretraga (command palette, Ctrl+K) koja to troši dodana je
-  naknadno, nakon Faze 3 — u Fazi 1 je postojao samo backend bez UI-ja (vidi
-  napomenu u `ROADMAP.md` uz Fazu 1).
+  Univerzalna pretraga (Filament nativna globalna pretraga, Ctrl+K) dodana je
+  naknadno, nakon Faze 3 — u Fazi 1 je postojao samo backend bez UI-ja. Custom
+  Livewire palette je prvo probana ali je iza reverse proxyja vraćala 419 na
+  `/livewire/update`; prešlo se na Filament globalnu pretragu radi pouzdanosti
+  (vidi napomenu u `ROADMAP.md` uz Fazu 1).
 
 Dokaz "sve je povezano": bilo koji `Shareable` objekat podijeljen s članom
 automatski pokrene `Shared` event → platform listener → `shared_with_you`

@@ -225,11 +225,19 @@ pretraživ — bez izmjene postojećeg koda.
 imala samo backend (`SearchProviderContract` + `SearchService`), bez UI-ja —
 pa se ništa nije moglo stvarno pretraživati kroz aplikaciju. To je bio propust
 (DoD (e) i "command palette / global search" iz tačke 5 podrazumijevaju i ulaz
-za korisnika). Dodana je univerzalna pretraga kao **command palette** (Ctrl/Cmd+K,
-`App\Platform\Filament\CommandPalette`) u topbaru — modal sa rezultatima grupisanim
-po aplikaciji, agregira sve registrovane providere preko `SearchService`-a (i
-dalje bez izmjene postojećeg koda modula). Dostupno na svim širinama (ispred
-hamburgera na tabletu/mobilnom).
+za korisnika).
+
+Prvo je dodana custom Livewire command palette u topbaru, ali je iza produkcijskog
+Apache reverse proxyja njen `/livewire/update` vraćao **419** (custom Livewire
+komponenta u Filament render hooku ne prolazi Filamentov Livewire lifecycle kao
+Filament stranice). Zbog pouzdanosti, univerzalna pretraga sada koristi
+**Filament nativnu globalnu pretragu** (topbar, `Ctrl/Cmd+K` preko
+`globalSearchKeyBindings`): svaki modul je čini dostupnom tako što svoj Resource
+učini globalno pretraživim (`getGloballySearchableAttributes`, rezultat
+scope-ovan kroz `getEloquentQuery` → tenancy + `visibleTo`). Radi na svim
+širinama (Filament sam rukuje mobilnim prikazom). `SearchProviderContract`/
+`SearchService` ostaju kao platform ugovor/servis (testirani); konsolidacija
+(zadržati jedno) je otvoreno pitanje za vlasnika.
 
 ---
 

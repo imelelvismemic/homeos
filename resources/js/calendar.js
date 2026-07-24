@@ -18,7 +18,10 @@ window.initHomeosCalendar = function (el, events) {
     const calendar = new Calendar(el, {
         plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
         initialView: 'dayGridMonth',
-        locale: bsLocale,
+        // Registruj bs locale i odaberi ga po kodu (nazivi mjeseci/dana dolaze iz
+        // Intl API-ja po locale kodu 'bs').
+        locales: [bsLocale],
+        locale: 'bs',
         firstDay: 1,
         headerToolbar: {
             left: 'prev,next today',
