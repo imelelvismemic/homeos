@@ -221,6 +221,14 @@ budući modul: (a) emituje event, (b) šalje notifikaciju, (c) označi objekat
 kao dijeljen/privatan, (d) registruje periodični zadatak, (e) postane
 pretraživ — bez izmjene postojećeg koda.
 
+**Naknadna dopuna (nakon Faze 3):** search infrastruktura (tačka 5) je u Fazi 1
+imala samo backend (`SearchProviderContract` + `SearchService`), bez UI-ja —
+pa se ništa nije moglo stvarno pretraživati kroz aplikaciju. To je bio propust
+(DoD (e) i "command palette / global search" iz tačke 5 podrazumijevaju i ulaz
+za korisnika). Dodana je univerzalna pretraga: topbar traka + `SearchPage`
+(`app/Platform/Filament/Pages`) koja agregira sve registrovane providere preko
+`SearchService`-a (i dalje bez izmjene postojećeg koda modula).
+
 ---
 
 ## Faza 2 — Dashboard (prazan kontejner)
