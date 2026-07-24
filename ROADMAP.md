@@ -227,17 +227,18 @@ pa se ništa nije moglo stvarno pretraživati kroz aplikaciju. To je bio propust
 (DoD (e) i "command palette / global search" iz tačke 5 podrazumijevaju i ulaz
 za korisnika).
 
-Prvo je dodana custom Livewire command palette u topbaru, ali je iza produkcijskog
-Apache reverse proxyja njen `/livewire/update` vraćao **419** (custom Livewire
-komponenta u Filament render hooku ne prolazi Filamentov Livewire lifecycle kao
-Filament stranice). Zbog pouzdanosti, univerzalna pretraga sada koristi
-**Filament nativnu globalnu pretragu** (topbar, `Ctrl/Cmd+K` preko
-`globalSearchKeyBindings`): svaki modul je čini dostupnom tako što svoj Resource
-učini globalno pretraživim (`getGloballySearchableAttributes`, rezultat
-scope-ovan kroz `getEloquentQuery` → tenancy + `visibleTo`). Radi na svim
-širinama (Filament sam rukuje mobilnim prikazom). `SearchProviderContract`/
-`SearchService` ostaju kao platform ugovor/servis (testirani); konsolidacija
-(zadržati jedno) je otvoreno pitanje za vlasnika.
+Dodana je univerzalna pretraga kao **command palette** (Ctrl/Cmd+K,
+`App\Platform\Filament\CommandPalette`) u topbaru — modal sa zatamnjenjem i
+rezultatima grupisanim po aplikaciji, agregira sve registrovane providere preko
+`SearchService`-a (bez izmjene koda modula). Ispred hamburgera na tabletu/mobilnom.
+
+*419 na `/livewire/update` (riješeno):* custom Livewire komponenta u render hooku
+ne prolazi Filamentov serving lifecycle na update-u, pa "current panel"/tenant
+nisu bili postavljeni → `TaskResource::getUrl()` je bacao `TypeError` koji
+Livewire u produkciji (app.debug=false) pretvara u tihi 419. Rješenje: komponenta
+u `boot()` (izvršava se na svakom zahtjevu) eksplicitno postavlja Filament panel i
+tenant, uz odbranu od null korisnika. Livewire testovi nisu hvatali ovo jer
+`Livewire::test` sam uspostavi puni Filament kontekst.
 
 ---
 

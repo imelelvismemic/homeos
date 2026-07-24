@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Platform\Filament\CommandPalette;
 use App\Platform\Filament\Pages\Dashboard;
 use App\Platform\Filament\Pages\RegisterHousehold;
 use App\Platform\Models\Household;
@@ -22,6 +23,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Livewire\Livewire;
 
 class HomePanelProvider extends PanelProvider
 {
@@ -58,12 +60,14 @@ class HomePanelProvider extends PanelProvider
             // Dashboard widgete kontroliše naš Dashboard (registry iz
             // config/homeos-apps.php), ne default Filament promo widgeti.
             ->widgets([])
-            // Univerzalna pretraga = Filament nativna globalna pretraga (topbar,
-            // dostupna i na mobilnom). Ctrl/Cmd+K fokusira polje. Filament sam
-            // agregira sve module (auto-discovered Resource-i koji su
-            // globalno pretraživi) i pravilno rukuje /livewire/update (za razliku
-            // od custom Livewire komponente u render hooku koja je vraćala 419).
-            ->globalSearchKeyBindings(['ctrl+k', 'command+k'])
+            // Univerzalna pretraga (command palette, Ctrl/Cmd+K) na početku topbara,
+            // ispred hamburgera na tabletu/mobilnom. Custom Livewire komponenta;
+            // Filament kontekst (panel/tenant) se uspostavlja u njenom boot()-u pa
+            // /livewire/update ne pada na 419 (getUrl treba current panel).
+            ->renderHook(
+                PanelsRenderHook::TOPBAR_START,
+                fn (): string => Livewire::mount(CommandPalette::class),
+            )
             // Quick capture launcher u topbaru — dostupan sa svake stranice.
             // Običan Filament dropdown linkova (bez Livewire komponente/modala):
             // otvara se client-side (Alpine), pa nema /livewire/update zahtjeva
