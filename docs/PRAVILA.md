@@ -49,9 +49,18 @@ Nastao je iz QA prolaza nakon Faze 3 — svaki novi modul ga mora poštovati, a
 
 ## 4. Naslovi modala potvrde
 
-- Modal brisanja mora reći **na šta** se odnosi: uz naslov "Brisanje zadatka",
-  opis sadrži naziv zapisa: „Sigurno želite obrisati zadatak "…"? Ova radnja je
-  nepovratna.“ (vidi `TaskResource` delete akciju).
+- **Svaki** modul mora u modalu brisanja reći **na šta** se odnosi — i u tabeli
+  (row akcija) i na Edit stranici (header akcija). Obrazac: naslov "Brisanje
+  \<entiteta\>", a opis sadrži naziv zapisa: „Sigurno želite obrisati
+  \<entitet\> "…"? Ova radnja je nepovratna.“
+- Realizacija: `DeleteAction::make()->modalHeading(__('<modul>.headings.delete'))
+  ->modalDescription(fn ($record) => __('<modul>.headings.delete_description',
+  ['title' => $record->title]))`. Primjeri: `TaskResource`, `ReminderResource`,
+  `NoteResource`.
+- Ako naslovno polje može biti prazno (npr. Bilješka bez `title`), koristi
+  fallback za prikaz (npr. `displayTitle()` — izvod iz sadržaja), ne prazan navod.
+- Ova pravila (naslovi/opisi modala) žive uz stringove u `lang/bs/<modul>.php`
+  pod ključem `headings.delete` / `headings.delete_description`.
 
 ## 5. Prazna stanja i greške
 

@@ -41,6 +41,8 @@ return [
     'headings' => [
         'create' => 'Dodaj podsjetnik',
         'edit' => 'Uredi podsjetnik',
+        'delete' => 'Brisanje podsjetnika',
+        'delete_description' => 'Sigurno želite obrisati podsjetnik ":title"? Ova radnja je nepovratna.',
     ],
 
     'empty' => [

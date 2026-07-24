@@ -114,7 +114,9 @@ class NoteResource extends Resource
             ])
             ->actions([
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->modalHeading(__('notes.headings.delete'))
+                    ->modalDescription(fn (Note $r) => __('notes.headings.delete_description', ['title' => $r->displayTitle()])),
             ])
             ->emptyStateHeading(__('notes.empty.heading'))
             ->emptyStateDescription(__('notes.empty.description'))

@@ -117,7 +117,7 @@ iznova otkriva:
   Resource, DashboardWidget/SearchProvider/CalendarSource, notifikacije,
   scheduler, testovi, registracija) + naučene Filament zamke. Svaki modul od
   Faze 4 kreće od njega, ne od praznog fajla.
-- **`docs/PRAVILA_PREVODA.md`** — pravila terminologije i pravopisa za sav
+- **`docs/PRAVILA.md`** — pravila terminologije i pravopisa za sav
   korisnički tekst (veliko/malo slovo, dosljedni termini dugmadi
   "Sačuvaj"/"Zatvori", formati datuma, prazna stanja). Nastalo iz QA prolaza
   nakon Faze 3; povezano iz `CLAUDE.md` §13, poštuje ga svaki modul.

@@ -18,7 +18,11 @@ class EditReminder extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [DeleteAction::make()];
+        return [
+            DeleteAction::make()
+                ->modalHeading(__('reminders.headings.delete'))
+                ->modalDescription(fn () => __('reminders.headings.delete_description', ['title' => $this->record->title])),
+        ];
     }
 
     protected function mutateFormDataBeforeFill(array $data): array

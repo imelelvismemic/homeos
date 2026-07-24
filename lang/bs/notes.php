@@ -28,6 +28,8 @@ return [
     'headings' => [
         'create' => 'Dodaj bilješku',
         'edit' => 'Uredi bilješku',
+        'delete' => 'Brisanje bilješke',
+        'delete_description' => 'Sigurno želite obrisati bilješku ":title"? Ova radnja je nepovratna.',
     ],
 
     'empty' => [

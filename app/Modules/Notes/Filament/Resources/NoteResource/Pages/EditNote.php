@@ -17,7 +17,11 @@ class EditNote extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [DeleteAction::make()];
+        return [
+            DeleteAction::make()
+                ->modalHeading(__('notes.headings.delete'))
+                ->modalDescription(fn () => __('notes.headings.delete_description', ['title' => $this->record->displayTitle()])),
+        ];
     }
 
     protected function mutateFormDataBeforeFill(array $data): array

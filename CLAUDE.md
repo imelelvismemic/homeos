@@ -358,7 +358,7 @@ hardkodovana lista modula u Blade/Filament kodu.
 - Filament Resource labels, navigation grupe i sl. koriste `__('tasks.title')`
   stil, ne hardkodovan tekst — radi buduće mogućnosti drugog jezika.
 - **Terminologija i pravopis** (veliko/malo slovo, dosljedni termini dugmadi,
-  formati datuma, prazna stanja) su fiksirani u `docs/PRAVILA_PREVODA.md` —
+  formati datuma, prazna stanja) su fiksirani u `docs/PRAVILA.md` —
   svaki modul ih poštuje. Pogrešne/nedostajuće paketske (Filament) prijevode
   ispravljati kroz `lang/vendor/<paket>/bs/*` override, ne po Resource-ima.
 

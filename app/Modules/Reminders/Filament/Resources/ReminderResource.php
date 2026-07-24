@@ -132,7 +132,9 @@ class ReminderResource extends Resource
                     ->visible(fn (Reminder $r) => $r->completed_at === null)
                     ->action(fn (Reminder $r) => $r->update(['completed_at' => now()])),
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->modalHeading(__('reminders.headings.delete'))
+                    ->modalDescription(fn (Reminder $r) => __('reminders.headings.delete_description', ['title' => $r->title])),
             ])
             ->emptyStateHeading(__('reminders.empty.heading'))
             ->emptyStateDescription(__('reminders.empty.description'))

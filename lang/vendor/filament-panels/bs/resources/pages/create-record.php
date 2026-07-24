@@ -1,7 +1,7 @@
 <?php
 
 // Override paketskih bs prijevoda (Laravel array_replace_recursive spaja preko
-// paketskog fajla). Ujednačena terminologija dugmadi — vidi docs/PRAVILA_PREVODA.md.
+// paketskog fajla). Ujednačena terminologija dugmadi — vidi docs/PRAVILA.md.
 
 return [
 
