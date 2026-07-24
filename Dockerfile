@@ -42,7 +42,9 @@ FROM node:22-alpine AS assets
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+# npm install (ne npm ci): Vite 8 rolldown native binarke su platform-specifične,
+# a lock je generisan na Alpine (musl) — npm install razriješi ispravnu binarku.
+RUN npm install --no-audit --no-fund
 
 COPY . .
 COPY --from=vendor /app/vendor ./vendor
