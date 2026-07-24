@@ -107,6 +107,25 @@ Namjera ovog pristupa: da se apstraktne/arhitekturne odluke donesu
 promišljeno i jednom, prije izrade — a ne da ih Claude Code improvizuje
 modul-po-modul usput, što bi vodilo nekonzistentnom sistemu.
 
+Uz ta četiri temeljna dokumenta, tokom razvoja su nastali i "živi" prateći
+dokumenti — kada se neko pravilo ili obrazac iskristališe, zapiše se da bi
+ga svaki naredni modul (i sam Claude Code kasnije) slijedio, umjesto da se
+iznova otkriva:
+
+- **`.claude/skills/homeos-new-module/SKILL.md`** — reusable skill izdvojen u
+  Fazi 3: kompletan obrazac za novi modul (Model, migracije, Policy, Filament
+  Resource, DashboardWidget/SearchProvider/CalendarSource, notifikacije,
+  scheduler, testovi, registracija) + naučene Filament zamke. Svaki modul od
+  Faze 4 kreće od njega, ne od praznog fajla.
+- **`docs/PRAVILA_PREVODA.md`** — pravila terminologije i pravopisa za sav
+  korisnički tekst (veliko/malo slovo, dosljedni termini dugmadi
+  "Sačuvaj"/"Zatvori", formati datuma, prazna stanja). Nastalo iz QA prolaza
+  nakon Faze 3; povezano iz `CLAUDE.md` §13, poštuje ga svaki modul.
+- **`app/Platform/README.md`** — vodič kroz ekstenzione tačke platforme
+  (contracts, event/listener auto-discovery, registry) za autore novih modula.
+- **`SUBMISSION.md`** — ovaj dokument; vodi se kao dnevnik napretka po fazama,
+  ne piše se tek na kraju.
+
 ---
 
 ## Deployment
