@@ -161,5 +161,27 @@ APP_KEY-a.
 - Uživo provjereno: registracija, kreiranje domaćinstva, pozivanje člana,
   reset lozinke + dostava emaila preko Resend-a.
 
-Sljedeće: **Faza 1** (platform jezgro — event bus, notifikacije, sharing,
-scheduler, global search) — čeka potvrdu prije početka.
+**Faza 1 završena** — platform jezgro na kojem grade svi budući moduli, pet
+ekstenzionih tačaka koje modul koristi bez izmjene postojećeg koda (`CLAUDE.md`
+§7–§11, vodič u `app/Platform/README.md`):
+- **Eventi** — listener auto-discovery (`bootstrap/app.php`) kroz
+  `app/Platform/Listeners` i `app/Modules/*/Listeners`; generički `Shared` event.
+- **Notifikacije** — kanali `mail` + `database`, preferencije po članu i
+  kategoriji; osnovna klasa `HouseholdNotification` bira kanale (in-app uvijek,
+  email osim ako je član isključio). Notifiable je `HouseholdMember`.
+- **Dijeljenje/privatnost** — generički `Shareable` trait + `shares`/
+  `share_recipients` tabele (privatno / cijelo domaćinstvo / određeni članovi),
+  sa izolacijom između domaćinstava; autorizacija ide kroz Policy → `isVisibleTo`.
+- **Scheduler** — modul registruje periodični zadatak preko
+  `routes/schedule.php`, centralni `ModuleSchedule` ga pokupi.
+- **Pretraga** — `SearchProviderContract` + `SearchService` agregira providere
+  iz `config/homeos-apps.php` (uz `DashboardWidgetContract` za Fazu 2).
+
+Dokaz "sve je povezano": bilo koji `Shareable` objekat podijeljen s članom
+automatski pokrene `Shared` event → platform listener → `shared_with_you`
+in-app + email obavještenje (uz poštovanje preferenci) — bez ijedne linije koda
+u modulu. Testirano: 18 testova / 63 assertiona; CI zeleno; deployano na
+produkciju (aditivne migracije).
+
+Sljedeće: **Faza 2** (Dashboard — dizajn token sistem, "Today" prikaz, widget
+agregacija, quick capture) — čeka potvrdu prije početka.
