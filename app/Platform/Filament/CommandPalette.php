@@ -8,6 +8,7 @@ use App\Platform\Search\SearchService;
 use Filament\Facades\Filament;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -43,12 +44,16 @@ class CommandPalette extends Component
      */
     public function boot(): void
     {
-        Filament::setCurrentPanel(Filament::getPanel('app'));
+        try {
+            Filament::setCurrentPanel(Filament::getPanel('app'));
 
-        $household = $this->householdId ? Household::find($this->householdId) : null;
+            $household = $this->householdId ? Household::find($this->householdId) : null;
 
-        if ($household && auth()->check()) {
-            Filament::setTenant($household);
+            if ($household && auth()->check()) {
+                Filament::setTenant($household);
+            }
+        } catch (\Throwable $e) {
+            Log::error('CommandPalette boot failed: '.$e->getMessage(), ['exception' => $e]);
         }
     }
 
@@ -69,7 +74,14 @@ class CommandPalette extends Component
             return collect();
         }
 
-        return app(SearchService::class)->searchGrouped(trim($this->q), $household);
+        try {
+            return app(SearchService::class)->searchGrouped(trim($this->q), $household);
+        } catch (\Throwable $e) {
+            // Ne rušimo /livewire/update (izbjegava tihi 419); logujemo pravi uzrok.
+            Log::error('CommandPalette search failed: '.$e->getMessage(), ['exception' => $e]);
+
+            return collect();
+        }
     }
 
     /** Prikazni naziv grupe rezultata (npr. 'task' → "Zadaci"). */
