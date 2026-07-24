@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Platform\Filament\Pages\Dashboard;
 use App\Platform\Filament\Pages\RegisterHousehold;
+use App\Platform\Http\QuickCreateController;
 use App\Platform\Http\SearchController;
 use App\Platform\Models\Household;
 use App\Platform\QuickCapture\QuickCaptureRegistry;
@@ -22,7 +23,6 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class HomePanelProvider extends PanelProvider
@@ -38,10 +38,12 @@ class HomePanelProvider extends PanelProvider
             ->passwordReset()
             ->tenant(Household::class)
             ->tenantRegistration(RegisterHousehold::class)
-            // JSON endpoint univerzalne pretrage (command palette ga zove fetch-om).
-            // Ruta panela → ima auth + tenant + serving middleware (Filament kontekst).
+            // Endpointi koje topbar modali (pretraga, brzo dodavanje) zovu fetch-om.
+            // Rute panela → SetUpPanel middleware (Filament kontekst); auth/tenant
+            // provjera je u kontrolerima (kao SearchController).
             ->routes(function (): void {
                 Route::get('/pretraga', SearchController::class)->name('search');
+                Route::post('/brzo/{key}', QuickCreateController::class)->name('quick-create');
             })
             // Custom tema "Topli dom" (CLAUDE.md §6). Paleta kroz ->colors()
             // (Filament generiše CSS varijable); Fraunces/Inter i signature
@@ -82,26 +84,25 @@ class HomePanelProvider extends PanelProvider
                     ])->render();
                 },
             )
-            // Quick capture launcher u topbaru — dostupan sa svake stranice.
-            // Običan Filament dropdown linkova (bez Livewire komponente/modala):
-            // otvara se client-side (Alpine), pa nema /livewire/update zahtjeva
-            // koji je van panel tenant middleware-a znao vraćati 419/404. URL-ovi
-            // se razrješavaju ovdje, pri renderu stranice, dok je tenant dostupan.
+            // "Brzo dodaj" — Alpine modal nad trenutnom stranicom (zamagljena
+            // pozadina, kao command palette): korisnik doda minimalne podatke,
+            // snimi šalje fetch POST na /brzo/{key}, modal se zatvori i korisnik
+            // ostaje gdje je bio (bez navigacije, bez Livewire → bez 419).
             ->renderHook(
                 PanelsRenderHook::TOPBAR_END,
                 function (): string {
                     $tenant = Filament::getTenant();
 
-                    $items = app(QuickCaptureRegistry::class)->items()
-                        ->map(function (array $item) use ($tenant): array {
-                            $item['href'] = Str::startsWith($item['url'], ['http', '/'])
-                                ? $item['url']
-                                : route($item['url'], $tenant ? ['tenant' => $tenant] : []);
+                    if (! $tenant) {
+                        return '';
+                    }
 
-                            return $item;
-                        });
-
-                    return view('filament.platform.quick-capture', ['items' => $items])->render();
+                    return view('filament.platform.quick-capture', [
+                        'items' => app(QuickCaptureRegistry::class)->items(),
+                        // Placeholder ključ mijenja Alpine po tipu; h je tenant.
+                        'postUrlTemplate' => route('filament.app.quick-create', ['key' => '__KEY__', 'h' => $tenant->getKey()]),
+                        'csrfToken' => csrf_token(),
+                    ])->render();
                 },
             )
             ->middleware([

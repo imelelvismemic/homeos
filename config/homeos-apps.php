@@ -1,12 +1,15 @@
 <?php
 
 use App\Modules\Notes\Dashboard\NoteDashboardWidget;
+use App\Modules\Notes\QuickCapture\NoteQuickCreate;
 use App\Modules\Notes\Search\NoteSearchProvider;
 use App\Modules\Reminders\Calendar\ReminderCalendarSource;
 use App\Modules\Reminders\Dashboard\ReminderDashboardWidget;
+use App\Modules\Reminders\QuickCapture\ReminderQuickCreate;
 use App\Modules\Reminders\Search\ReminderSearchProvider;
 use App\Modules\Tasks\Calendar\TaskCalendarSource;
 use App\Modules\Tasks\Dashboard\TaskDashboardWidget;
+use App\Modules\Tasks\QuickCapture\TaskQuickCreate;
 use App\Modules\Tasks\Search\TaskSearchProvider;
 
 /**
@@ -30,7 +33,10 @@ return [
         'quick_capture' => [
             'label' => 'Novi zadatak',
             'icon' => 'heroicon-o-check-circle',
-            'url' => 'filament.app.resources.tasks.create',
+            'handler' => TaskQuickCreate::class,
+            'fields' => [
+                ['name' => 'title', 'label' => 'Naslov', 'type' => 'text', 'required' => true],
+            ],
         ],
     ],
 
@@ -44,7 +50,11 @@ return [
         'quick_capture' => [
             'label' => 'Novi podsjetnik',
             'icon' => 'heroicon-o-bell',
-            'url' => 'filament.app.resources.reminders.create',
+            'handler' => ReminderQuickCreate::class,
+            'fields' => [
+                ['name' => 'title', 'label' => 'Naslov', 'type' => 'text', 'required' => true],
+                ['name' => 'due_date', 'label' => 'Vrijeme', 'type' => 'datetime', 'required' => true],
+            ],
         ],
     ],
 
@@ -57,7 +67,10 @@ return [
         'quick_capture' => [
             'label' => 'Nova bilješka',
             'icon' => 'heroicon-o-document-text',
-            'url' => 'filament.app.resources.notes.create',
+            'handler' => NoteQuickCreate::class,
+            'fields' => [
+                ['name' => 'body', 'label' => 'Sadržaj', 'type' => 'textarea', 'required' => true],
+            ],
         ],
     ],
 

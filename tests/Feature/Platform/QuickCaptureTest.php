@@ -1,8 +1,14 @@
 <?php
 
+use App\Modules\Tasks\Models\Task;
+use App\Modules\Tasks\QuickCapture\TaskQuickCreate;
 use App\Platform\QuickCapture\QuickCaptureRegistry;
+use App\Platform\QuickCapture\QuickCreateContract;
 use Filament\Facades\Filament;
-use Illuminate\Support\Str;
+
+beforeEach(function () {
+    Filament::setCurrentPanel(Filament::getPanel('app'));
+});
 
 it('has no capture options when no modules are registered', function () {
     config()->set('homeos-apps', []);
@@ -10,15 +16,18 @@ it('has no capture options when no modules are registered', function () {
     expect(app(QuickCaptureRegistry::class)->items())->toBeEmpty();
 });
 
-it('exposes a capture option registered by a module', function () {
+it('exposes capture options (label/icon/fields) registered by a module', function () {
     config()->set('homeos-apps', [
         'tasks' => [
             'enabled' => true,
             'name' => 'Zadaci',
-            'icon' => 'heroicon-o-check-circle',
             'quick_capture' => [
                 'label' => 'Novi zadatak',
-                'url' => 'https://homeos.test/tasks/create',
+                'icon' => 'heroicon-o-check-circle',
+                'handler' => TaskQuickCreate::class,
+                'fields' => [
+                    ['name' => 'title', 'label' => 'Naslov', 'type' => 'text', 'required' => true],
+                ],
             ],
         ],
     ]);
@@ -27,44 +36,61 @@ it('exposes a capture option registered by a module', function () {
 
     expect($items)->toHaveCount(1);
     expect($items->first()['label'])->toBe('Novi zadatak');
-    expect($items->first()['icon'])->toBe('heroicon-o-check-circle');
-    expect($items->first()['url'])->toBe('https://homeos.test/tasks/create');
+    expect($items->first()['fields'][0]['name'])->toBe('title');
+    expect(app(QuickCaptureRegistry::class)->handlerClassFor('tasks'))
+        ->toBe(TaskQuickCreate::class);
 });
 
-it('resolves a panel-route capture href with the tenant segment at page render', function () {
-    // "Brzo dodaj" je običan dropdown linkova renderovan u topbar render hooku
-    // (bez Livewire modala) — href se razrješava dok je tenant kontekst dostupan.
-    // Ranije je route() padao bez {tenant} segmenta → 404/419 na /livewire/update.
-    config()->set('homeos-apps', [
-        'tasks' => [
-            'enabled' => true,
-            'name' => 'Zadaci',
-            'icon' => 'heroicon-o-check-circle',
-            'quick_capture' => [
-                'label' => 'Novi zadatak',
-                'url' => 'filament.app.resources.tasks.create',
-            ],
-        ],
-    ]);
-
-    Filament::setCurrentPanel(Filament::getPanel('app'));
+it('quick-creates a task via the endpoint, scoped to the household', function () {
     [$household, $owner] = makeHousehold();
-    test()->actingAs($owner->user);
-    Filament::setTenant($household);
 
-    // Replicira logiku render hooka (HomePanelProvider).
-    $tenant = Filament::getTenant();
-    $items = app(QuickCaptureRegistry::class)->items()
-        ->map(function (array $item) use ($tenant): array {
-            $item['href'] = Str::startsWith($item['url'], ['http', '/'])
-                ? $item['url']
-                : route($item['url'], $tenant ? ['tenant' => $tenant] : []);
+    $url = route('filament.app.quick-create', ['key' => 'tasks', 'h' => $household->getKey()]);
 
-            return $item;
-        });
+    test()->actingAs($owner->user)
+        ->postJson($url, ['title' => 'Brzi zadatak'])
+        ->assertOk()
+        ->assertJson(['ok' => true]);
 
-    $html = view('filament.platform.quick-capture', ['items' => $items])->render();
+    $task = Task::firstWhere('title', 'Brzi zadatak');
+    expect($task)->not->toBeNull();
+    expect($task->household_id)->toBe($household->id);
+    expect($task->created_by)->toBe($owner->user_id);
+});
 
-    expect($html)->toContain("/{$household->getRouteKey()}/tasks/create");
-    expect($html)->toContain('Novi zadatak');
+it('validates quick-create input (422 on missing required field)', function () {
+    [$household, $owner] = makeHousehold();
+
+    $url = route('filament.app.quick-create', ['key' => 'tasks', 'h' => $household->getKey()]);
+
+    test()->actingAs($owner->user)
+        ->postJson($url, ['title' => ''])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('title');
+});
+
+it('rejects quick-create for a household the user is not a member of', function () {
+    [$householdA] = makeHousehold();
+    [, $ownerB] = makeHousehold();
+
+    $url = route('filament.app.quick-create', ['key' => 'tasks', 'h' => $householdA->getKey()]);
+
+    test()->actingAs($ownerB->user)->postJson($url, ['title' => 'X'])->assertStatus(404);
+});
+
+it('rejects quick-create when unauthenticated', function () {
+    [$householdA] = makeHousehold();
+
+    $url = route('filament.app.quick-create', ['key' => 'tasks', 'h' => $householdA->getKey()]);
+
+    test()->postJson($url, ['title' => 'X'])->assertStatus(403);
+});
+
+it('provides a QuickCreateContract handler for each module that registers quick capture', function () {
+    foreach (config('homeos-apps') as $key => $app) {
+        if (empty($app['quick_capture']['handler'])) {
+            continue;
+        }
+
+        expect(app($app['quick_capture']['handler']))->toBeInstanceOf(QuickCreateContract::class);
+    }
 });

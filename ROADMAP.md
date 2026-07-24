@@ -257,6 +257,16 @@ Ova faza ostaje "prazna" (bez pravih widgeta) dok se ne dodaju moduli u
 Fazi 3+ — dashboard je svjesno napravljen da prikazuje ništa dok nema šta
 da agregira. Ovo potvrđuje da je widget-interfejs ispravno dizajniran.
 
+**Naknadna ispravka (QA, prije Faze 5):** "Brzo dodaj" je prvo bilo izvedeno kao
+dropdown linkova koji navigiraju na create stranicu — to gubi kontekst i krši
+namjeru iz ORIGINAL_SPEC ("dodaj … odakle god, bez pretraživanja menija", niska
+frikcija) i sam opis iz tačke 4 ("modal dostupan sa bilo koje stranice").
+Rekonstruisano u **modal** (Alpine + fetch POST, zamagljena pozadina kao command
+palette): korisnik doda minimalne podatke, snimi zatvara modal i ostavlja ga na
+trenutnoj stranici. Registry-driven: modul u `quick_capture` registruje `fields`
++ `handler` (`QuickCreateContract`); generički `QuickCreateController` (ruta
+panela `/brzo/{key}`) validira i kreira. Bez Livewire (izbjegava 419 iz Faze 3 QA).
+
 **Definition of done:** Dashboard se renderuje bez grešaka i sa 0 modula
 instaliranih, sa primijenjenom custom temom (ne default Filament izgled),
 provjeren vizuelno na mobile/tablet/desktop širinama.

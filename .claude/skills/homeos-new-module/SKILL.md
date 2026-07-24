@@ -81,8 +81,11 @@ tests/Feature/<Ime>/…             # Pest: CRUD, svaki event, sharing/privacy, 
 9. **Notifikacije** — kroz `HouseholdNotification` (nikad `Mail::send`). Dopiši
    kategoriju u DATA_MODEL.md §5. Listener u `Listeners/` šalje notifikaciju.
 10. **Scheduler** — `routes/schedule.php` vraća closure; ne pravi vlastiti cron.
-11. **Brzo dodavanje** (opcionalno) — `quick_capture` ključ u registryju (label,
-    icon, url = route name create stranice).
+11. **Brzo dodavanje** (opcionalno) — `quick_capture` u registryju: `label`,
+    `icon`, `handler` (klasa koja implementira `App\Platform\QuickCapture\
+    QuickCreateContract` — `rules()` + `create()`), i `fields` (minimalna polja
+    za modal: `name`, `label`, `type` ∈ {text, textarea, datetime}, `required`).
+    Modal (Alpine + fetch, generički `QuickCreateController`) snima bez navigacije.
 12. **Lokalizacija** — `lang/bs/<ime>.php`; svi stringovi kroz `__()`.
 13. **Tema/responzivnost** (CLAUDE.md §6) — bez default Filament izgleda; custom
     komponente (kanban/kalendar) testirati na mobile/tablet/desktop; smislena
@@ -96,7 +99,11 @@ tests/Feature/<Ime>/…             # Pest: CRUD, svaki event, sharing/privacy, 
         'dashboard_widget' => \App\Modules\<Ime>\Dashboard\<Ime>DashboardWidget::class,
         'search_provider' => \App\Modules\<Ime>\Search\<Entitet>SearchProvider::class,
         'calendar_source' => \App\Modules\<Ime>\Calendar\<Entitet>CalendarSource::class, // ako vremenski
-        'quick_capture' => ['label' => '…', 'icon' => '…', 'url' => 'filament.app.resources.<slug>.create'],
+        'quick_capture' => [
+            'label' => '…', 'icon' => 'heroicon-o-…',
+            'handler' => \App\Modules\<Ime>\QuickCapture\<Entitet>QuickCreate::class,
+            'fields' => [['name' => 'title', 'label' => 'Naslov', 'type' => 'text', 'required' => true]],
+        ],
     ],
     ```
 

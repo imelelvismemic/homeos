@@ -49,6 +49,10 @@ return [
         'button' => 'Brzo dodaj',
         'heading' => 'Šta želite dodati?',
         'close' => 'Zatvori',
+        'back' => 'Nazad',
+        'save' => 'Sačuvaj',
+        'saved' => 'Sačuvano ✓',
+        'error' => 'Greška. Pokušajte ponovo.',
         'empty' => 'Još nema opcija za brzo dodavanje. Kako instalirate module (zadaci, bilješke, računi...), pojavljuju se ovdje.',
     ],
 
