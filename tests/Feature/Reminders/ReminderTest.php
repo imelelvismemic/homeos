@@ -61,6 +61,25 @@ it('fires due reminders via scheduler: notifies creator and marks completed', fu
     Notification::assertSentTo($owner, ReminderDue::class, fn (ReminderDue $n) => $n->reminder->is($due));
 });
 
+it('notifies the assigned member instead of the creator when set', function () {
+    [$household, $owner, $members] = makeHousehold(extraMembers: 1);
+    $assignee = $members[0];
+    Notification::fake();
+
+    Reminder::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'assigned_to' => $assignee->id,
+        'title' => 'Za drugog člana',
+        'due_date' => now()->subMinute(),
+    ]);
+
+    test()->artisan('reminders:fire')->assertSuccessful();
+
+    Notification::assertSentTo($assignee, ReminderDue::class);
+    Notification::assertNotSentTo($owner, ReminderDue::class);
+});
+
 it('spawns the next instance when a recurring reminder fires', function () {
     [$household, $owner] = makeHousehold();
     Notification::fake();

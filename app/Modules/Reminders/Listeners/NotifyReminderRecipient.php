@@ -16,7 +16,8 @@ class NotifyReminderRecipient
     {
         $reminder = $event->reminder;
 
-        $member = HouseholdMember::query()
+        // Namijenjen članu (spec) → njemu; inače kreatoru podsjetnika.
+        $member = $reminder->assignee ?? HouseholdMember::query()
             ->where('household_id', $reminder->household_id)
             ->where('user_id', $reminder->created_by)
             ->first();

@@ -48,6 +48,19 @@ it('creates a reminder tied to a task via ReminderRequested (no cross-module imp
     expect($reminder->remindable->is($task))->toBeTrue();
 });
 
+it('carries the assignee through ReminderRequested (reminder inherits responsible member)', function () {
+    [$household, $owner, $members] = makeHousehold(extraMembers: 1);
+    test()->actingAs($owner->user);
+    $assignee = $members[0];
+    $task = makeTaskFor($household, $owner, 'Odnijeti paket');
+
+    ReminderRequested::dispatch($task, now()->addDay(), 'Podsjetnik: Odnijeti paket', assignedTo: $assignee->id);
+
+    $reminder = Reminder::firstWhere('title', 'Podsjetnik: Odnijeti paket');
+
+    expect($reminder->assigned_to)->toBe($assignee->id);
+});
+
 it('creates a note tied to a task via NoteRequested', function () {
     [$household, $owner] = makeHousehold();
     test()->actingAs($owner->user);

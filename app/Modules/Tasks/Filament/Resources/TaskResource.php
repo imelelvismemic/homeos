@@ -254,6 +254,7 @@ class TaskResource extends Resource
                             $record,
                             Carbon::parse($data['due_date']),
                             __('tasks.remind.title', ['title' => $record->title]),
+                            assignedTo: $record->assigned_to, // podsjetnik nasljeđuje odgovornu osobu zadatka
                         )),
                     Action::make('addNote')
                         ->label(__('tasks.actions.add_note'))

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Modules\Reminders\Events\ReminderCreated;
 use App\Platform\Concerns\Shareable;
 use App\Platform\Models\Household;
+use App\Platform\Models\HouseholdMember;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * za ponavljanje.
  */
 #[Fillable([
-    'household_id', 'created_by', 'title', 'description', 'due_date',
+    'household_id', 'created_by', 'assigned_to', 'title', 'description', 'due_date',
     'completed_at', 'recurrence_rule', 'remindable_type', 'remindable_id',
 ])]
 class Reminder extends Model
@@ -50,6 +51,12 @@ class Reminder extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /** Odgovorna osoba (član domaćinstva) kojoj je podsjetnik namijenjen. */
+    public function assignee(): BelongsTo
+    {
+        return $this->belongsTo(HouseholdMember::class, 'assigned_to');
     }
 
     /** Opciona veza na bilo koji entitet (Task, kasnije Bill). */

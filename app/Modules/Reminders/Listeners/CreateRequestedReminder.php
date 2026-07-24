@@ -19,6 +19,7 @@ class CreateRequestedReminder
         Reminder::create([
             'household_id' => $remindable->household_id,
             'created_by' => auth()->id() ?? $remindable->created_by,
+            'assigned_to' => $event->assignedTo,
             'title' => $event->title,
             'description' => $event->description,
             'due_date' => $event->dueDate,

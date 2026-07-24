@@ -4,6 +4,8 @@ namespace App\Modules\Reminders\Filament\Resources;
 
 use App\Modules\Reminders\Filament\Resources\ReminderResource\Pages;
 use App\Modules\Reminders\Models\Reminder;
+use App\Platform\Models\HouseholdMember;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -92,6 +94,16 @@ class ReminderResource extends Resource
                 ])
                 ->default('none')
                 ->dehydrated(false),
+
+            Select::make('assigned_to')
+                ->label(__('reminders.fields.assigned_to'))
+                ->options(fn () => HouseholdMember::query()
+                    ->where('household_id', Filament::getTenant()?->id)
+                    ->with('user')
+                    ->get()
+                    ->pluck('user.name', 'id'))
+                ->searchable()
+                ->helperText(__('reminders.fields.assigned_to_help')),
         ]);
     }
 
@@ -110,6 +122,11 @@ class ReminderResource extends Resource
                     ->dateTime('d.m.Y. H:i')
                     ->sortable()
                     ->color(fn (Reminder $r) => $r->due_date && $r->due_date->isPast() && ! $r->completed_at ? 'danger' : null),
+
+                TextColumn::make('assignee.user.name')
+                    ->label(__('reminders.fields.assigned_to'))
+                    ->placeholder('—')
+                    ->toggleable(),
 
                 TextColumn::make('completed_at')
                     ->label(__('reminders.fields.status'))

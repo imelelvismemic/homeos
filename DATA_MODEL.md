@@ -135,6 +135,7 @@ reminders_reminders
   id
   household_id      → households.id
   created_by        → users.id
+  assigned_to       nullable FK → household_members.id  (kome je namijenjen — spec)
   title             string
   description       text, nullable
   due_date          nullable datetime            (kad podsjetnik "okine" — ime po §3)

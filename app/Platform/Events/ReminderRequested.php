@@ -22,5 +22,6 @@ class ReminderRequested
         public CarbonInterface $dueDate,
         public string $title,
         public ?string $description = null,
+        public ?int $assignedTo = null,   // HouseholdMember id (opciono)
     ) {}
 }

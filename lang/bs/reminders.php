@@ -13,6 +13,8 @@ return [
         'due_date' => 'Vrijeme',
         'due_date_now' => 'Sada',
         'recurrence' => 'Ponavljanje',
+        'assigned_to' => 'Odgovorna osoba',
+        'assigned_to_help' => 'Kome je podsjetnik namijenjen. Ako je prazno, ide vama.',
         'status' => 'Status',
     ],
 

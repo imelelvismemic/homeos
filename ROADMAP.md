@@ -312,15 +312,23 @@ i naredni modul ga stvarno koristi kao polaznu tačku.
 
 ## Faza 4 — Podsjetnici i Bilješke
 
-1. Modul **Podsjetnici**: jednokratni/ponavljajući, mogu biti pokrenuti iz
-   bilo kojeg drugog modula (koristi generički event mehanizam — npr. bill
-   iz Finansija emituje event na koji se Podsjetnik može "zakačiti").
+1. Modul **Podsjetnici**: jednokratni/ponavljajući, **namijenjeni određenim
+   članovima** (odgovorna osoba — ORIGINAL_SPEC), mogu biti pokrenuti iz bilo
+   kojeg drugog modula (generički event mehanizam — npr. bill iz Finansija
+   emituje event na koji se Podsjetnik "zakači").
 2. Modul **Bilješke**: jednostavne bilješke + tagovi + dnevni journal +
    polymorphic veza ka bilo kojem drugom objektu (zadatak, račun, događaj).
 
 **Definition of done:** Podsjetnik se može kreirati vezan za bilo koji
 postojeći entitet (task, bill), i on to čini kroz javni interfejs tog
 entiteta, ne kroz direktan pristup njegovoj bazi.
+
+**Naknadna ispravka (QA):** prva realizacija je izostavila da je podsjetnik
+"namijenjen određenim članovima" (ORIGINAL_SPEC, "Podsjetnici" + "Dijeljenje").
+Dodano: `reminders_reminders.assigned_to` (član), izbor odgovorne osobe u formi,
+a scheduler obavještava dodijeljenog člana (fallback kreator). `ReminderRequested`
+event nosi opcioni `assignedTo`, pa podsjetnik kreiran s zadatka nasljeđuje
+odgovornu osobu zadatka.
 
 ---
 
