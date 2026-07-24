@@ -125,6 +125,20 @@ helper iz `tests/Pest.php`. Filament testovi: `Livewire::test(...)`, uz
 - **Panel rute traže `{tenant}` parametar** — `route('filament.app.resources.x.create')`
   puca bez `['tenant' => Filament::getTenant()]`.
 
+## Obrasci naučeni u Fazi 4 (Podsjetnici/Bilješke)
+
+- **Veza na "bilo koji entitet" bez cross-module importa:** koristi polimorfni
+  `morphTo` (`remindable`/`notable`, nullable) + generički **platform event**
+  (`ReminderRequested`/`NoteRequested`) koji nosi `Model` instancu. Modul-izvor
+  emituje event (ne importuje ciljni modul); ciljni modul ga sluša i kreira
+  vezani zapis. Tako se ispunjava "kroz javni interfejs, ne direktan pristup bazi".
+- **Dijeljena logika ide u `app/Platform`** (npr. `Recurrence\RecurrenceService`
+  koriste i Zadaci i Podsjetnici) — ne duplirati po modulima, ne importovati iz
+  tuđeg modula.
+- **Vremenski entitet** (`due_date`) automatski na kalendaru/dashboardu/pretrazi
+  preko istih kontrakata kao Task — samo registruj `calendar_source`/
+  `dashboard_widget`/`search_provider`.
+
 ## Verifikacija prije "gotovo"
 
 - `php vendor/bin/pest` zeleno (lokalno u kontejneru s `intl`, i CI).

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Tasks\Services;
+namespace App\Platform\Recurrence;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
@@ -9,6 +9,9 @@ use Carbon\CarbonInterface;
  * Minimalni RRULE (RFC5545) podskup: FREQ (DAILY/WEEKLY/MONTHLY/YEARLY) + INTERVAL.
  * Dovoljno za "svaki dan/sedmicu/mjesec/godinu" iz UI-ja; može se proširiti
  * pravom RRULE bibliotekom bez mijenjanja pozivatelja.
+ *
+ * Platform servis — dijele ga Zadaci i Podsjetnici (i budući moduli s
+ * ponavljanjem), da se logika ne duplira (CLAUDE.md §4/§18).
  */
 class RecurrenceService
 {

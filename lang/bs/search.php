@@ -13,6 +13,8 @@ return [
     // Prikazni naziv grupe po tipu rezultata (svaki modul dopisuje svoj tip).
     'types' => [
         'task' => 'Zadaci',
+        'reminder' => 'Podsjetnici',
+        'note' => 'Bilješke',
     ],
 
 ];

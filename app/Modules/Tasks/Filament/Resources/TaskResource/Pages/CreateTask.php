@@ -3,7 +3,7 @@
 namespace App\Modules\Tasks\Filament\Resources\TaskResource\Pages;
 
 use App\Modules\Tasks\Filament\Resources\TaskResource;
-use App\Modules\Tasks\Services\RecurrenceService;
+use App\Platform\Recurrence\RecurrenceService;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;

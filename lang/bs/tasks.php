@@ -61,6 +61,18 @@ return [
         'create' => 'Dodaj zadatak',
         'complete' => 'Označi završenim',
         'add_subtask' => 'Dodaj podzadatak',
+        'remind' => 'Podsjeti me',
+        'add_note' => 'Dodaj bilješku',
+    ],
+
+    'remind' => [
+        'when' => 'Kada da te podsjetim?',
+        'title' => 'Podsjetnik: :title',
+    ],
+
+    'note' => [
+        'body' => 'Sadržaj bilješke',
+        'title' => 'Bilješka uz zadatak: :title',
     ],
 
     'empty' => [

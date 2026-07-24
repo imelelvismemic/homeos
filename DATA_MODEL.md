@@ -128,6 +128,51 @@ Ovo je referentni primjer kako izgleda "modul entitet" koji poštuje tačku 3
 
 ---
 
+## 4a. `Reminder` i `Note` (Faza 4, `app/Modules/Reminders`, `app/Modules/Notes`)
+
+```
+reminders_reminders
+  id
+  household_id      → households.id
+  created_by        → users.id
+  title             string
+  description       text, nullable
+  due_date          nullable datetime            (kad podsjetnik "okine" — ime po §3)
+  completed_at      nullable datetime            (postavlja se kad okine/označi gotovim)
+  recurrence_rule   nullable string              (RRULE podskup, isto kao Task)
+  remindable_type   nullable string  ┐ polimorfna, OPCIONA veza na bilo koji
+  remindable_id     nullable big int ┘ entitet (Task, kasnije Bill) — morphTo
+  timestamps
+  index (household_id, due_date)
+
+notes_notes
+  id
+  household_id      → households.id
+  created_by        → users.id
+  title             string, nullable             (bilješka/journal ne mora imati naslov)
+  body              longtext                      (HTML iz Filament RichEditor-a)
+  journal_date      nullable date                (ako je unos dnevnika — "Dnevnik" prikaz grupiše po danu)
+  notable_type      nullable string  ┐ polimorfna, OPCIONA veza na bilo koji
+  notable_id        nullable big int ┘ entitet (Task, …) — morphTo
+  timestamps
+  index (household_id, journal_date)
+```
+
+Napomene:
+- **Oba** koriste generički `Shareable` (privatnost/dijeljenje) i platform tagove
+  (`Taggable`) — nema svojih tag/visibility kolona (§2, §9).
+- **Podsjetnik ↔ entitet:** veza je polimorfna (`remindable`), a KREIRA se kroz
+  javni interfejs — Platform event `ReminderRequested(Model $remindable, …)` koji
+  drugi modul emituje, a Reminders listener uhvati (nema direktnog pristupa tuđoj
+  bazi ni cross-module importa). Isto za `NoteRequested`. Ovim se ispunjava DoD
+  Faze 4. Podsjetnik s `due_date` se pojavljuje na kalendaru/dashboardu/pretrazi
+  preko istih kontrakata kao Task (bez dupliranja).
+- **Ponavljajući podsjetnik:** kad okine, spawn sljedeće instance (isto kao Task);
+  koristi zajednički `App\Platform\Recurrence\RecurrenceService`.
+- `reminder_fired` kategorija notifikacija (§5) — šalje je scheduler kad podsjetnik okine.
+
+---
+
 ## 5. Lista notifikacijskih kategorija (raste kroz faze, popuniti pri dodavanju)
 
 Faza 1 definiše mehanizam; svaki modul pri dodavanju upisuje ovdje svoju

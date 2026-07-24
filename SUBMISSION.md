@@ -261,3 +261,27 @@ ručnog povezivanja u tim modulima (svi čitaju isti Task preko registryja /
 Testirano: **44 testa / 129 assertiona** (cijeli paket, uklj. 18 novih za
 Fazu 3 — CRUD, svaki event, sharing/privacy kroz Resource, ponavljanje,
 obavještenja, i integracija dashboard+kalendar+kanban+pretraga); Pint čist.
+
+**Faza 4 završena** — Podsjetnici + Bilješke (drugi/treći modul-građanin,
+izgrađeni po `homeos-new-module` skillu):
+
+- **Podsjetnici** — samostalni ili (opciono) polimorfno vezani za bilo koji
+  entitet (`remindable`); jednokratni i ponavljajući (dijeljeni
+  `App\Platform\Recurrence\RecurrenceService`); centralni scheduler ih okida na
+  `due_date` (`reminders:fire`, svake minute) → in-app/email obavještenje
+  (`reminder_fired`) + spawn sljedeće instance. Automatski na kalendaru/
+  dashboardu/pretrazi preko istih kontrakata kao Zadaci.
+- **Bilješke** — rich text (Filament RichEditor), platform oznake (`Taggable`),
+  `journal_date` za dnevničke unose (filter "Samo dnevnik"), polimorfna veza
+  `notable`. Na dashboardu (nedavne) i u pretrazi.
+- **Dokaz "sve je povezano" (DoD Faze 4):** podsjetnik/bilješka se kreiraju
+  vezani za postojeći entitet KROZ javni interfejs — generički platform eventi
+  `ReminderRequested`/`NoteRequested` koje modul-izvor emituje, a Podsjetnici/
+  Bilješke uhvate i kreiraju zapis s polimorfnom vezom. Zadaci imaju akcije
+  "Podsjeti me" / "Dodaj bilješku" koje emituju te evente — Zadaci NE importuju
+  module Podsjetnici/Bilješke (nema cross-module zavisnosti, nema direktnog
+  pristupa bazi). Pokriveno testom.
+
+Testirano: **69 testova / 217 assertiona** (cijeli paket, uklj. 14 novih za
+Fazu 4 — model/scheduler/ponavljanje, sharing, oba Resource-a, DoD event-
+vezivanje i integracija kalendar+dashboard+pretraga); Pint čist.

@@ -7,10 +7,14 @@ use App\Modules\Tasks\Enums\TaskStatus;
 use App\Modules\Tasks\Filament\Resources\TaskResource\Pages;
 use App\Modules\Tasks\Models\Board;
 use App\Modules\Tasks\Models\Task;
+use App\Platform\Events\NoteRequested;
+use App\Platform\Events\ReminderRequested;
 use App\Platform\Models\HouseholdMember;
+use Carbon\Carbon;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -19,6 +23,7 @@ use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -229,9 +234,44 @@ class TaskResource extends Resource
                     ->visible(fn (Task $r) => $r->status !== TaskStatus::Done)
                     ->action(fn (Task $r) => $r->update(['status' => TaskStatus::Done])),
                 EditAction::make(),
-                DeleteAction::make()
-                    ->modalHeading(__('tasks.headings.delete'))
-                    ->modalDescription(fn (Task $r) => __('tasks.headings.delete_description', ['title' => $r->title])),
+                ActionGroup::make([
+                    // "Sve je povezano": zadatak traži podsjetnik/bilješku preko
+                    // platform eventa — Tasks NE zna za module Podsjetnici/Bilješke
+                    // (ne importuje ih), samo emituje event (CLAUDE.md §9, DoD Faze 4).
+                    Action::make('remind')
+                        ->label(__('tasks.actions.remind'))
+                        ->icon('heroicon-m-bell')
+                        ->form([
+                            DateTimePicker::make('due_date')
+                                ->label(__('tasks.remind.when'))
+                                ->native(false)
+                                ->seconds(false)
+                                ->displayFormat('d.m.Y H:i')
+                                ->default(fn (Task $r) => $r->due_date ?? now()->addDay())
+                                ->required(),
+                        ])
+                        ->action(fn (Task $record, array $data) => ReminderRequested::dispatch(
+                            $record,
+                            Carbon::parse($data['due_date']),
+                            __('tasks.remind.title', ['title' => $record->title]),
+                        )),
+                    Action::make('addNote')
+                        ->label(__('tasks.actions.add_note'))
+                        ->icon('heroicon-m-document-text')
+                        ->form([
+                            RichEditor::make('body')
+                                ->label(__('tasks.note.body'))
+                                ->required(),
+                        ])
+                        ->action(fn (Task $record, array $data) => NoteRequested::dispatch(
+                            $record,
+                            $data['body'],
+                            __('tasks.note.title', ['title' => $record->title]),
+                        )),
+                    DeleteAction::make()
+                        ->modalHeading(__('tasks.headings.delete'))
+                        ->modalDescription(fn (Task $r) => __('tasks.headings.delete_description', ['title' => $r->title])),
+                ]),
             ])
             ->emptyStateHeading(__('tasks.empty.heading'))
             ->emptyStateDescription(__('tasks.empty.description'))

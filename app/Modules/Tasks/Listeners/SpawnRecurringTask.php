@@ -5,7 +5,7 @@ namespace App\Modules\Tasks\Listeners;
 use App\Modules\Tasks\Enums\TaskStatus;
 use App\Modules\Tasks\Events\TaskCompleted;
 use App\Modules\Tasks\Models\Task;
-use App\Modules\Tasks\Services\RecurrenceService;
+use App\Platform\Recurrence\RecurrenceService;
 
 /**
  * Auto-discoveran listener (CLAUDE.md §9): kad se ponavljajući zadatak završi,
