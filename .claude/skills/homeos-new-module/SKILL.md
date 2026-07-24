@@ -110,6 +110,21 @@ bez ručnog povezivanja); da modul radi i kad su drugi opcioni moduli isključen
 helper iz `tests/Pest.php`. Filament testovi: `Livewire::test(...)`, uz
 `Filament::setCurrentPanel(Filament::getPanel('app'))` + `Filament::setTenant(...)`.
 
+## Filament zamke (naučeno u praksi)
+
+- **Filter query closure parametar se MORA zvati `$query`.** Filament ubrizgava
+  upit po IMENU parametra, ne po tipu — `->query(fn (Builder $q) => …)` tiho ne
+  radi ništa (filter modifikuje odbačeni builder). Uvijek `fn (Builder $query)`.
+  Isto vrijedi za `TernaryFilter::queries(true:/false:/blank:)`.
+- **Create-time tenancy bez relacije na tenantu.** Filament po defaultu veže novi
+  zapis preko `$tenant->{plural}()` (npr. `Household::tasks()`), što bi spojilo
+  Platform s modulom. Umjesto toga postavi `protected static ?string
+  $tenantOwnershipRelationshipName = 'household';` na Resource-u i u Createpage
+  override-uj `handleRecordCreation()` da postavi `household_id` iz
+  `Filament::getTenant()`.
+- **Panel rute traže `{tenant}` parametar** — `route('filament.app.resources.x.create')`
+  puca bez `['tenant' => Filament::getTenant()]`.
+
 ## Verifikacija prije "gotovo"
 
 - `php vendor/bin/pest` zeleno (lokalno u kontejneru s `intl`, i CI).

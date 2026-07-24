@@ -42,7 +42,10 @@ class Dashboard extends BaseDashboard
     {
         $hour = (int) Carbon::now()->format('G');
 
+        // Noć (0–5) je "Dobro veče", ne "Dobro jutro"; jutro 5–11, dan 11–18,
+        // veče 18–24.
         $part = match (true) {
+            $hour < 5 => 'evening',
             $hour < 11 => 'morning',
             $hour < 18 => 'day',
             default => 'evening',

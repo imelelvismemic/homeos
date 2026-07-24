@@ -15,4 +15,25 @@ return [
 
     ],
 
+    // "Columns" menadžer kolona nije preveden u paketskoj bs verziji.
+    'column_manager' => [
+        'heading' => 'Kolone',
+    ],
+
+    'actions' => [
+
+        'toggle_columns' => [
+            'label' => 'Kolone',
+        ],
+
+        'column_manager' => [
+            'label' => 'Kolone',
+        ],
+
+    ],
+
+    'empty' => [
+        'description' => 'Dodajte prvu stavku da započnete.',
+    ],
+
 ];

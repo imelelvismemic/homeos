@@ -13,6 +13,7 @@ return [
         'priority' => 'Prioritet',
         'status' => 'Status',
         'due_date' => 'Rok',
+        'due_date_now' => 'Sada',
         'assigned_to' => 'Odgovorna osoba',
         'board' => 'Tabla',
         'parent' => 'Nadređeni zadatak',
@@ -20,6 +21,14 @@ return [
         'recurrence' => 'Ponavljanje',
         'completed_at' => 'Završeno',
         'subtasks' => 'Podzadaci',
+    ],
+
+    // Naslovi stranica/modala — druga riječ malim slovom (bosanski pravopis).
+    'headings' => [
+        'create' => 'Dodaj zadatak',
+        'edit' => 'Uredi zadatak',
+        'delete' => 'Brisanje zadatka',
+        'delete_description' => 'Sigurno želite obrisati zadatak ":title"? Ova radnja je nepovratna.',
     ],
 
     'priority' => [
@@ -49,6 +58,7 @@ return [
     ],
 
     'actions' => [
+        'create' => 'Dodaj zadatak',
         'complete' => 'Označi završenim',
         'add_subtask' => 'Dodaj podzadatak',
     ],
@@ -78,7 +88,9 @@ return [
 
     'subtasks' => [
         'title' => 'Podzadaci',
-        'empty' => 'Nema podzadataka. Razložite zadatak na manje korake.',
+        'create' => 'Kreiraj podzadatak',
+        'empty' => 'Još nema podzadataka',
+        'empty_description' => 'Razložite zadatak na manje korake.',
     ],
 
     'notifications' => [

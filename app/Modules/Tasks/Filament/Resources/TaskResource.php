@@ -9,12 +9,14 @@ use App\Modules\Tasks\Models\Board;
 use App\Modules\Tasks\Models\Task;
 use App\Platform\Models\HouseholdMember;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\DeleteAction;
@@ -89,7 +91,15 @@ class TaskResource extends Resource
 
             DateTimePicker::make('due_date')
                 ->label(__('tasks.fields.due_date'))
-                ->seconds(false),
+                ->native(false)
+                ->seconds(false)
+                ->displayFormat('d.m.Y H:i')
+                ->suffixAction(
+                    FormAction::make('now')
+                        ->label(__('tasks.fields.due_date_now'))
+                        ->icon('heroicon-m-clock')
+                        ->action(fn (Set $set) => $set('due_date', now())),
+                ),
 
             Select::make('recurrence')
                 ->label(__('tasks.fields.recurrence'))
@@ -152,12 +162,14 @@ class TaskResource extends Resource
 
                 TextColumn::make('due_date')
                     ->label(__('tasks.fields.due_date'))
-                    ->dateTime('j. M Y. H:i')
+                    ->dateTime('d.m.Y. H:i')
                     ->sortable()
+                    ->toggleable()
                     ->color(fn (Task $r) => $r->due_date && $r->due_date->isPast() && ! $r->completed_at ? 'danger' : null),
 
                 TextColumn::make('assignee.user.name')
                     ->label(__('tasks.fields.assigned_to'))
+                    ->toggleable()
                     ->placeholder('—'),
 
                 TextColumn::make('tags.name')
@@ -168,19 +180,22 @@ class TaskResource extends Resource
             ])
             ->defaultSort('due_date')
             ->filters([
+                // NB: Filament ubrizgava upit u filter closure PO IMENU parametra
+                // (`$query`), ne po tipu — parametar se MORA zvati $query, inače
+                // filter tiho ne radi ništa.
                 TernaryFilter::make('assigned_to_me')
                     ->label(__('tasks.filters.only_mine'))
                     ->queries(
-                        true: fn (Builder $q) => $q->whereHas('assignee', fn (Builder $q) => $q->where('user_id', auth()->id())),
-                        false: fn (Builder $q) => $q,
-                        blank: fn (Builder $q) => $q,
+                        true: fn (Builder $query) => $query->whereHas('assignee', fn (Builder $q) => $q->where('user_id', auth()->id())),
+                        false: fn (Builder $query) => $query,
+                        blank: fn (Builder $query) => $query,
                     ),
                 Filter::make('overdue')
                     ->label(__('tasks.filters.overdue'))
-                    ->query(fn (Builder $q) => $q->whereNull('completed_at')->whereNotNull('due_date')->where('due_date', '<', now())),
+                    ->query(fn (Builder $query) => $query->whereNull('completed_at')->whereNotNull('due_date')->where('due_date', '<', now())),
                 Filter::make('hide_done')
                     ->label(__('tasks.filters.hide_done'))
-                    ->query(fn (Builder $q) => $q->where('status', '!=', TaskStatus::Done->value))
+                    ->query(fn (Builder $query) => $query->where('status', '!=', TaskStatus::Done->value))
                     ->default(),
             ])
             ->actions([
@@ -191,7 +206,9 @@ class TaskResource extends Resource
                     ->visible(fn (Task $r) => $r->status !== TaskStatus::Done)
                     ->action(fn (Task $r) => $r->update(['status' => TaskStatus::Done])),
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->modalHeading(__('tasks.headings.delete'))
+                    ->modalDescription(fn (Task $r) => __('tasks.headings.delete_description', ['title' => $r->title])),
             ])
             ->emptyStateHeading(__('tasks.empty.heading'))
             ->emptyStateDescription(__('tasks.empty.description'))

@@ -58,6 +58,31 @@ it('edits a task through the Filament resource', function () {
     expect($task->fresh()->status)->toBe(TaskStatus::InProgress);
 });
 
+it('overdue filter shows only past-due, incomplete tasks', function () {
+    [$household, $owner] = makeHousehold();
+    test()->actingAs($owner->user);
+    Filament::setTenant($household);
+
+    $make = fn (string $title, $due, TaskStatus $status = TaskStatus::Todo) => Task::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => $title,
+        'priority' => Priority::Medium,
+        'status' => $status,
+        'due_date' => $due,
+    ]);
+
+    $overdue = $make('Zakašnjeli zadatak', now()->subDays(2));
+    $future = $make('Budući zadatak', now()->addDays(2));
+    $noDue = $make('Bez roka', null);
+    $doneButPast = $make('Završen ali star', now()->subDays(3), TaskStatus::Done);
+
+    Livewire::test(ListTasks::class)
+        ->filterTable('overdue', true)
+        ->assertCanSeeTableRecords([$overdue])
+        ->assertCanNotSeeTableRecords([$future, $noDue, $doneButPast]);
+});
+
 it('never shows a task to a member of another household', function () {
     [$householdA, $ownerA] = makeHousehold();
     [$householdB, $ownerB] = makeHousehold();

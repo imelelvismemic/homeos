@@ -138,3 +138,31 @@ it('finds a task through the aggregated search', function () {
     expect($results->first()->type)->toBe('task');
     expect($results->first()->title)->toContain('godišnji');
 });
+
+it('finds a task by tag name and by assignee name', function () {
+    [$household, $owner, $members] = makeHousehold(extraMembers: 1);
+    test()->actingAs($owner->user);
+    Filament::setTenant($household);
+    $assignee = $members[0];
+
+    $tagged = Task::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => 'Neki zadatak',
+        'priority' => Priority::Medium,
+        'status' => TaskStatus::Todo,
+    ]);
+    $tagged->tag(['vikend']);
+
+    Task::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => 'Zadatak s odgovornom osobom',
+        'priority' => Priority::Medium,
+        'status' => TaskStatus::Todo,
+        'assigned_to' => $assignee->id,
+    ]);
+
+    expect(app(SearchService::class)->search('vikend', $household))->toHaveCount(1);
+    expect(app(SearchService::class)->search($assignee->user->name, $household))->toHaveCount(1);
+});

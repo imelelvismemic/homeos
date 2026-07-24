@@ -1,8 +1,14 @@
 @if ($items->isNotEmpty())
     <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
         @foreach ($items as $item)
+            @php
+                $tenant = \Filament\Facades\Filament::getTenant();
+                $href = \Illuminate\Support\Str::startsWith($item['url'], ['http', '/'])
+                    ? $item['url']
+                    : route($item['url'], $tenant ? ['tenant' => $tenant] : []);
+            @endphp
             <a
-                href="{{ \Illuminate\Support\Str::startsWith($item['url'], ['http', '/']) ? $item['url'] : route($item['url']) }}"
+                href="{{ $href }}"
                 class="flex items-center gap-3 rounded-xl border border-gray-200 p-4 transition hover:border-primary-500 hover:bg-primary-50 dark:border-gray-700 dark:hover:bg-primary-500/10"
             >
                 @if ($item['icon'])

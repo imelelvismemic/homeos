@@ -52,18 +52,22 @@ class SubtasksRelationManager extends RelationManager
                     ->color(fn (TaskStatus $state) => $state->color()),
             ])
             ->headerActions([
-                CreateAction::make()->mutateFormDataUsing(function (array $data): array {
-                    // Podzadatak nasljeđuje domaćinstvo i autora od roditelja.
-                    $data['household_id'] = $this->getOwnerRecord()->household_id;
-                    $data['created_by'] = auth()->id();
+                CreateAction::make()
+                    ->label(__('tasks.subtasks.create'))
+                    ->modalHeading(__('tasks.subtasks.create'))
+                    ->mutateFormDataUsing(function (array $data): array {
+                        // Podzadatak nasljeđuje domaćinstvo i autora od roditelja.
+                        $data['household_id'] = $this->getOwnerRecord()->household_id;
+                        $data['created_by'] = auth()->id();
 
-                    return $data;
-                }),
+                        return $data;
+                    }),
             ])
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->emptyStateHeading(__('tasks.subtasks.empty'));
+            ->emptyStateHeading(__('tasks.subtasks.empty'))
+            ->emptyStateDescription(__('tasks.subtasks.empty_description'));
     }
 }

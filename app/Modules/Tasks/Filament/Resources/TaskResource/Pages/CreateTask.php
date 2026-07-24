@@ -12,6 +12,16 @@ class CreateTask extends CreateRecord
 {
     protected static string $resource = TaskResource::class;
 
+    public function getTitle(): string
+    {
+        return __('tasks.headings.create');
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return __('tasks.headings.create');
+    }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // household_id vežemo na trenutni Filament tenant; created_by na korisnika.
