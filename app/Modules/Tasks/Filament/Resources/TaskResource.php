@@ -121,7 +121,20 @@ class TaskResource extends Resource
             Select::make('board_id')
                 ->label(__('tasks.fields.board'))
                 ->options(fn () => Board::query()->where('household_id', Filament::getTenant()?->id)->pluck('name', 'id'))
-                ->searchable(),
+                ->searchable()
+                // Tabla se kreira "u hodu" iz forme (dropdown je prazan dok ne
+                // postoji nijedna tabla) — bez odlaska na poseban ekran.
+                ->createOptionForm([
+                    TextInput::make('name')
+                        ->label(__('tasks.kanban.board_name'))
+                        ->required()
+                        ->maxLength(255),
+                ])
+                ->createOptionUsing(fn (array $data): int => Board::create([
+                    'household_id' => Filament::getTenant()?->id,
+                    'created_by' => auth()->id(),
+                    'name' => $data['name'],
+                ])->getKey()),
 
             Select::make('parent_task_id')
                 ->label(__('tasks.fields.parent'))

@@ -5,7 +5,9 @@ namespace App\Modules\Tasks\Filament\Pages;
 use App\Modules\Tasks\Enums\TaskStatus;
 use App\Modules\Tasks\Models\Board;
 use App\Modules\Tasks\Models\Task;
+use Filament\Actions\Action;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
 
@@ -41,6 +43,34 @@ class KanbanBoard extends Page
     public static function getNavigationGroup(): ?string
     {
         return __('tasks.navigation_group');
+    }
+
+    /**
+     * @return array<int, Action>
+     */
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('newBoard')
+                ->label(__('tasks.kanban.new_board'))
+                ->icon('heroicon-m-plus')
+                ->form([
+                    TextInput::make('name')
+                        ->label(__('tasks.kanban.board_name'))
+                        ->required()
+                        ->maxLength(255),
+                ])
+                ->action(function (array $data): void {
+                    $board = Board::create([
+                        'household_id' => Filament::getTenant()?->id,
+                        'created_by' => auth()->id(),
+                        'name' => $data['name'],
+                    ]);
+
+                    // Odmah filtriraj na novu tablu.
+                    $this->boardId = $board->getKey();
+                }),
+        ];
     }
 
     /**
