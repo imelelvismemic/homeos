@@ -225,9 +225,11 @@ pretraživ — bez izmjene postojećeg koda.
 imala samo backend (`SearchProviderContract` + `SearchService`), bez UI-ja —
 pa se ništa nije moglo stvarno pretraživati kroz aplikaciju. To je bio propust
 (DoD (e) i "command palette / global search" iz tačke 5 podrazumijevaju i ulaz
-za korisnika). Dodana je univerzalna pretraga: topbar traka + `SearchPage`
-(`app/Platform/Filament/Pages`) koja agregira sve registrovane providere preko
-`SearchService`-a (i dalje bez izmjene postojećeg koda modula).
+za korisnika). Dodana je univerzalna pretraga kao **command palette** (Ctrl/Cmd+K,
+`App\Platform\Filament\CommandPalette`) u topbaru — modal sa rezultatima grupisanim
+po aplikaciji, agregira sve registrovane providere preko `SearchService`-a (i
+dalje bez izmjene postojećeg koda modula). Dostupno na svim širinama (ispred
+hamburgera na tabletu/mobilnom).
 
 ---
 

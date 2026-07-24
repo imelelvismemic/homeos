@@ -14,16 +14,15 @@ class TaskSearchProvider implements SearchProviderContract
 {
     public function search(string $query, Household $household): Collection
     {
+        // Univerzalna pretraga ide po vlastitom tekstu zadatka (naslov + opis).
+        // Pretraga po odgovornoj osobi i oznakama je namjerno u search boxu SAME
+        // liste zadataka (TaskResource tabela), ne ovdje.
         return Task::query()
             ->where('household_id', $household->id)
             ->visibleTo(auth()->user())
             ->where(function (Builder $q) use ($query) {
                 $q->where('title', 'like', "%{$query}%")
-                    ->orWhere('description', 'like', "%{$query}%")
-                    // Sadržaj oznaka (dijeljeni platform tagovi).
-                    ->orWhereHas('tags', fn ($t) => $t->where('name', 'like', "%{$query}%"))
-                    // Ime i prezime odgovorne osobe.
-                    ->orWhereHas('assignee.user', fn ($u) => $u->where('name', 'like', "%{$query}%"));
+                    ->orWhere('description', 'like', "%{$query}%");
             })
             ->limit(8)
             ->get()
@@ -31,7 +30,9 @@ class TaskSearchProvider implements SearchProviderContract
                 type: 'task',
                 id: $task->id,
                 title: $task->title,
-                url: TaskResource::getUrl('edit', ['record' => $task]),
+                // Tenant eksplicitno — URL se gradi i tokom Livewire update-a
+                // (command palette) gdje Filament tenant kontekst nije postavljen.
+                url: TaskResource::getUrl('edit', ['record' => $task, 'tenant' => $household]),
                 icon: 'heroicon-o-check-circle',
             ));
     }

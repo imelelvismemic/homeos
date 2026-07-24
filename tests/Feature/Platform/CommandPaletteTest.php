@@ -3,7 +3,7 @@
 use App\Modules\Tasks\Enums\Priority;
 use App\Modules\Tasks\Enums\TaskStatus;
 use App\Modules\Tasks\Models\Task;
-use App\Platform\Filament\Pages\SearchPage;
+use App\Platform\Filament\CommandPalette;
 use Filament\Facades\Filament;
 use Livewire\Livewire;
 
@@ -16,14 +16,14 @@ it('shows a hint until at least two characters are entered', function () {
     test()->actingAs($owner->user);
     Filament::setTenant($household);
 
-    Livewire::test(SearchPage::class)
+    Livewire::test(CommandPalette::class)
         ->assertOk()
         ->assertSee(__('search.hint'))
         ->set('q', 'a')
         ->assertSee(__('search.hint'));
 });
 
-it('aggregates task results via the platform SearchService', function () {
+it('aggregates task results grouped by type via SearchService', function () {
     [$household, $owner] = makeHousehold();
     test()->actingAs($owner->user);
     Filament::setTenant($household);
@@ -36,10 +36,10 @@ it('aggregates task results via the platform SearchService', function () {
         'status' => TaskStatus::Todo,
     ]);
 
-    Livewire::test(SearchPage::class)
+    Livewire::test(CommandPalette::class)
         ->set('q', 'godišnji')
         ->assertSee('Rezervisati godišnji odmor')
-        ->assertSee('Zadaci'); // grupni naslov po tipu
+        ->assertSee('Zadaci');
 });
 
 it('renders gracefully with no search modules registered', function () {
@@ -48,7 +48,7 @@ it('renders gracefully with no search modules registered', function () {
     test()->actingAs($owner->user);
     Filament::setTenant($household);
 
-    Livewire::test(SearchPage::class)
+    Livewire::test(CommandPalette::class)
         ->set('q', 'bilo šta')
         ->assertOk()
         ->assertSee('Nema rezultata');

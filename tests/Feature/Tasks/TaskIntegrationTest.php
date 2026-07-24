@@ -139,30 +139,30 @@ it('finds a task through the aggregated search', function () {
     expect($results->first()->title)->toContain('godišnji');
 });
 
-it('finds a task by tag name and by assignee name', function () {
+it('universal search matches task text (title/description) but not assignee or tags', function () {
+    // Pretraga po odgovornoj osobi i oznakama je namjerno SAMO u search boxu
+    // liste zadataka (TaskResource tabela), ne u univerzalnoj pretrazi.
     [$household, $owner, $members] = makeHousehold(extraMembers: 1);
     test()->actingAs($owner->user);
     Filament::setTenant($household);
     $assignee = $members[0];
 
-    $tagged = Task::create([
+    $task = Task::create([
         'household_id' => $household->id,
         'created_by' => $owner->user_id,
         'title' => 'Neki zadatak',
-        'priority' => Priority::Medium,
-        'status' => TaskStatus::Todo,
-    ]);
-    $tagged->tag(['vikend']);
-
-    Task::create([
-        'household_id' => $household->id,
-        'created_by' => $owner->user_id,
-        'title' => 'Zadatak s odgovornom osobom',
+        'description' => 'sa opisom koji sadrži ključnu riječ paprika',
         'priority' => Priority::Medium,
         'status' => TaskStatus::Todo,
         'assigned_to' => $assignee->id,
     ]);
+    $task->tag(['vikend']);
 
-    expect(app(SearchService::class)->search('vikend', $household))->toHaveCount(1);
-    expect(app(SearchService::class)->search($assignee->user->name, $household))->toHaveCount(1);
+    // Po naslovu i opisu — da.
+    expect(app(SearchService::class)->search('Neki', $household))->toHaveCount(1);
+    expect(app(SearchService::class)->search('paprika', $household))->toHaveCount(1);
+
+    // Po oznaci i imenu odgovorne osobe — ne (to je u pretrazi liste).
+    expect(app(SearchService::class)->search('vikend', $household))->toBeEmpty();
+    expect(app(SearchService::class)->search($assignee->user->name, $household))->toBeEmpty();
 });

@@ -2,9 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Platform\Filament\CommandPalette;
 use App\Platform\Filament\Pages\Dashboard;
 use App\Platform\Filament\Pages\RegisterHousehold;
-use App\Platform\Filament\Pages\SearchPage;
 use App\Platform\Models\Household;
 use App\Platform\QuickCapture\QuickCaptureRegistry;
 use Filament\Facades\Filament;
@@ -23,6 +23,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Livewire\Livewire;
 
 class HomePanelProvider extends PanelProvider
 {
@@ -59,20 +60,13 @@ class HomePanelProvider extends PanelProvider
             // Dashboard widgete kontroliše naš Dashboard (registry iz
             // config/homeos-apps.php), ne default Filament promo widgeti.
             ->widgets([])
-            // Univerzalna pretraga u topbaru — GET forma ka SearchPage (agregira
-            // sve module preko SearchService-a). URL se razrješava dok je tenant
-            // dostupan; bez tenanta (npr. prije odabira domaćinstva) se ne prikazuje.
+            // Univerzalna pretraga (command palette, Ctrl+K) — na početku topbara,
+            // ispred hamburgera na tabletu/mobilnom. Livewire::mount() (ne
+            // Blade::render) daje ispravan snapshot pa /livewire/update ne pada
+            // na 419. Agregira sve module preko SearchService-a.
             ->renderHook(
                 PanelsRenderHook::TOPBAR_START,
-                function (): string {
-                    if (! Filament::getTenant()) {
-                        return '';
-                    }
-
-                    return view('filament.platform.search-bar', [
-                        'action' => SearchPage::getUrl(),
-                    ])->render();
-                },
+                fn (): string => Livewire::mount(CommandPalette::class),
             )
             // Quick capture launcher u topbaru — dostupan sa svake stranice.
             // Običan Filament dropdown linkova (bez Livewire komponente/modala):

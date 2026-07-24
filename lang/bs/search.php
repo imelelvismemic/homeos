@@ -3,9 +3,11 @@
 return [
 
     'title' => 'Pretraga',
-    'placeholder' => 'Pretraži zadatke, oznake, osobe...',
+    'placeholder' => 'Pretraži zadatke, bilješke, račune...',
+    'placeholder_short' => 'Pretraži...',
     'hint' => 'Unesite bar 2 znaka za pretragu.',
     'empty' => 'Nema rezultata za ":query".',
+    'shortcut_hint' => 'za pretragu',
 
     // Prikazni naziv grupe po tipu rezultata (svaki modul dopisuje svoj tip).
     'types' => [
