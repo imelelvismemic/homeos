@@ -356,6 +356,16 @@ odgovornu osobu zadatka.
 generiše podsjetnik i email obavještenje bez ijedne linije koda van modula
 Finansije.
 
+**Status:** Fazu 5 isporučujemo u dva koraka (odluka vlasnika, veliki moduli).
+- **Faza 5a — Finansije: GOTOVO i deployano.** Transakcije (prihod/rashod) po
+  kategorijama, budžeti po kategoriji/mjesecu, računi/pretplate (rok, ponavljanje,
+  `remind_days_before`), mjesečni pregled + "ko duguje kome" (`BalanceService`).
+  DoD ispunjen: na kreiranju računa Finance emituje `ReminderRequested` (X dana
+  prije dospijeća) → Reminders kreira podsjetnik → scheduler okine → email; ništa
+  van Finansija. Račun se pojavljuje i na kalendaru/dashboardu/pretrazi.
+- **Faza 5b — Life admin: sljedeće** (dokumenti/garancije/kontakti + rokovi →
+  podsjetnici, zajedničke liste).
+
 ---
 
 ## Faza 6 — Dijeljenje, email obavještenja, digest

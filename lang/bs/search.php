@@ -15,6 +15,8 @@ return [
         'task' => 'Zadaci',
         'reminder' => 'Podsjetnici',
         'note' => 'Bilješke',
+        'bill' => 'Računi',
+        'transaction' => 'Transakcije',
     ],
 
 ];

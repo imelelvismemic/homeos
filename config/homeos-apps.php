@@ -1,5 +1,9 @@
 <?php
 
+use App\Modules\Finance\Calendar\BillCalendarSource;
+use App\Modules\Finance\Dashboard\FinanceDashboardWidget;
+use App\Modules\Finance\QuickCapture\FinanceQuickCreate;
+use App\Modules\Finance\Search\FinanceSearchProvider;
 use App\Modules\Notes\Dashboard\NoteDashboardWidget;
 use App\Modules\Notes\QuickCapture\NoteQuickCreate;
 use App\Modules\Notes\Search\NoteSearchProvider;
@@ -70,6 +74,24 @@ return [
             'handler' => NoteQuickCreate::class,
             'fields' => [
                 ['name' => 'body', 'label' => 'Sadržaj', 'type' => 'textarea', 'required' => true],
+            ],
+        ],
+    ],
+
+    'finance' => [
+        'name' => 'Finansije',
+        'icon' => 'heroicon-o-banknotes',
+        'enabled' => true,
+        'dashboard_widget' => FinanceDashboardWidget::class,
+        'search_provider' => FinanceSearchProvider::class,
+        'calendar_source' => BillCalendarSource::class,
+        'quick_capture' => [
+            'label' => 'Novi trošak',
+            'icon' => 'heroicon-o-banknotes',
+            'handler' => FinanceQuickCreate::class,
+            'fields' => [
+                ['name' => 'title', 'label' => 'Naziv', 'type' => 'text', 'required' => true],
+                ['name' => 'amount', 'label' => 'Iznos (KM)', 'type' => 'number', 'required' => true],
             ],
         ],
     ],

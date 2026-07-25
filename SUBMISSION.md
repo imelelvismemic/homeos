@@ -285,3 +285,19 @@ izgrađeni po `homeos-new-module` skillu):
 Testirano: **69 testova / 217 assertiona** (cijeli paket, uklj. 14 novih za
 Fazu 4 — model/scheduler/ponavljanje, sharing, oba Resource-a, DoD event-
 vezivanje i integracija kalendar+dashboard+pretraga); Pint čist.
+
+**Faza 5a završena** — Finansije (isporuka Faze 5 u dva koraka; Life admin slijedi):
+
+- **Transakcije** (prihod/rashod) po kategorijama, s platiocem i (opciono)
+  podjelom troška među članovima (`BalanceService` računa "ko duguje kome").
+- **Računi/pretplate** s dospijećem, ponavljanjem i `remind_days_before`;
+  **budžeti** po kategoriji/mjesecu; **mjesečni pregled** (prihod/rashod, po
+  kategoriji vs budžet, saldo članova).
+- **Dokaz "sve je povezano" (DoD Faze 5):** na kreiranju računa Finance emituje
+  `App\Platform\Events\ReminderRequested` (X dana prije dospijeća) → Podsjetnici
+  kreiraju podsjetnik → scheduler ga okine → `reminder_fired` email. Nijedna
+  linija koda van modula Finansije; račun se pojavljuje i na kalendaru/
+  dashboardu/pretrazi. Pokriveno testom.
+
+Testirano: **84 testa / 261 assertion** (cijeli paket, uklj. 15 novih za Fazu 5a —
+model/DoD/ponavljanje/saldo/oba Resource-a/integracija); Pint čist.

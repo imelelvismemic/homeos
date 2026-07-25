@@ -174,6 +174,79 @@ Napomene:
 
 ---
 
+## 4b. `Finance` (Faza 5, `app/Modules/Finance`)
+
+Iznosi su decimal(12,2) u KM (BAM); prikaz preko Filament `->money('BAM', 'bs')`.
+
+```
+finance_categories
+  id
+  household_id      → households.id
+  created_by        → users.id
+  name              string
+  color             string, nullable            (hex, za prikaz)
+  timestamps
+
+finance_transactions                            (Shareable)
+  id
+  household_id      → households.id
+  created_by        → users.id
+  category_id       nullable FK → finance_categories.id (nullOnDelete)
+  type              enum: income, expense
+  title             string
+  amount            decimal(12,2)
+  date              date
+  paid_by           nullable FK → household_members.id  (ko je platio — spec)
+  timestamps
+  index (household_id, date)
+
+finance_transaction_participants                (jednaka podjela troška)
+  id
+  transaction_id    FK → finance_transactions.id (cascade)
+  household_member_id FK → household_members.id  (cascade)
+  unique (transaction_id, household_member_id)
+
+finance_bills                                   (Shareable) — računi/pretplate
+  id
+  household_id      → households.id
+  created_by        → users.id
+  category_id       nullable FK → finance_categories.id
+  title             string
+  amount            decimal(12,2)
+  due_date          date                        (dospijeće — ime po §3)
+  recurrence_rule   nullable string             (RRULE podskup)
+  remind_days_before unsigned int, default 3    (koliko dana prije da podsjeti)
+  paid_at           nullable datetime           (kad je plaćen)
+  timestamps
+  index (household_id, due_date)
+
+finance_budgets
+  id
+  household_id      → households.id
+  created_by        → users.id
+  category_id       FK → finance_categories.id (cascade)
+  month             date                        (prvi dan mjeseca)
+  amount            decimal(12,2)
+  timestamps
+  unique (household_id, category_id, month)
+```
+
+Napomene:
+- **Ko platio / ko duguje:** trošak (`expense`) ima `paid_by` i (opciono) učesnike
+  (`finance_transaction_participants`) među kojima se dijeli JEDNAKO. `BalanceService`
+  računa net saldo po članu = (što je platio) − (njegov udio u troškovima). Mjesečni
+  pregled prikazuje saldo. Prihod se ne dijeli.
+- **Račun s rokom → podsjetnik (DoD Faze 5):** na kreiranju Bill-a Finance emituje
+  `App\Platform\Events\ReminderRequested($bill, due_date − remind_days_before, …)`;
+  Reminders kreira podsjetnik, koji scheduler okine → `reminder_fired` email. NIŠTA
+  van modula Finansije nije potrebno. Bill se pojavljuje i na kalendaru (`due_date`).
+- **Ponavljajući račun:** kad se označi plaćenim, spawn sljedeće instance (zajednički
+  `RecurrenceService`), koja pri kreiranju ponovo dispatch-uje svoj podsjetnik.
+- `bill_due` kategorija (§5) je pokrivena kroz `reminder_fired` (podsjetnik računa);
+  zaseban Finance digest može doći u Fazi 6.
+
+---
+
 ## 5. Lista notifikacijskih kategorija (raste kroz faze, popuniti pri dodavanju)
 
 Faza 1 definiše mehanizam; svaki modul pri dodavanju upisuje ovdje svoju
