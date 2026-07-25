@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Reminders\Filament\Resources\ReminderResource\Pages\CreateReminder;
+use App\Modules\Reminders\Filament\Resources\ReminderResource\Pages\EditReminder;
 use App\Modules\Reminders\Filament\Resources\ReminderResource\Pages\ListReminders;
 use App\Modules\Reminders\Models\Reminder;
 use Filament\Facades\Filament;
@@ -8,6 +9,24 @@ use Livewire\Livewire;
 
 beforeEach(function () {
     Filament::setCurrentPanel(Filament::getPanel('app'));
+});
+
+it('marks a reminder complete from its edit page', function () {
+    [$household, $owner] = makeHousehold();
+    test()->actingAs($owner->user);
+    Filament::setTenant($household);
+
+    $reminder = Reminder::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => 'Zaliti cvijeće',
+        'due_date' => now()->addDay(),
+    ]);
+
+    Livewire::test(EditReminder::class, ['record' => $reminder->getRouteKey()])
+        ->callAction('complete');
+
+    expect($reminder->fresh()->completed_at)->not->toBeNull();
 });
 
 it('creates a reminder through the resource, stamping household and creator', function () {

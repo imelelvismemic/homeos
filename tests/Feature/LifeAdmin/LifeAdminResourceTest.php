@@ -2,6 +2,7 @@
 
 use App\Modules\LifeAdmin\Enums\DocumentType;
 use App\Modules\LifeAdmin\Filament\Resources\ContactResource\Pages\CreateContact;
+use App\Modules\LifeAdmin\Filament\Resources\ContactResource\Pages\ListContacts;
 use App\Modules\LifeAdmin\Filament\Resources\DocumentResource\Pages\CreateDocument;
 use App\Modules\LifeAdmin\Filament\Resources\DocumentResource\Pages\ListDocuments;
 use App\Modules\LifeAdmin\Filament\Resources\ShoppingListResource\Pages\CreateShoppingList;
@@ -83,6 +84,35 @@ it('creates a contact through the resource, stamping household and creator', fun
     expect($contact)->not->toBeNull();
     expect($contact->household_id)->toBe($household->id);
     expect($contact->created_by)->toBe($owner->user_id);
+});
+
+it('searches contacts by phone and email in the list', function () {
+    [$household, $owner] = makeHousehold();
+    test()->actingAs($owner->user);
+    Filament::setTenant($household);
+
+    $byPhone = Contact::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'name' => 'Vodoinstalater',
+        'phone' => '061987654',
+    ]);
+    $byEmail = Contact::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'name' => 'Ljekar',
+        'email' => 'ordinacija@example.com',
+    ]);
+
+    Livewire::test(ListContacts::class)
+        ->searchTable('061987654')
+        ->assertCanSeeTableRecords([$byPhone])
+        ->assertCanNotSeeTableRecords([$byEmail]);
+
+    Livewire::test(ListContacts::class)
+        ->searchTable('ordinacija@example.com')
+        ->assertCanSeeTableRecords([$byEmail])
+        ->assertCanNotSeeTableRecords([$byPhone]);
 });
 
 it('creates a shopping list with items that can be checked off', function () {

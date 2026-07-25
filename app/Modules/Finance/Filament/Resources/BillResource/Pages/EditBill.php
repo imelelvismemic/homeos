@@ -4,6 +4,7 @@ namespace App\Modules\Finance\Filament\Resources\BillResource\Pages;
 
 use App\Modules\Finance\Filament\Resources\BillResource;
 use App\Platform\Recurrence\RecurrenceService;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -19,6 +20,13 @@ class EditBill extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('markPaid')
+                ->label(__('finance.bills.actions.mark_paid'))
+                ->icon('heroicon-m-check')
+                ->color('success')
+                ->visible(fn () => ! $this->record->isPaid())
+                ->requiresConfirmation()
+                ->action(fn () => $this->record->update(['paid_at' => now()])),
             DeleteAction::make()
                 ->modalHeading(__('finance.bills.delete'))
                 ->modalDescription(fn () => __('finance.bills.delete_description', ['title' => $this->record->title])),

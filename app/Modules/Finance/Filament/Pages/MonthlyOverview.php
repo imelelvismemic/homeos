@@ -13,6 +13,7 @@ use App\Platform\Models\HouseholdMember;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 /**
  * Mjesečni pregled (ORIGINAL_SPEC): prihod/rashod tekućeg mjeseca, potrošeno po
@@ -29,6 +30,14 @@ class MonthlyOverview extends Page
 
     protected static ?int $navigationSort = 0;
 
+    /** Odabrani mjesec (prvi dan mjeseca, Y-m-d) — navigacija prethodni/sljedeći. */
+    public ?string $period = null;
+
+    public function mount(): void
+    {
+        $this->period = Carbon::now()->startOfMonth()->toDateString();
+    }
+
     public static function getNavigationLabel(): string
     {
         return __('finance.overview.title');
@@ -36,7 +45,37 @@ class MonthlyOverview extends Page
 
     public function getTitle(): string
     {
-        return __('finance.overview.title').' — '.Carbon::now()->translatedFormat('F Y.');
+        return __('finance.overview.title').' — '.$this->periodLabel();
+    }
+
+    private function periodDate(): Carbon
+    {
+        return $this->period !== null
+            ? Carbon::parse($this->period)->startOfMonth()
+            : Carbon::now()->startOfMonth();
+    }
+
+    public function periodLabel(): string
+    {
+        return Str::ucfirst($this->periodDate()->translatedFormat('F Y.'));
+    }
+
+    /** Ne dopuštamo prelazak u budućnost — najdalje do tekućeg mjeseca. */
+    public function canGoNext(): bool
+    {
+        return $this->periodDate()->lt(Carbon::now()->startOfMonth());
+    }
+
+    public function previousMonth(): void
+    {
+        $this->period = $this->periodDate()->subMonthNoOverflow()->toDateString();
+    }
+
+    public function nextMonth(): void
+    {
+        if ($this->canGoNext()) {
+            $this->period = $this->periodDate()->addMonthNoOverflow()->toDateString();
+        }
     }
 
     public static function getNavigationGroup(): ?string
@@ -53,12 +92,12 @@ class MonthlyOverview extends Page
 
     private function start(): Carbon
     {
-        return Carbon::now()->startOfMonth();
+        return $this->periodDate()->startOfMonth();
     }
 
     private function end(): Carbon
     {
-        return Carbon::now()->endOfMonth();
+        return $this->periodDate()->endOfMonth();
     }
 
     /** @return array<string, float> */

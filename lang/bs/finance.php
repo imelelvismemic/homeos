@@ -115,6 +115,8 @@ return [
 
     'overview' => [
         'title' => 'Mjesečni pregled',
+        'previous_month' => 'Prethodni mjesec',
+        'next_month' => 'Sljedeći mjesec',
         'income' => 'Prihod',
         'expense' => 'Rashod',
         'net' => 'Saldo',

@@ -85,8 +85,8 @@ class ContactResource extends Resource
             ->columns([
                 TextColumn::make('name')->label(__('lifeadmin.contacts.fields.name'))->searchable()->weight('medium'),
                 TextColumn::make('relationship')->label(__('lifeadmin.contacts.fields.relationship'))->placeholder('—')->searchable(),
-                TextColumn::make('phone')->label(__('lifeadmin.contacts.fields.phone'))->placeholder('—')->copyable(),
-                TextColumn::make('email')->label(__('lifeadmin.contacts.fields.email'))->placeholder('—')->copyable()->toggleable(),
+                TextColumn::make('phone')->label(__('lifeadmin.contacts.fields.phone'))->placeholder('—')->searchable()->copyable(),
+                TextColumn::make('email')->label(__('lifeadmin.contacts.fields.email'))->placeholder('—')->searchable()->copyable()->toggleable(),
             ])
             ->defaultSort('name')
             ->actions([

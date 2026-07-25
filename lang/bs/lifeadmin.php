@@ -92,6 +92,9 @@ return [
     'items' => [
         'label' => 'Stavka',
         'plural_label' => 'Stavke',
+        'headings' => ['create' => 'Dodaj stavku', 'edit' => 'Uredi stavku'],
+        'delete' => 'Brisanje stavke',
+        'delete_description' => 'Sigurno želite obrisati stavku ":name"? Ova radnja je nepovratna.',
         'fields' => [
             'name' => 'Stavka',
             'is_done' => 'Kupljeno',

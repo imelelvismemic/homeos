@@ -1,7 +1,9 @@
 <?php
 
 use App\Modules\Finance\Enums\TransactionType;
+use App\Modules\Finance\Filament\Pages\MonthlyOverview;
 use App\Modules\Finance\Filament\Resources\BillResource\Pages\CreateBill;
+use App\Modules\Finance\Filament\Resources\BillResource\Pages\EditBill;
 use App\Modules\Finance\Filament\Resources\BillResource\Pages\ListBills;
 use App\Modules\Finance\Filament\Resources\TransactionResource\Pages\CreateTransaction;
 use App\Modules\Finance\Models\Bill;
@@ -75,4 +77,41 @@ it('never shows a bill to a member of another household', function () {
     Filament::setTenant($householdB);
 
     Livewire::test(ListBills::class)->assertCanNotSeeTableRecords([$bill]);
+});
+
+it('marks a bill paid from its edit page', function () {
+    [$household, $owner] = makeHousehold();
+    test()->actingAs($owner->user);
+    Filament::setTenant($household);
+
+    $bill = Bill::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => 'Struja',
+        'amount' => 60,
+        'due_date' => now()->addDays(3)->toDateString(),
+    ]);
+
+    Livewire::test(EditBill::class, ['record' => $bill->getRouteKey()])
+        ->callAction('markPaid');
+
+    expect($bill->fresh()->isPaid())->toBeTrue();
+});
+
+it('lets the monthly overview step to the previous month but not past the current month', function () {
+    [$household, $owner] = makeHousehold();
+    test()->actingAs($owner->user);
+    Filament::setTenant($household);
+
+    $current = now()->startOfMonth()->toDateString();
+    $previous = now()->startOfMonth()->subMonthNoOverflow()->toDateString();
+
+    Livewire::test(MonthlyOverview::class)
+        ->assertSet('period', $current)
+        ->call('nextMonth')            // već na tekućem mjesecu → ne mijenja se
+        ->assertSet('period', $current)
+        ->call('previousMonth')
+        ->assertSet('period', $previous)
+        ->call('nextMonth')
+        ->assertSet('period', $current);
 });

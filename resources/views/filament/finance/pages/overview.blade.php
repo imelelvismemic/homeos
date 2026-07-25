@@ -1,4 +1,27 @@
 <x-filament-panels::page>
+    {{-- Navigacija po mjesecima (najdalje do tekućeg mjeseca) --}}
+    <div class="flex items-center justify-between gap-3">
+        <x-filament::button
+            color="gray"
+            icon="heroicon-m-chevron-left"
+            wire:click="previousMonth"
+        >
+            {{ __('finance.overview.previous_month') }}
+        </x-filament::button>
+
+        <span class="text-base font-semibold text-gray-950 dark:text-white">{{ $this->periodLabel() }}</span>
+
+        <x-filament::button
+            color="gray"
+            icon="heroicon-m-chevron-right"
+            icon-position="after"
+            wire:click="nextMonth"
+            :disabled="! $this->canGoNext()"
+        >
+            {{ __('finance.overview.next_month') }}
+        </x-filament::button>
+    </div>
+
     @php($totals = $this->totals())
 
     {{-- Sažetak mjeseca --}}

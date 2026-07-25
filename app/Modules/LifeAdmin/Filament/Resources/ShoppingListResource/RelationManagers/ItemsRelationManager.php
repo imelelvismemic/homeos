@@ -11,6 +11,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Stavke liste za kupovinu. `is_done` je ToggleColumn — štiklira se odmah (bez
@@ -20,7 +21,10 @@ class ItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'items';
 
-    protected static ?string $title = null;
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('lifeadmin.items.plural_label');
+    }
 
     public function form(Form $form): Form
     {
@@ -36,21 +40,26 @@ class ItemsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('name')
-            ->heading(__('lifeadmin.items.plural_label'))
+            ->modelLabel(__('lifeadmin.items.label'))
+            ->pluralModelLabel(__('lifeadmin.items.plural_label'))
             ->columns([
                 ToggleColumn::make('is_done')->label(__('lifeadmin.items.fields.is_done')),
                 TextColumn::make('name')
                     ->label(__('lifeadmin.items.fields.name'))
-                    ->description(fn () => null)
-                    ->color(fn ($record) => $record->is_done ? 'gray' : null),
+                    ->color(fn (Model $record) => $record->is_done ? 'gray' : null),
             ])
             ->defaultSort('is_done')
             ->headerActions([
-                CreateAction::make()->label(__('lifeadmin.items.actions.add')),
+                CreateAction::make()
+                    ->label(__('lifeadmin.items.actions.add'))
+                    ->modalHeading(__('lifeadmin.items.headings.create')),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->modalHeading(__('lifeadmin.items.headings.edit')),
+                DeleteAction::make()
+                    ->modalHeading(__('lifeadmin.items.delete'))
+                    ->modalDescription(fn (Model $record) => __('lifeadmin.items.delete_description', ['name' => $record->name])),
             ])
             ->emptyStateHeading(__('lifeadmin.items.empty.heading'))
             ->emptyStateDescription(__('lifeadmin.items.empty.description'))
