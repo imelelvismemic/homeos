@@ -30,5 +30,7 @@ it('does not let a plain member rename the household', function () {
     test()->actingAs($member);
     Filament::setTenant($household);
 
-    expect(EditHouseholdProfile::canView($household))->toBeFalse();
+    // Član vidi stranicu (i listu članova), ali ne može mijenjati naziv.
+    expect(EditHouseholdProfile::canView($household))->toBeTrue();
+    expect(EditHouseholdProfile::currentUserIsOwner())->toBeFalse();
 });

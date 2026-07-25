@@ -435,3 +435,17 @@ ispravke koje su dotakle više modula odjednom:
   formu dodavanja s koje je korisnik došao — pravilo u `docs/PRAVILA.md` §9 i u
   checklisti novog modula.
 - **Mobilna navigacija** — meni više ne završava ispod URL trake browsera.
+
+**Treći krug QA-a — konsolidacija postavki:** „moje postavke“ i „postavke
+domaćinstva“ su svedene na dvije stranice umjesto četiri stavke menija.
+
+- **Profil korisnika** je dobio kartice: Nalog (podaci + slika), Lozinka i
+  **Obavještenja** (email po kategoriji + ritam sažetka, ranije zasebna stavka).
+- **Postavke domaćinstva** sada nose i **članove**: listu vidi svaki član, a
+  radnje (pozovi, uloga, prijenos vlasništva, uklanjanje) i izmjenu naziva samo
+  vlasnik. `HouseholdMemberResource` je uklonjen — jedna stranica, jedno mjesto.
+- **Profilna slika se nije prikazivala** nakon snimanja: privatni disk nema
+  javni ni privremeni URL, pa je Filament generisao neupotrebljiv link; pregled
+  sada ide kroz istu autentikovanu rutu kao i avatar u panelu.
+- Prevedeni „Save changes“ i cijeli uređivač slike, kroz `lang/vendor/*` — dakle
+  spremno i za engleski/njemački iz Faze 9.

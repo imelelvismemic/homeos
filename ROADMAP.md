@@ -469,6 +469,24 @@ Vlasnički pregled cijele aplikacije nakon Faze 6. Ispravljeno:
 - **Mobilna navigacija** — meni je dobio rezervu na dnu (uz `safe-area`), jer je
   URL traka mobilnog browsera prekrivala posljednje stavke.
 
+**Treći krug QA-a — konsolidacija postavki:**
+
+- **Postavke obavještenja** više nisu zasebna stavka menija — postale su kartica
+  na profilu korisnika (`UserProfile`: Nalog / Lozinka / Obavještenja), jer su i
+  jedno i drugo „moje postavke“. Kategorije i dalje dolaze iz registryja.
+- **Članovi domaćinstva** više nisu zasebna stavka menija ni Filament Resource —
+  lista i sve radnje (pozovi, promijeni ulogu, prenesi vlasništvo, ukloni) su na
+  stranici **Postavke domaćinstva**, uz naziv domaćinstva. **Svaki član vidi ko
+  je u domaćinstvu**; izmjene (naziv i radnje nad članovima) ostaju vlasniku —
+  zato `canView()` provjerava članstvo, a ne Policy `update`.
+- **Profilna slika se nije prikazivala** nakon snimanja (bijeli kvadrat):
+  privatni lokalni disk nema javni ni privremeni URL, pa je Filament generisao
+  neupotrebljiv `/storage/...` link. Pregled sada ide kroz našu autentikovanu
+  rutu (`getUploadedFileUsing`).
+- **Prijevodi**: „Save changes“ na postavkama domaćinstva i cijeli uređivač slike
+  (Cancel/Reset/Save/Width/Height/Rotation…) — kroz `lang/vendor/*` override, pa
+  su spremni i za `en`/`de` iz Faze 9 (tačka 6).
+
 **Nije propust, nego obim Faze 7:** uključivanje/isključivanje modula po
 domaćinstvu. Ključ `enabled` u `config/homeos-apps.php` postoji i **svi** registri
 ga već poštuju (dashboard, pretraga, kalendar, digest, brzo dodavanje, kategorije

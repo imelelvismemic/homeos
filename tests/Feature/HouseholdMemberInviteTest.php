@@ -1,9 +1,10 @@
 <?php
 
 use App\Models\User;
-use App\Platform\Filament\Resources\HouseholdMemberResource\Pages\ListHouseholdMembers;
+use App\Platform\Filament\Tenancy\EditHouseholdProfile;
 use App\Platform\Models\Household;
 use Filament\Facades\Filament;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -20,6 +21,12 @@ function makeHouseholdWithOwner(): array
     return [$household, $owner];
 }
 
+/** Članovi domaćinstva žive na stranici postavki domaćinstva, ne kao zasebna stavka menija. */
+function householdProfile(Household $household): Testable
+{
+    return Livewire::test(EditHouseholdProfile::class, ['tenant' => $household]);
+}
+
 it('lets the owner invite an existing registered user by email', function () {
     [$household, $owner] = makeHouseholdWithOwner();
     $invitee = User::factory()->create(['email' => 'invitee@example.com']);
@@ -27,7 +34,7 @@ it('lets the owner invite an existing registered user by email', function () {
     test()->actingAs($owner);
     Filament::setTenant($household);
 
-    Livewire::test(ListHouseholdMembers::class)
+    householdProfile($household)
         ->callAction('invite', data: [
             'email' => 'invitee@example.com',
             'role' => 'member',
@@ -43,7 +50,7 @@ it('rejects inviting an email with no registered user', function () {
     test()->actingAs($owner);
     Filament::setTenant($household);
 
-    Livewire::test(ListHouseholdMembers::class)
+    householdProfile($household)
         ->callAction('invite', data: [
             'email' => 'nobody@example.com',
             'role' => 'member',
@@ -57,7 +64,7 @@ it('rejects inviting a user who is already a member', function () {
     test()->actingAs($owner);
     Filament::setTenant($household);
 
-    Livewire::test(ListHouseholdMembers::class)
+    householdProfile($household)
         ->callAction('invite', data: [
             'email' => $owner->email,
             'role' => 'member',
@@ -72,10 +79,24 @@ it('hides the invite action from a member who is not the household owner', funct
 
     test()->actingAs($owner);
     Filament::setTenant($household);
-    Livewire::test(ListHouseholdMembers::class)->assertActionVisible('invite');
+    householdProfile($household)->assertActionVisible('invite');
 
     test()->actingAs($member);
-    Livewire::test(ListHouseholdMembers::class)->assertActionHidden('invite');
+    householdProfile($household)->assertActionHidden('invite');
+});
+
+it('shows every member of the household to a plain member too', function () {
+    [$household, $owner] = makeHouseholdWithOwner();
+    $member = User::factory()->create(['name' => 'Drugi član']);
+    $household->members()->create(['user_id' => $member->id, 'role' => 'member', 'joined_at' => now()]);
+
+    test()->actingAs($member);
+    Filament::setTenant($household);
+
+    householdProfile($household)
+        ->assertOk()
+        ->assertCanSeeTableRecords($household->members()->get())
+        ->assertSee($owner->name);
 });
 
 it('does not let a member of another household see this household members', function () {
@@ -84,4 +105,5 @@ it('does not let a member of another household see this household members', func
 
     expect($household->users()->whereKey($otherOwner->id)->exists())->toBeFalse();
     expect($otherOwner->can('view', $household))->toBeFalse();
+    expect(EditHouseholdProfile::canView($household))->toBeFalse();
 });
