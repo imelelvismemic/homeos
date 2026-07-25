@@ -444,6 +444,31 @@ Vlasnički pregled cijele aplikacije nakon Faze 6. Ispravljeno:
   cijelom sistemu; pretraga listi po odgovornoj osobi/oznakama fiksirana kao
   pravilo (PRAVILA.md §8).
 
+**Drugi krug QA-a (isti prolaz, nakon provjere vlasnika):**
+
+- **Naziv domaćinstva** — vlasnik ga mijenja kroz „Postavke domaćinstva“
+  (`EditHouseholdProfile`, Filament tenant profil); pristup ide kroz postojeću
+  `HouseholdPolicy::update`, dakle član ne može.
+- **Profil korisnika je vraćao 500** — Filamentov ugrađeni `->profile()` se
+  registruje IZVAN tenant rute, pa panel layout puca kad navigacija zatraži
+  URL-ove vezane za domaćinstvo. Zamijenjen vlastitom stranicom panela
+  (`UserProfile`), dostupnom iz korisničkog menija. Uz to: **profilna slika**
+  (upload i uklanjanje) na privatnom disku, servirana autentikovanom rutom
+  (`AvatarController`) — javni disk nije opcija jer Nginx servira host checkout.
+- **Kalendar** — događaji se sada dohvataju kao FullCalendar feed
+  (`CalendarEventsController`, raspon koji je prikazan), pa se nakon brzog
+  dodavanja osvježe **bez promjene mjeseca**. Izabrani dan se prosljeđuje unosu:
+  zadatku kao rok, bilješci kao datum dnevnika, trošku kao datum (ranije je
+  upisivao današnji), podsjetniku kao predloženo vrijeme.
+- **Brzo dodavanje računa** — modul sada može registrovati **više** tipova
+  brzog unosa (`quick_capture` kao lista definicija s vlastitim `key`), pa
+  Finansije nude i trošak (`finance.expense`) i račun (`finance.bill`, s
+  naslovom, iznosom i rokom). Dodan i tip polja `date`.
+- **„Nazad“ s forme uređivanja** vodi na listu, ne na prethodnu stranicu
+  (`CancelReturnsToList` na svim Edit stranicama) — `docs/PRAVILA.md` §9.
+- **Mobilna navigacija** — meni je dobio rezervu na dnu (uz `safe-area`), jer je
+  URL traka mobilnog browsera prekrivala posljednje stavke.
+
 **Nije propust, nego obim Faze 7:** uključivanje/isključivanje modula po
 domaćinstvu. Ključ `enabled` u `config/homeos-apps.php` postoji i **svi** registri
 ga već poštuju (dashboard, pretraga, kalendar, digest, brzo dodavanje, kategorije
@@ -509,6 +534,48 @@ bez gubitka podataka.
    ispuniti ta pravila kroz checklistu (tačka 14).
 4. Sigurnosni pregled — rate limiting, CSRF, autorizacija po household-u
    (da član jednog domaćinstva ne može vidjeti podatke drugog).
+
+**Dodano na zahtjev vlasnika (prije izrade Faze 9) — radi se PRVO, jer rebrend i
+višejezičnost diraju svaki string u sistemu, pa finalni UX prolaz (tačka 3) ima
+smisla tek nakon njih:**
+
+5. **Rebrend „Home OS" → „Home OS plus"** kroz cijeli sistem, a ne samo naslov:
+   - `APP_NAME` (`.env.example`, `.env.prod.example`, CI/deploy okruženje),
+     naslov panela i `<title>`, login/registracija, prazna stanja koja spominju
+     naziv, email šabloni i potpis digesta, `README.md`/`SUBMISSION.md`.
+   - Provjeriti da nigdje nije hardkodovan naziv u Blade/PHP-u — ide kroz
+     `config('app.name')` odnosno prijevod (`docs/PRAVILA.md` §1).
+   - Domena, ime repozitorija, Docker/DB imena i `homeos.imel.cloud` se **NE**
+     mijenjaju (infrastruktura ostaje ista) — mijenja se samo ono što korisnik
+     vidi. To eksplicitno navesti u commit poruci da se kasnije ne "ispravlja".
+   - Ako se mijenja i logo/wordmark, ide u istu izmjenu (tema, tačka 6 CLAUDE.md).
+
+6. **Višejezičnost: bosanski (default), engleski, njemački** kroz cijeli sistem:
+   - Postojeći `lang/bs/*` je referentni set; dodaju se `lang/en/*` i `lang/de/*`
+     s **istim ključevima** (nedostajući ključ mora biti greška u pregledu, ne
+     tihi fallback na engleski Filamentov tekst). Isto važi za `lang/vendor/*`
+     override-e i `lang/*.json`.
+   - Izbor jezika **zastavicama, bez teksta** (`bs` / `en` / `de`), dostupan na
+     **dvije tačke**: na **login formi** (prije prijave — bira se za sesiju) i u
+     **topbaru** (nakon prijave). Zastavice moraju imati `aria-label`/`title` s
+     nazivom jezika radi pristupačnosti (CLAUDE.md §6) — vizuelno bez teksta,
+     ali ne i za čitače ekrana.
+   - Odabir prijavljenog korisnika se **pamti na korisniku** (`users.locale`
+     kolona već postoji u modelu — dodati migraciju ako nedostaje u bazi), a za
+     neprijavljene u sesiji. Middleware postavlja `App::setLocale()` iz tog
+     izvora, ne iz `Accept-Language`.
+   - Email obavještenja i digest se šalju na jeziku **primaoca** (član, ne
+     pošiljalac) — Notification klase moraju postaviti locale prije renderovanja.
+   - Datumi/valuta ostaju po `docs/PRAVILA.md` §6 (24h, `d.m.Y`, KM) na svim
+     jezicima — ne prevoditi format u lokalne konvencije.
+   - Testovi: za svaki jezik jedan smoke test da se ključne stranice renderuju i
+     da nema nedostajućih ključeva (usporedba skupa ključeva `bs` vs `en`/`de`).
+
+7. **Footer aplikacije** — tanka traka na dnu svake stranice panela:
+   „Powered by @elvismemic" + verzija (`v1.0`). Verzija se čita iz jednog mjesta
+   (npr. `config('app.version')`), ne hardkodovano po layoutu; footer ide kroz
+   Filament render hook (`PanelsRenderHook::FOOTER`), diskretno, u skladu s
+   temom i u light/dark varijanti.
 
 ---
 

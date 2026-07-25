@@ -10,6 +10,7 @@ return [
         'register_heading' => 'Kreirajte svoje domaćinstvo',
         'register_subheading' => 'Ovo je prostor u kojem ćete dijeliti zadatke, kalendar, bilješke i još mnogo toga sa članovima porodice.',
         'register_submit' => 'Kreiraj domaćinstvo',
+        'settings_label' => 'Postavke domaćinstva',
     ],
 
     'members' => [
@@ -50,8 +51,19 @@ return [
 
     'profile' => [
         'title' => 'Moj profil',
+        'account_section' => 'Podaci naloga',
+        'avatar' => 'Profilna slika',
+        'avatar_help' => 'Kvadratna slika izgleda najbolje. Za uklanjanje slike kliknite × na njoj, pa sačuvajte.',
+        'name' => 'Ime i prezime',
+        'email' => 'E-mail adresa',
+        'password_section' => 'Promjena lozinke',
+        'password_help' => 'Ostavite prazno ako ne mijenjate lozinku.',
+        'new_password' => 'Nova lozinka',
+        'new_password_confirmation' => 'Potvrdi novu lozinku',
         'current_password' => 'Trenutna lozinka',
         'current_password_help' => 'Radi sigurnosti potvrdite lozinku kojom se sada prijavljujete.',
+        'save' => 'Sačuvaj',
+        'saved' => 'Profil je sačuvan.',
     ],
 
     'sharing' => [

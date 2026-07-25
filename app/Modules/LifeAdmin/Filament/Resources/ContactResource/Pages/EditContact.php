@@ -3,12 +3,15 @@
 namespace App\Modules\LifeAdmin\Filament\Resources\ContactResource\Pages;
 
 use App\Modules\LifeAdmin\Filament\Resources\ContactResource;
+use App\Platform\Filament\Concerns\CancelReturnsToList;
 use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditContact extends EditRecord
 {
+    use CancelReturnsToList;
+
     protected static string $resource = ContactResource::class;
 
     public function getTitle(): string

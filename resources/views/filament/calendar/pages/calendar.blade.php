@@ -41,7 +41,7 @@
 
     <script>
         (function () {
-            const events = @json($this->events());
+            const eventsUrl = @json($this->eventsUrl());
 
             function bootHomeosCalendar() {
                 const el = document.getElementById('homeos-calendar');
@@ -52,7 +52,7 @@
                     return;
                 }
                 el.dataset.booted = '1';
-                window.initHomeosCalendar(el, events);
+                window.initHomeosCalendar(el, eventsUrl);
             }
 
             document.addEventListener('DOMContentLoaded', bootHomeosCalendar);

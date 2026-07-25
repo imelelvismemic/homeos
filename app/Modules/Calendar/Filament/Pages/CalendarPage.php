@@ -2,7 +2,6 @@
 
 namespace App\Modules\Calendar\Filament\Pages;
 
-use App\Platform\Calendar\CalendarService;
 use App\Platform\Models\Household;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
@@ -40,23 +39,18 @@ class CalendarPage extends Page
     }
 
     /**
-     * Događaji za širok prozor (prošli mjesec → naredna dva) — dovoljno za
-     * mjesečni/sedmični pregled bez dinamičkog dohvata po rasponu.
-     *
-     * @return array<int, array<string, mixed>>
+     * URL feeda događaja. FullCalendar sam javlja raspon koji prikazuje, pa se
+     * događaji dohvataju po potrebi i mogu se ponovo učitati (nakon brzog
+     * dodavanja) bez promjene prikazanog mjeseca.
      */
-    public function events(): array
+    public function eventsUrl(): ?string
     {
         $household = Filament::getTenant();
 
         if (! $household instanceof Household) {
-            return [];
+            return null;
         }
 
-        return app(CalendarService::class)->fullCalendarEvents(
-            now()->startOfMonth()->subMonth(),
-            now()->endOfMonth()->addMonths(2),
-            $household,
-        );
+        return route('filament.app.calendar-events', ['h' => $household->getKey()]);
     }
 }

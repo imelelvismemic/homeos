@@ -2,6 +2,7 @@
 
 use App\Modules\Tasks\Enums\Priority;
 use App\Modules\Tasks\Enums\TaskStatus;
+use App\Modules\Tasks\Filament\Resources\TaskResource;
 use App\Modules\Tasks\Filament\Resources\TaskResource\Pages\CreateTask;
 use App\Modules\Tasks\Filament\Resources\TaskResource\Pages\EditTask;
 use App\Modules\Tasks\Filament\Resources\TaskResource\Pages\ListTasks;
@@ -169,4 +170,22 @@ it('hides a private task from other members of the same household', function () 
     Livewire::test(ListTasks::class)
         ->assertCanSeeTableRecords([$shared])
         ->assertCanNotSeeTableRecords([$private]);
+});
+
+it('sends the user back to the list from the edit form, not to the previous page', function () {
+    [$household, $owner] = makeHousehold();
+    test()->actingAs($owner->user);
+    Filament::setTenant($household);
+
+    $task = Task::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => 'Zadatak za povratak',
+    ]);
+
+    // Nakon dodavanja korisnik završi na formi uređivanja; "Nazad" tada ne smije
+    // raditi history.back() (vratilo bi ga na formu dodavanja) — vodi na listu.
+    Livewire::test(EditTask::class, ['record' => $task->getKey()])
+        ->assertDontSee('window.history.back()', escape: false)
+        ->assertSee(TaskResource::getUrl('index', ['tenant' => $household]), escape: false);
 });

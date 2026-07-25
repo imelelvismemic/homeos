@@ -3,6 +3,7 @@
 namespace App\Modules\Finance\Filament\Resources\BillResource\Pages;
 
 use App\Modules\Finance\Filament\Resources\BillResource;
+use App\Platform\Filament\Concerns\CancelReturnsToList;
 use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Recurrence\RecurrenceService;
 use Filament\Actions\Action;
@@ -11,6 +12,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditBill extends EditRecord
 {
+    use CancelReturnsToList;
+
     protected static string $resource = BillResource::class;
 
     public function getTitle(): string

@@ -389,6 +389,8 @@ Prije nego što se modul smatra gotovim, mora ispuniti sve tačke:
       tačke 6 — testiran na mobile/tablet/desktop, prazna stanja i greške
       imaju smislen tekst
 - [ ] Prijevodi u `lang/bs/<modul>.php` (tačka 13)
+- [ ] Edit stranice koriste `App\Platform\Filament\Concerns\CancelReturnsToList`
+      — „Nazad“ vodi na listu, ne na prethodnu stranicu (`docs/PRAVILA.md` §9)
 - [ ] Radi (ne baca grešku) i kad su drugi opcioni moduli isključeni —
       testirati eksplicitno (Pest test)
 - [ ] Pest testovi za osnovni CRUD i za svaki emitovan event

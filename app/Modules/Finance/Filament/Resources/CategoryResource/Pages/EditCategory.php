@@ -3,11 +3,14 @@
 namespace App\Modules\Finance\Filament\Resources\CategoryResource\Pages;
 
 use App\Modules\Finance\Filament\Resources\CategoryResource;
+use App\Platform\Filament\Concerns\CancelReturnsToList;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditCategory extends EditRecord
 {
+    use CancelReturnsToList;
+
     protected static string $resource = CategoryResource::class;
 
     public function getTitle(): string

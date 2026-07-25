@@ -3,6 +3,7 @@
 use App\Modules\Finance\Calendar\BillCalendarSource;
 use App\Modules\Finance\Dashboard\FinanceDashboardWidget;
 use App\Modules\Finance\Digest\BillDigestSource;
+use App\Modules\Finance\QuickCapture\BillQuickCreate;
 use App\Modules\Finance\QuickCapture\FinanceQuickCreate;
 use App\Modules\Finance\Search\FinanceSearchProvider;
 use App\Modules\LifeAdmin\Calendar\DocumentExpiryCalendarSource;
@@ -100,13 +101,29 @@ return [
         'calendar_source' => BillCalendarSource::class,
         'digest_source' => BillDigestSource::class,
         'notification_categories' => ['bill_due'],
+        // Finansije nude dva tipa brzog unosa — lista definicija, javni ključevi
+        // su `finance.expense` i `finance.bill` (vidi QuickCaptureRegistry).
         'quick_capture' => [
-            'label' => 'Novi trošak',
-            'icon' => 'heroicon-o-banknotes',
-            'handler' => FinanceQuickCreate::class,
-            'fields' => [
-                ['name' => 'title', 'label' => 'Naziv', 'type' => 'text', 'required' => true],
-                ['name' => 'amount', 'label' => 'Iznos (KM)', 'type' => 'number', 'required' => true],
+            [
+                'key' => 'expense',
+                'label' => 'Novi trošak',
+                'icon' => 'heroicon-o-banknotes',
+                'handler' => FinanceQuickCreate::class,
+                'fields' => [
+                    ['name' => 'title', 'label' => 'Naziv', 'type' => 'text', 'required' => true],
+                    ['name' => 'amount', 'label' => 'Iznos (KM)', 'type' => 'number', 'required' => true],
+                ],
+            ],
+            [
+                'key' => 'bill',
+                'label' => 'Novi račun',
+                'icon' => 'heroicon-o-document-currency-euro',
+                'handler' => BillQuickCreate::class,
+                'fields' => [
+                    ['name' => 'title', 'label' => 'Naziv', 'type' => 'text', 'required' => true],
+                    ['name' => 'amount', 'label' => 'Iznos (KM)', 'type' => 'number', 'required' => true],
+                    ['name' => 'due_date', 'label' => 'Rok plaćanja', 'type' => 'date', 'required' => true],
+                ],
             ],
         ],
     ],

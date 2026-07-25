@@ -16,6 +16,11 @@ interface QuickCreateContract
     /**
      * Validaciona pravila za polja brzog dodavanja (Laravel validator).
      *
+     * Uz vidljiva polja, modal opciono šalje i `date` — datum koji je korisnik
+     * kliknuo na kalendaru. Handler koji taj datum ima gdje smisleno upisati
+     * (rok zadatka, datum dnevnika, datum troška) treba ga primiti u pravilima
+     * kao `['nullable', 'date']`; ostali ga jednostavno ignorišu.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array;

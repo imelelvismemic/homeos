@@ -15,6 +15,8 @@ class TaskQuickCreate implements QuickCreateContract
     {
         return [
             'title' => ['required', 'string', 'max:255'],
+            // Datum kliknut na kalendaru (opciono).
+            'date' => ['nullable', 'date'],
         ];
     }
 
@@ -24,6 +26,8 @@ class TaskQuickCreate implements QuickCreateContract
             'household_id' => $household->getKey(),
             'created_by' => $user->getKey(),
             'title' => $data['title'],
+            // Dodavanje s kalendara: kliknuti dan je rok zadatka.
+            'due_date' => $data['date'] ?? null,
             'priority' => Priority::Medium,
             'status' => TaskStatus::Todo,
         ]);

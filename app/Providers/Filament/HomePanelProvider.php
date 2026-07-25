@@ -3,9 +3,12 @@
 namespace App\Providers\Filament;
 
 use App\Platform\Filament\Pages\Dashboard;
-use App\Platform\Filament\Pages\EditProfile;
 use App\Platform\Filament\Pages\NotificationsInbox;
 use App\Platform\Filament\Pages\RegisterHousehold;
+use App\Platform\Filament\Pages\UserProfile;
+use App\Platform\Filament\Tenancy\EditHouseholdProfile;
+use App\Platform\Http\AvatarController;
+use App\Platform\Http\CalendarEventsController;
 use App\Platform\Http\QuickCreateController;
 use App\Platform\Http\SearchController;
 use App\Platform\Models\Household;
@@ -15,6 +18,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -38,17 +42,31 @@ class HomePanelProvider extends PanelProvider
             ->login()
             ->registration()
             ->passwordReset()
-            // Profil (ime, e-mail, promjena lozinke) — naša verzija traži i
-            // potvrdu trenutne lozinke prije promjene.
-            ->profile(EditProfile::class, isSimple: false)
+            // Profil NIJE Filamentov ->profile(): ta stranica se registruje izvan
+            // tenant rute, pa panel layout puca (500) jer navigacija traži tenant.
+            // Naša UserProfile je obična stranica panela, dostupna iz korisničkog menija.
+            ->userMenuItems([
+                'profile' => MenuItem::make()
+                    ->label(fn (): string => __('platform.profile.title'))
+                    ->icon('heroicon-m-user-circle')
+                    ->url(fn (): string => UserProfile::getUrl()),
+            ])
             ->tenant(Household::class)
             ->tenantRegistration(RegisterHousehold::class)
+            // Izmjena naziva domaćinstva (samo vlasnik) — stranica je unutar
+            // tenant ruta, pa ima puni kontekst domaćinstva.
+            ->tenantProfile(EditHouseholdProfile::class)
             // Endpointi koje topbar modali (pretraga, brzo dodavanje) zovu fetch-om.
             // Rute panela → SetUpPanel middleware (Filament kontekst); auth/tenant
             // provjera je u kontrolerima (kao SearchController).
             ->routes(function (): void {
                 Route::get('/pretraga', SearchController::class)->name('search');
                 Route::post('/brzo/{key}', QuickCreateController::class)->name('quick-create');
+                // Kalendar dohvata događaje po prikazanom rasponu (FullCalendar feed),
+                // pa se nakon brzog dodavanja osvježi bez promjene mjeseca.
+                Route::get('/kalendar/dogadjaji', CalendarEventsController::class)->name('calendar-events');
+                // Profilna slika s privatnog diska (autentikovano).
+                Route::get('/profil/slika/{user}', AvatarController::class)->name('avatar');
             })
             // Custom tema "Topli dom" (CLAUDE.md §6). Paleta kroz ->colors()
             // (Filament generiše CSS varijable); Fraunces/Inter i signature

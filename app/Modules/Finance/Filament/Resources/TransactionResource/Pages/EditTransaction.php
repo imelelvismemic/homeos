@@ -3,12 +3,15 @@
 namespace App\Modules\Finance\Filament\Resources\TransactionResource\Pages;
 
 use App\Modules\Finance\Filament\Resources\TransactionResource;
+use App\Platform\Filament\Concerns\CancelReturnsToList;
 use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditTransaction extends EditRecord
 {
+    use CancelReturnsToList;
+
     protected static string $resource = TransactionResource::class;
 
     public function getTitle(): string

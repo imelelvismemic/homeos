@@ -4,6 +4,7 @@ namespace App\Modules\Reminders\Filament\Resources\ReminderResource\Pages;
 
 use App\Modules\Reminders\Filament\Resources\ReminderResource;
 use App\Modules\Reminders\Services\ReminderFirer;
+use App\Platform\Filament\Concerns\CancelReturnsToList;
 use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Recurrence\RecurrenceService;
 use Filament\Actions\Action;
@@ -13,6 +14,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditReminder extends EditRecord
 {
+    use CancelReturnsToList;
+
     protected static string $resource = ReminderResource::class;
 
     public function getTitle(): string

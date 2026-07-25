@@ -34,22 +34,29 @@
             this.form = {};
             this.errors = {};
             this.saved = false;
+            // Datum s kalendara ide uz svaki unos: modul ga sam iskoristi kako mu
+            // odgovara (rok zadatka, datum dnevnika, datum troška), i onda kad
+            // nema vidljivo polje za njega.
+            if (this.prefillDate) {
+                this.form.date = this.prefillDate;
+            }
             this.$nextTick(() => {
-                this.$root.querySelectorAll('[data-qc-datetime]').forEach((el) => {
+                this.$root.querySelectorAll('[data-qc-datetime], [data-qc-date]').forEach((el) => {
                     if (el._flatpickr || ! window.flatpickr) return;
-                    const name = el.getAttribute('data-qc-datetime');
+                    const withTime = el.hasAttribute('data-qc-datetime');
+                    const name = el.getAttribute(withTime ? 'data-qc-datetime' : 'data-qc-date');
                     const picker = window.flatpickr(el, {
-                        enableTime: true,
+                        enableTime: withTime,
                         time_24hr: true,
-                        dateFormat: 'Y-m-d H:i',
+                        dateFormat: withTime ? 'Y-m-d H:i' : 'Y-m-d',
                         altInput: true,
-                        altFormat: 'd.m.Y H:i',
+                        altFormat: withTime ? 'd.m.Y H:i' : 'd.m.Y',
                         onChange: (dates, str) => { this.form[name] = str; },
                     });
 
-                    // Dan izabran u kalendaru → već upisan u polje vremena.
+                    // Dan izabran u kalendaru → već upisan u polje datuma/vremena.
                     if (this.prefillDate) {
-                        picker.setDate(this.prefillDate, true);
+                        picker.setDate(withTime ? this.prefillDate : this.prefillDate.slice(0, 10), true);
                     }
                 });
                 this.$root.querySelector('[data-qc-field]')?.focus();
@@ -72,6 +79,11 @@
                 });
                 if (res.ok) {
                     this.saved = true;
+                    // Stranice koje prikazuju podatke (kalendar) osvježe se same,
+                    // bez navigacije i bez gubitka trenutnog prikaza.
+                    window.dispatchEvent(new CustomEvent('homeos-quick-created', {
+                        detail: { key: this.activeKey },
+                    }));
                     setTimeout(() => { this.close(); this.reset(); }, 700);
                 } else if (res.status === 422) {
                     this.errors = (await res.json()).errors || {};
@@ -151,6 +163,15 @@
                                             data-qc-field
                                             x-bind:data-qc-datetime="field.name"
                                             placeholder="dd.mm.gggg ss:mm"
+                                            class="block w-full rounded-lg border-none bg-white text-sm text-gray-950 shadow-sm ring-1 ring-gray-950/10 focus:ring-2 focus:ring-primary-500 dark:bg-white/5 dark:text-white dark:ring-white/20"
+                                        />
+                                    </template>
+                                    <template x-if="field.type === 'date'">
+                                        <input
+                                            type="text"
+                                            data-qc-field
+                                            x-bind:data-qc-date="field.name"
+                                            placeholder="dd.mm.gggg"
                                             class="block w-full rounded-lg border-none bg-white text-sm text-gray-950 shadow-sm ring-1 ring-gray-950/10 focus:ring-2 focus:ring-primary-500 dark:bg-white/5 dark:text-white dark:ring-white/20"
                                         />
                                     </template>

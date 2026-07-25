@@ -17,9 +17,20 @@ use Illuminate\Support\Collection;
  *         ],
  *     ],
  *
- * Core ne zna za module — samo iterira registrovane stavke. Modal (Alpine + fetch)
- * renderuje tipove i polja odavde; generički QuickCreateController koristi handler.
- * Graceful sa 0 modula.
+ * Modul koji nudi VIŠE tipova brzog unosa (Finansije: trošak i račun) daje listu
+ * definicija, svaku sa svojim `key`:
+ *
+ *     'quick_capture' => [
+ *         ['key' => 'expense', 'label' => 'Novi trošak', 'handler' => …, 'fields' => …],
+ *         ['key' => 'bill',    'label' => 'Novi račun',  'handler' => …, 'fields' => …],
+ *     ],
+ *
+ * Javni ključ je tada `finance.expense` / `finance.bill`; modul s jednim tipom
+ * ostaje samo `tasks`. Core ne zna za module — iterira registrovane stavke; modal
+ * (Alpine + fetch) renderuje tipove i polja odavde, a generički QuickCreateController
+ * koristi handler. Graceful sa 0 modula.
+ *
+ * Podržani tipovi polja: `text`, `textarea`, `number`, `date`, `datetime`.
  */
 class QuickCaptureRegistry
 {
@@ -31,30 +42,41 @@ class QuickCaptureRegistry
     public function items(): Collection
     {
         return collect(config('homeos-apps', []))
-            ->filter(fn (array $app) => ($app['enabled'] ?? true) && ! empty($app['quick_capture']['handler']))
-            ->map(fn (array $app, string $key) => [
-                'key' => $key,
-                'label' => $app['quick_capture']['label'] ?? ($app['name'] ?? $key),
-                'icon' => $app['quick_capture']['icon'] ?? $app['icon'] ?? null,
-                'fields' => array_values($app['quick_capture']['fields'] ?? []),
-            ])
+            ->filter(fn (array $app) => $app['enabled'] ?? true)
+            ->flatMap(fn (array $app, string $moduleKey) => collect($this->definitions($app))
+                ->filter(fn (array $definition) => ! empty($definition['handler']))
+                ->map(fn (array $definition) => [
+                    'key' => $this->keyFor($moduleKey, $app, $definition),
+                    'label' => $definition['label'] ?? ($app['name'] ?? $moduleKey),
+                    'icon' => $definition['icon'] ?? $app['icon'] ?? null,
+                    'fields' => array_values($definition['fields'] ?? []),
+                ])
+                ->values())
             ->values();
     }
 
-    /** Handler klasa za dati modul (ili null ako nije registrovan/isključen). */
+    /** Handler klasa za dati ključ (ili null ako nije registrovan/isključen). */
     public function handlerClassFor(string $key): ?string
     {
-        $app = config("homeos-apps.{$key}");
+        [$moduleKey, $subKey] = array_pad(explode('.', $key, 2), 2, null);
+
+        $app = config("homeos-apps.{$moduleKey}");
 
         if (! is_array($app) || ! ($app['enabled'] ?? true)) {
             return null;
         }
 
-        return $app['quick_capture']['handler'] ?? null;
+        foreach ($this->definitions($app) as $definition) {
+            if (($definition['key'] ?? null) === $subKey) {
+                return $definition['handler'] ?? null;
+            }
+        }
+
+        return null;
     }
 
     /**
-     * Validaciona pravila za dati modul (iz handlera).
+     * Validaciona pravila za dati ključ (iz handlera).
      *
      * @return array<string, mixed>
      */
@@ -63,5 +85,33 @@ class QuickCaptureRegistry
         $handler = $this->handlerClassFor($key);
 
         return $handler ? app($handler)->rules() : [];
+    }
+
+    /**
+     * Definicije brzog unosa modula — uvijek kao lista (jedna ili više).
+     *
+     * @param  array<string, mixed>  $app
+     * @return array<int, array<string, mixed>>
+     */
+    private function definitions(array $app): array
+    {
+        $quickCapture = $app['quick_capture'] ?? null;
+
+        if (! is_array($quickCapture)) {
+            return [];
+        }
+
+        return array_is_list($quickCapture) ? $quickCapture : [$quickCapture];
+    }
+
+    /**
+     * @param  array<string, mixed>  $app
+     * @param  array<string, mixed>  $definition
+     */
+    private function keyFor(string $moduleKey, array $app, array $definition): string
+    {
+        return array_is_list($app['quick_capture'] ?? [])
+            ? $moduleKey.'.'.($definition['key'] ?? '')
+            : $moduleKey;
     }
 }

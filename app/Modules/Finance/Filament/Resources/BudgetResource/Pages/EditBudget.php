@@ -3,11 +3,14 @@
 namespace App\Modules\Finance\Filament\Resources\BudgetResource\Pages;
 
 use App\Modules\Finance\Filament\Resources\BudgetResource;
+use App\Platform\Filament\Concerns\CancelReturnsToList;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditBudget extends EditRecord
 {
+    use CancelReturnsToList;
+
     protected static string $resource = BudgetResource::class;
 
     public function getTitle(): string

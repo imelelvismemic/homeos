@@ -120,3 +120,15 @@ Univerzalna pretraga (`SearchProviderContract`, Ctrl/Cmd+K) je namjerno uža —
 ide samo po **vlastitom tekstu** zapisa (naslov + opis/sadržaj), jer se rezultati
 svih modula miješaju u jednoj listi pa bi pogodak po imenu člana ili oznaci bio
 zbunjujuć. Pretraga po odgovornoj osobi/oznakama pripada listi tog modula.
+
+## 9. Kretanje kroz forme („Nazad" uvijek vodi na listu)
+
+- Nakon **dodavanja** zapisa korisnik ostaje na formi **uređivanja** tog zapisa
+  (vidi da je snimljeno i može odmah dopuniti detalje).
+- Na formi uređivanja dugme **„Nazad" vodi na listu** tog modula — nikad natrag
+  na formu dodavanja. Filament po defaultu radi `window.history.back()`, pa
+  korisnik koji je upravo snimio zapis završi na praznoj formi dodavanja i
+  djeluje kao da ništa nije snimljeno.
+- Realizacija: svaka `EditRecord` stranica koristi
+  `App\Platform\Filament\Concerns\CancelReturnsToList` (uklanja `history.back()`
+  i postavlja URL liste). Dio je checkliste za novi modul (`CLAUDE.md` §14).

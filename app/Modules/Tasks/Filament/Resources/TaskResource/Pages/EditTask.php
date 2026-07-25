@@ -3,6 +3,7 @@
 namespace App\Modules\Tasks\Filament\Resources\TaskResource\Pages;
 
 use App\Modules\Tasks\Filament\Resources\TaskResource;
+use App\Platform\Filament\Concerns\CancelReturnsToList;
 use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Recurrence\RecurrenceService;
 use Filament\Actions\DeleteAction;
@@ -10,6 +11,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditTask extends EditRecord
 {
+    use CancelReturnsToList;
+
     protected static string $resource = TaskResource::class;
 
     public function getTitle(): string

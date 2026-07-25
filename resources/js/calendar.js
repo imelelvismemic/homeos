@@ -39,7 +39,7 @@ function bsTitle(view) {
     return startStr + ' – ' + endStr;
 }
 
-window.initHomeosCalendar = function (el, events) {
+window.initHomeosCalendar = function (el, eventsUrl) {
     const calendar = new Calendar(el, {
         plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
         initialView: 'dayGridMonth',
@@ -64,7 +64,11 @@ window.initHomeosCalendar = function (el, events) {
         slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
         height: 'auto',
         nowIndicator: true,
-        events: events || [],
+        // JSON feed: FullCalendar sam šalje start/end prikazanog raspona, pa
+        // refetchEvents() osvježava podatke bez promjene mjeseca.
+        events: eventsUrl
+            ? { url: eventsUrl, method: 'GET', extraParams: {}, failure: () => {} }
+            : [],
         // Zaglavlja dana na bosanskom.
         dayHeaderContent: function (arg) {
             if (arg.view.type === 'dayGridMonth') {
@@ -98,6 +102,12 @@ window.initHomeosCalendar = function (el, events) {
     });
 
     calendar.render();
+
+    // Brzo dodavanje javi da je nešto snimljeno → osvježi samo događaje.
+    // Prikaz (mjesec/sedmica/dan i trenutni raspon) ostaje netaknut.
+    window.addEventListener('homeos-quick-created', function () {
+        calendar.refetchEvents();
+    });
 
     return calendar;
 };

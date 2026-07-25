@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Modules\Notes\Models\Note;
 use App\Platform\Models\Household;
 use App\Platform\QuickCapture\QuickCreateContract;
+use Illuminate\Support\Carbon;
 
 class NoteQuickCreate implements QuickCreateContract
 {
@@ -13,6 +14,8 @@ class NoteQuickCreate implements QuickCreateContract
     {
         return [
             'body' => ['required', 'string'],
+            // Datum kliknut na kalendaru (opciono).
+            'date' => ['nullable', 'date'],
         ];
     }
 
@@ -23,6 +26,8 @@ class NoteQuickCreate implements QuickCreateContract
             'household_id' => $household->getKey(),
             'created_by' => $user->getKey(),
             'body' => '<p>'.e($data['body']).'</p>',
+            // Dodavanje s kalendara: bilješka postaje unos dnevnika za taj dan.
+            'journal_date' => isset($data['date']) ? Carbon::parse($data['date'])->toDateString() : null,
         ]);
     }
 }

@@ -3,12 +3,15 @@
 namespace App\Modules\Notes\Filament\Resources\NoteResource\Pages;
 
 use App\Modules\Notes\Filament\Resources\NoteResource;
+use App\Platform\Filament\Concerns\CancelReturnsToList;
 use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditNote extends EditRecord
 {
+    use CancelReturnsToList;
+
     protected static string $resource = NoteResource::class;
 
     public function getTitle(): string

@@ -417,3 +417,21 @@ ispravke koje su dotakle više modula odjednom:
 - **Jezik** — „Columns“ → „Kolone“ na svim listama (tačan paketski ključ) i
   ujednačen termin „lozinka“ umjesto „šifra“ kroz cijeli sistem. Naučeno pravilo
   zapisano u `docs/PRAVILA.md` (§1, §3, §7, §8) da se ne ponovi u novim modulima.
+
+**Drugi krug QA-a** (nakon iste provjere vlasnika):
+
+- **Naziv domaćinstva** mijenja vlasnik kroz „Postavke domaćinstva“; pristup ide
+  kroz postojeću `HouseholdPolicy::update` — bez ijedne ručne `if` provjere.
+- **Profil je vraćao 500** — Filamentov `->profile()` se registruje izvan tenant
+  rute, pa panel layout puca kad navigacija zatraži URL vezan za domaćinstvo.
+  Zamijenjen vlastitom stranicom u panelu, uz **profilnu sliku** (dodavanje i
+  uklanjanje) na privatnom disku, serviranu autentikovanom rutom.
+- **Kalendar** dohvata događaje kao feed po prikazanom rasponu, pa se nakon
+  brzog dodavanja osvježi bez promjene mjeseca; izabrani dan se prosljeđuje
+  unosu (rok zadatka, datum dnevnika, datum troška).
+- **Brzo dodavanje** je prošireno: modul može registrovati više tipova unosa
+  (`quick_capture` kao lista), pa Finansije nude i trošak i **račun**.
+- **„Nazad“ s forme uređivanja** vodi na listu (`CancelReturnsToList`), a ne na
+  formu dodavanja s koje je korisnik došao — pravilo u `docs/PRAVILA.md` §9 i u
+  checklisti novog modula.
+- **Mobilna navigacija** — meni više ne završava ispod URL trake browsera.
