@@ -3,6 +3,7 @@
 namespace App\Platform\Models;
 
 use App\Models\User;
+use App\Platform\Enums\DigestFrequency;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,7 +18,7 @@ use Illuminate\Notifications\Notifiable;
  * domaćinstvo, a email preferencije po kategoriji vežu se za člana
  * (CLAUDE.md §10, DATA_MODEL.md §1). Email se rutira na korisnikov email.
  */
-#[Fillable(['household_id', 'user_id', 'role', 'joined_at'])]
+#[Fillable(['household_id', 'user_id', 'role', 'joined_at', 'digest_frequency'])]
 class HouseholdMember extends Pivot
 {
     use Notifiable;
@@ -30,6 +31,7 @@ class HouseholdMember extends Pivot
     {
         return [
             'joined_at' => 'datetime',
+            'digest_frequency' => DigestFrequency::class,
         ];
     }
 

@@ -360,3 +360,20 @@ model/DoD/ponavljanje/saldo/oba Resource-a/integracija); Pint čist.
   invariantu "domaćinstvo uvijek ima bar jednog vlasnika".
 - Testovi: Share akcija (privatno/određeni članovi), member admin (uloga/uklanjanje/
   zadnji vlasnik/prijenos). Pint čist.
+
+**Faza 6b — Obavještenja po članu + digest** (dio 2 od 2; zaokružuje Fazu 6):
+
+- **Postavke obavještenja** (`NotificationSettings` stranica, po članu): email
+  uključi/isključi po kategoriji + ritam digesta (bez / dnevni / sedmični).
+  Kategorije se čitaju iz registryja (`NotificationCategoryRegistry` → svaki modul
+  deklariše svoje u `config/homeos-apps.php`, platforma nosi `shared_with_you`).
+  In-app obavještenja uvijek stižu; email samo ako kategorija nije isključena
+  (`HouseholdNotification`). **DoD Faze 6 ispunjen** — član može isključiti sve
+  emailove osim npr. `bill_due` i to se poštuje sistemski.
+- **Digest email** (`DigestService` + `DigestNotification`, mail-only): scheduler
+  šalje dnevni/sedmični sažetak članovima koji su odabrali ritam. Sadržaj agregira
+  sve module kroz `DigestSourceContract` (registry `digest_source`) — nadolazeći
+  zadaci, računi, podsjetnici i istek dokumenata koje član smije vidjeti. Prazan
+  digest se ne šalje. Novo polje `household_members.digest_frequency` (opt-in).
+- Testovi: registry kategorija, agregacija digesta uz poštovanje privatnosti, slanje
+  po ritmu/prazan digest/mail-only kanal, snimanje postavki na stranici.

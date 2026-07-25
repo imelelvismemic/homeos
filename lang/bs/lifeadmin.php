@@ -12,6 +12,10 @@ return [
         'expiry' => 'Ističe: :title',
     ],
 
+    'digest' => [
+        'line' => ':title ističe :date',
+    ],
+
     'widget' => [
         'heading' => 'Uskoro ističe',
         'none' => 'Nema dokumenata kojima uskoro ističe rok.',

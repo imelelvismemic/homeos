@@ -1,5 +1,7 @@
 <?php
 
+use App\Platform\Digest\DigestService;
+use App\Platform\Enums\DigestFrequency;
 use App\Platform\Scheduling\ModuleSchedule;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -27,6 +29,18 @@ return Application::configure(basePath: dirname(__DIR__))
     // preko app/Modules/<Ime>/routes/schedule.php — bez diranja core-a.
     ->withSchedule(function (Schedule $schedule): void {
         ModuleSchedule::register($schedule, ModuleSchedule::moduleScheduleFiles());
+
+        // Digest email (Faza 6) — platform-nivo (agregira sve module kroz
+        // DigestSource registry), pa se planira ovdje, ne u modulu.
+        $schedule->call(fn () => app(DigestService::class)->sendDue(DigestFrequency::Daily))
+            ->dailyAt('07:00')
+            ->name('digest-daily')
+            ->withoutOverlapping();
+
+        $schedule->call(fn () => app(DigestService::class)->sendDue(DigestFrequency::Weekly))
+            ->weeklyOn(1, '07:30')
+            ->name('digest-weekly')
+            ->withoutOverlapping();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         // Iza lanca Apache (SSL terminacija) → Nginx → PHP-FPM (CLAUDE.md §3a).

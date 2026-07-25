@@ -385,6 +385,21 @@ Finansije.
 **Definition of done:** Član domaćinstva može isključiti sve emailove osim
 "bill coming due" i to se poštuje sistemski.
 
+**Status: GOTOVO i deployano** (u dva koraka).
+- **6a** — Zajednički "Podijeli" mehanizam (`App\Platform\Filament\Sharing`)
+  na svih 8 Shareable entiteta (Privatno/Domaćinstvo/Određeni članovi); upravljanje
+  članovima (`HouseholdMemberService`: promjena uloge, uklanjanje, prijenos
+  vlasništva, uz invariantu "bar jedan vlasnik").
+- **6b** — Postavke obavještenja po članu (`NotificationSettings`): email po
+  kategoriji (registry `NotificationCategoryRegistry`) + ritam digesta. Digest email
+  (`DigestService`/`DigestNotification`, mail-only) agregira module kroz
+  `DigestSourceContract` (registry `digest_source`); dnevni/sedmični scheduler; polje
+  `household_members.digest_frequency`. DoD ispunjen (član isključi sve osim `bill_due`).
+- **Poznata stavka (Faza 5 nasljeđe, za ubuduće):** podsjetnik koji se automatski
+  kreira za PRIVATAN račun je household-vidljiv i u naslovu nosi naziv računa —
+  privatnost izvora se ne prenosi na izvedeni podsjetnik. Kandidat za ispravku
+  (podsjetnik nasljeđuje vidljivost izvora) u zasebnom prolazu.
+
 ---
 
 ## Faza 7 — Extensibility layer (platforma za buduće apps)
