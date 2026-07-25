@@ -22,6 +22,9 @@ class NotificationsInbox extends Page
 
     protected static string $view = 'filament.platform.pages.notifications-inbox';
 
+    /** Pročitana obavještenja su po defaultu skrivena — sanduče pokazuje šta je novo. */
+    public bool $showRead = false;
+
     public static function getNavigationLabel(): string
     {
         return __('platform.inbox.navigation_label');
@@ -48,7 +51,11 @@ class NotificationsInbox extends Page
             return collect();
         }
 
-        return $member->notifications()->latest()->limit(50)->get();
+        return $member->notifications()
+            ->when(! $this->showRead, fn ($query) => $query->whereNull('read_at'))
+            ->latest()
+            ->limit(50)
+            ->get();
     }
 
     public function unreadCount(): int
@@ -56,14 +63,23 @@ class NotificationsInbox extends Page
         return static::unreadCountFor(static::currentMember());
     }
 
+    public function toggleShowRead(): void
+    {
+        $this->showRead = ! $this->showRead;
+    }
+
     public function markAsRead(string $id): void
     {
         static::currentMember()?->notifications()->whereKey($id)->first()?->markAsRead();
+
+        $this->announceUnreadCount();
     }
 
     public function markAllRead(): void
     {
         static::currentMember()?->unreadNotifications->markAsRead();
+
+        $this->announceUnreadCount();
     }
 
     /** Prikazna linija obavještenja iz njegovog `data` (kategorija + naslov). */
@@ -74,6 +90,12 @@ class NotificationsInbox extends Page
         $line = __($key, ['title' => $data['title'] ?? '']);
 
         return $line === $key ? (string) ($data['title'] ?? '') : $line;
+    }
+
+    /** Javi zvoncetu u topbaru novi broj nepročitanih (bez ponovnog učitavanja). */
+    private function announceUnreadCount(): void
+    {
+        $this->dispatch('homeos-notifications-read', count: $this->unreadCount());
     }
 
     private static function currentMember(): ?HouseholdMember

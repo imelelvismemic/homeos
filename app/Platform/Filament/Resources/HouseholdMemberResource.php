@@ -110,7 +110,8 @@ class HouseholdMemberResource extends Resource
         return $household?->members()->where('user_id', auth()->id())->first();
     }
 
-    private static function currentUserIsOwner(): bool
+    /** Pozivanje/uklanjanje/promjena uloge su radnje vlasnika domaćinstva. */
+    public static function currentUserIsOwner(): bool
     {
         return static::currentMember()?->role === 'owner';
     }

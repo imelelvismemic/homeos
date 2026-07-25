@@ -26,12 +26,12 @@ return [
         ],
 
         'password' => [
-            'label' => 'Šifra',
-            'validation_attribute' => 'šifra',
+            'label' => 'Lozinka',
+            'validation_attribute' => 'lozinka',
         ],
 
         'password_confirmation' => [
-            'label' => 'Potvrda šifre',
+            'label' => 'Potvrda lozinke',
         ],
 
         'actions' => [

@@ -9,10 +9,10 @@
         @else
             <ul class="divide-y divide-gray-100 dark:divide-white/10">
                 @foreach ($reminders as $reminder)
-                    <li>
+                    <li class="-mx-2 flex items-center gap-2 rounded-lg px-2 transition hover:bg-gray-50 dark:hover:bg-white/5">
                         <a
                             href="{{ \App\Modules\Reminders\Filament\Resources\ReminderResource::getUrl('edit', ['record' => $reminder]) }}"
-                            class="-mx-2 flex items-center justify-between gap-3 rounded-lg px-2 py-2 transition hover:bg-gray-50 dark:hover:bg-white/5"
+                            class="flex min-w-0 flex-1 items-center justify-between gap-3 py-2"
                         >
                             <div class="flex items-center gap-2 min-w-0">
                                 <x-filament::icon icon="heroicon-m-bell" class="h-4 w-4 shrink-0 text-primary-500" />
@@ -28,6 +28,17 @@
                                 </span>
                             @endif
                         </a>
+
+                        {{-- Okidanje bez odlaska na listu (obavještenje ide odgovornoj osobi). --}}
+                        <x-filament::icon-button
+                            icon="heroicon-m-check"
+                            color="success"
+                            size="sm"
+                            wire:click="fireReminder({{ $reminder->getKey() }})"
+                            wire:loading.attr="disabled"
+                            :label="__('reminders.actions.complete')"
+                            :tooltip="__('reminders.actions.complete')"
+                        />
                     </li>
                 @endforeach
             </ul>

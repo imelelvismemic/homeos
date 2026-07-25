@@ -14,7 +14,6 @@ use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -62,6 +61,11 @@ class NoteResource extends Resource
             RichEditor::make('body')
                 ->label(__('notes.fields.body'))
                 ->required()
+                // Prilog fajla u editoru zahtijeva javno dostupan disk za slike;
+                // Home OS drži fajlove na privatnom disku (Dokumenti, Faza 5b), pa
+                // bi dugme vodilo u slijepu ulicu. Fajlovi idu kroz Administraciju.
+                ->disableToolbarButtons(['attachFiles'])
+                ->helperText(__('notes.fields.body_help'))
                 ->columnSpanFull(),
 
             DatePicker::make('journal_date')
@@ -84,7 +88,11 @@ class NoteResource extends Resource
                 TextColumn::make('title')
                     ->label(__('notes.fields.title'))
                     ->getStateUsing(fn (Note $r) => $r->displayTitle())
-                    ->searchable()
+                    // Bilješka bez naslova se prikazuje kao izvod iz sadržaja, pa
+                    // pretraga mora obuhvatiti i sadržaj (PRAVILA.md §8).
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query
+                        ->orWhere('title', 'like', "%{$search}%")
+                        ->orWhere('body', 'like', "%{$search}%"))
                     ->weight('medium')
                     ->wrap(),
 
@@ -99,7 +107,12 @@ class NoteResource extends Resource
                     ->label(__('notes.fields.tags'))
                     ->badge()
                     ->separator(',')
-                    ->toggleable(),
+                    ->toggleable()
+                    // Pretraga tabele po nazivima oznaka (PRAVILA.md §8).
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->orWhereHas(
+                        'tags',
+                        fn (Builder $q) => $q->where('name', 'like', "%{$search}%"),
+                    )),
 
                 TextColumn::make('updated_at')
                     ->label(__('notes.fields.updated_at'))
@@ -108,11 +121,9 @@ class NoteResource extends Resource
                     ->toggleable(),
             ])
             ->defaultSort('updated_at', 'desc')
-            ->filters([
-                Filter::make('journal_only')
-                    ->label(__('notes.filters.journal_only'))
-                    ->query(fn (Builder $query) => $query->whereNotNull('journal_date')),
-            ])
+            // Dnevnik je zasebna kartica na listi (ListNotes::getTabs), pa isti
+            // izbor nema i kao filter — jedan pojam, jedno mjesto (PRAVILA.md §5).
+            ->filters([])
             ->actions([
                 EditAction::make(),
                 SharingForm::tableAction(),

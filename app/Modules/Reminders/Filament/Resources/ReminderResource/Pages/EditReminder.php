@@ -3,10 +3,12 @@
 namespace App\Modules\Reminders\Filament\Resources\ReminderResource\Pages;
 
 use App\Modules\Reminders\Filament\Resources\ReminderResource;
+use App\Modules\Reminders\Services\ReminderFirer;
 use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Recurrence\RecurrenceService;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
 class EditReminder extends EditRecord
@@ -28,7 +30,16 @@ class EditReminder extends EditRecord
                 ->color('success')
                 ->visible(fn () => $this->record->completed_at === null)
                 ->requiresConfirmation()
-                ->action(fn () => $this->record->update(['completed_at' => now()])),
+                // Isti put kao scheduler/lista (ReminderFirer) — okidanje šalje
+                // obavještenje odgovornoj osobi, ne samo tiho označi zapis.
+                ->action(function (): void {
+                    app(ReminderFirer::class)->fire($this->record);
+
+                    Notification::make()
+                        ->title(__('reminders.actions.completed_notice'))
+                        ->success()
+                        ->send();
+                }),
             DeleteAction::make()
                 ->modalHeading(__('reminders.headings.delete'))
                 ->modalDescription(fn () => __('reminders.headings.delete_description', ['title' => $this->record->title])),

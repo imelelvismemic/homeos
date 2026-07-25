@@ -65,6 +65,19 @@ it('rejects inviting a user who is already a member', function () {
         ->assertHasActionErrors(['email']);
 });
 
+it('hides the invite action from a member who is not the household owner', function () {
+    [$household, $owner] = makeHouseholdWithOwner();
+    $member = User::factory()->create();
+    $household->members()->create(['user_id' => $member->id, 'role' => 'member', 'joined_at' => now()]);
+
+    test()->actingAs($owner);
+    Filament::setTenant($household);
+    Livewire::test(ListHouseholdMembers::class)->assertActionVisible('invite');
+
+    test()->actingAs($member);
+    Livewire::test(ListHouseholdMembers::class)->assertActionHidden('invite');
+});
+
 it('does not let a member of another household see this household members', function () {
     [$household] = makeHouseholdWithOwner();
     [$otherHousehold, $otherOwner] = makeHouseholdWithOwner();

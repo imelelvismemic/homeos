@@ -19,6 +19,9 @@ class ListHouseholdMembers extends ListRecords
         return [
             Action::make('invite')
                 ->label(__('platform.members.invite_action'))
+                // Član (ne-vlasnik) ne može dovoditi ljude u tuđe domaćinstvo —
+                // "domaćinstvo zadržava kontrolu" (CLAUDE.md §1).
+                ->visible(fn (): bool => HouseholdMemberResource::currentUserIsOwner())
                 ->modalHeading(__('platform.members.invite_modal_heading'))
                 ->modalSubmitActionLabel(__('platform.members.invite_modal_submit'))
                 ->form([

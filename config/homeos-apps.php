@@ -9,6 +9,7 @@ use App\Modules\LifeAdmin\Calendar\DocumentExpiryCalendarSource;
 use App\Modules\LifeAdmin\Dashboard\LifeAdminDashboardWidget;
 use App\Modules\LifeAdmin\Digest\DocumentDigestSource;
 use App\Modules\LifeAdmin\Search\LifeAdminSearchProvider;
+use App\Modules\Notes\Calendar\JournalCalendarSource;
 use App\Modules\Notes\Dashboard\NoteDashboardWidget;
 use App\Modules\Notes\QuickCapture\NoteQuickCreate;
 use App\Modules\Notes\Search\NoteSearchProvider;
@@ -79,6 +80,7 @@ return [
         'enabled' => true,
         'dashboard_widget' => NoteDashboardWidget::class,
         'search_provider' => NoteSearchProvider::class,
+        'calendar_source' => JournalCalendarSource::class,
         'quick_capture' => [
             'label' => 'Nova bilješka',
             'icon' => 'heroicon-o-document-text',

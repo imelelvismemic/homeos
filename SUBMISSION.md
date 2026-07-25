@@ -387,3 +387,33 @@ model/DoD/ponavljanje/saldo/oba Resource-a/integracija); Pint čist.
 - Testovi: registry kategorija, agregacija digesta uz poštovanje privatnosti, slanje
   po ritmu/prazan digest/mail-only kanal, snimanje postavki, in-app sanduče
   (nepročitano/označi pročitanim), propagacija privatnosti računa na podsjetnik.
+
+**QA prolaz kroz cijeli sistem (prije Faze 7)** — vlasnički pregled aplikacije;
+ispravke koje su dotakle više modula odjednom:
+
+- **Vremenska zona** — `config/app.php` je imao hardkodovan `'UTC'` i ignorisao
+  `APP_TIMEZONE`, pa je pozdrav u 06:55 glasio „Dobro veče“ (04:55 UTC), a
+  podsjetnici su okidali dva sata iza upisanog vremena. Sada čita
+  `env('APP_TIMEZONE')` → `Europe/Sarajevo`.
+- **Podsjetnici — okidanje na jednom mjestu** (`ReminderFirer`): scheduler, lista,
+  forma podsjetnika i dashboard widget rade istu stvar, a `completed_at` se upisuje
+  PRIJE slanja obavještenja. Time je riješen bug u kojem je pad slanja emaila
+  ostavljao podsjetnik neokinutim, pa ga je scheduler ponavljao — i punio sanduče
+  istim obavještenjem — svake minute. Ručno okidanje sada šalje obavještenje kao i
+  automatsko (`DATA_MODEL.md` §4a).
+- **Kalendar** — klik na dan otvara „Brzo dodaj“ s postavljenim datumom (spec:
+  „dodajte zadatak, bilješku ili podsjetnik odakle god“), 24-satni prikaz vremena.
+- **Bilješke/dnevnik** — kartica „Dnevnik“ na listi, akcija „Dnevnik za danas“ i
+  unosi dnevnika na kalendaru (`JournalCalendarSource`), pa datum dnevnika ima
+  stvarnu svrhu; iz editora uklonjeno nefunkcionalno prilaganje fajlova.
+- **Profil korisnika** s promjenom lozinke koja traži potvrdu trenutne lozinke.
+- **Upload dokumenata > 2 MB** — bazni PHP image ne aktivira `php.ini`, pa su
+  vrijedile ugrađene vrijednosti (`upload_max_filesize=2M`) i veći prilog je tiho
+  padao, ostavljajući dugme „Sačuvaj“ zaglavljenim. Dodan `docker/php.ini`
+  (20M/24M) s limitima poredanim tako da aplikacija uvijek javi grešku prije nego
+  je presretne sloj ispod.
+- **Sanduče obavještenja** — pročitana skrivena po defaultu, brojač na zvoncetu se
+  osvježava odmah; **„Pozovi“** vidi samo vlasnik domaćinstva.
+- **Jezik** — „Columns“ → „Kolone“ na svim listama (tačan paketski ključ) i
+  ujednačen termin „lozinka“ umjesto „šifra“ kroz cijeli sistem. Naučeno pravilo
+  zapisano u `docs/PRAVILA.md` (§1, §3, §7, §8) da se ne ponovi u novim modulima.

@@ -21,6 +21,19 @@ class CreateNote extends CreateRecord
         return __('notes.headings.create');
     }
 
+    /**
+     * "Dnevnik za danas" (?journal=1) otvara istu formu s već postavljenim
+     * današnjim datumom — jedan klik do dnevničkog unosa.
+     */
+    protected function fillForm(): void
+    {
+        $this->callHook('beforeFill');
+
+        $this->form->fill(request()->boolean('journal') ? ['journal_date' => today()] : null);
+
+        $this->callHook('afterFill');
+    }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['household_id'] = Filament::getTenant()?->getKey();

@@ -4,6 +4,7 @@ namespace App\Modules\Reminders\Filament\Resources;
 
 use App\Modules\Reminders\Filament\Resources\ReminderResource\Pages;
 use App\Modules\Reminders\Models\Reminder;
+use App\Modules\Reminders\Services\ReminderFirer;
 use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Models\HouseholdMember;
 use Filament\Facades\Filament;
@@ -14,6 +15,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\DeleteAction;
@@ -127,7 +129,12 @@ class ReminderResource extends Resource
                 TextColumn::make('assignee.user.name')
                     ->label(__('reminders.fields.assigned_to'))
                     ->placeholder('—')
-                    ->toggleable(),
+                    ->toggleable()
+                    // Pretraga tabele po imenu odgovorne osobe (PRAVILA.md §8).
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->orWhereHas(
+                        'assignee.user',
+                        fn (Builder $q) => $q->where('name', 'like', "%{$search}%"),
+                    )),
 
                 TextColumn::make('completed_at')
                     ->label(__('reminders.fields.status'))
@@ -148,7 +155,16 @@ class ReminderResource extends Resource
                     ->icon('heroicon-m-check')
                     ->color('success')
                     ->visible(fn (Reminder $r) => $r->completed_at === null)
-                    ->action(fn (Reminder $r) => $r->update(['completed_at' => now()])),
+                    // Ručno okidanje ide istim putem kao scheduler (ReminderFirer):
+                    // označi okinutim + pošalji obavještenje odgovornoj osobi.
+                    ->action(function (Reminder $r): void {
+                        app(ReminderFirer::class)->fire($r);
+
+                        Notification::make()
+                            ->title(__('reminders.actions.completed_notice'))
+                            ->success()
+                            ->send();
+                    }),
                 EditAction::make(),
                 SharingForm::tableAction(),
                 DeleteAction::make()

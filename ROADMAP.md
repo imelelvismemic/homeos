@@ -406,6 +406,53 @@ Finansije.
 
 ---
 
+## QA prolaz kroz cijeli sistem (prije Faze 7)
+
+Vlasnički pregled cijele aplikacije nakon Faze 6. Ispravljeno:
+
+- **Vremenska zona** — `config/app.php` je imao hardkodovan `'UTC'` i ignorisao
+  `APP_TIMEZONE`. Posljedica: pozdrav na dashboardu u 06:55 je glasio „Dobro veče“
+  (04:55 UTC), a podsjetnici su okidali dva sata kasnije od upisanog vremena.
+  Sada `env('APP_TIMEZONE', 'UTC')` → `Europe/Sarajevo`. Podaci se ne migriraju:
+  vremena su i upisivana i prikazivana kao lokalna, pa im ovo tek daje ispravno
+  značenje.
+- **Podsjetnici — okidanje** — uzrok obavještenja „svake minute“ i cijela
+  funkcionalnost dokumentovani u `DATA_MODEL.md` §4a. Uvedeno: `ReminderFirer`
+  (jedan put za scheduler i UI), okidanje s liste, s forme podsjetnika i s
+  dashboard widgeta, obavještenje i kod ručnog okidanja.
+- **Kalendar** — klik na dan otvara „Brzo dodaj“ s postavljenim datumom (spec:
+  „dodajte zadatak, bilješku ili podsjetnik odakle god“); 24-satni prikaz vremena
+  u sedmičnom/dnevnom/list prikazu (PRAVILA.md §6).
+- **Bilješke** — dnevnik dobio stvarnu razradu: zasebna kartica „Dnevnik“ na
+  listi, akcija „Dnevnik za danas“ (prefill datuma) i prikaz unosa dnevnika na
+  kalendaru (`JournalCalendarSource`). Iz editora uklonjeno nefunkcionalno
+  dugme za prilaganje fajlova (fajlovi idu kroz Administraciju → Dokumenti).
+- **Profil korisnika** — dodan (`->profile()`), s promjenom lozinke koja traži
+  potvrdu **trenutne** lozinke; prijevodi kroz `lang/vendor/filament-panels`.
+- **Prilog dokumenta veći od 2 MB** — bazni `php:8.3-fpm-alpine` ne aktivira
+  nijedan `php.ini`, pa su vrijedile ugrađene vrijednosti `upload_max_filesize=2M`
+  / `post_max_size=8M`: PHP je odbacivao fajl, Livewire upload nikad ne bi završio
+  i dugme „Sačuvaj“ je ostajalo zaglavljeno (manji fajlovi su prolazili). Dodan
+  `docker/php.ini` (20M/24M) u runtime image; lanac limita je sada Filament 10 MB
+  < Livewire 12 MB < PHP 20 MB < Nginx 32 MB, pa korisnik dobije poruku iz
+  aplikacije umjesto tihog pada.
+- **Sanduče obavještenja** — filter „sakrij pročitane“ (uključen po defaultu) i
+  brojač na zvoncetu koji se osvježi odmah po označavanju pročitanim.
+- **Članovi** — dugme „Pozovi“ vidi samo vlasnik domaćinstva.
+- **Prijevodi/terminologija** — „Columns“ → „Kolone“ na svim listama (tačan
+  paketski ključ, vidi PRAVILA.md §1); ujednačeno „lozinka“ umjesto „šifra“ u
+  cijelom sistemu; pretraga listi po odgovornoj osobi/oznakama fiksirana kao
+  pravilo (PRAVILA.md §8).
+
+**Nije propust, nego obim Faze 7:** uključivanje/isključivanje modula po
+domaćinstvu. Ključ `enabled` u `config/homeos-apps.php` postoji i **svi** registri
+ga već poštuju (dashboard, pretraga, kalendar, digest, brzo dodavanje, kategorije
+obavještenja), ali je to zasad globalna postavka i navigacija Filamenta se i dalje
+gradi auto-discoveryjem foldera — pa isključen modul nestane s dashboarda/pretrage,
+a stavka u meniju ostane. Faza 7 to zaokružuje (tačke 1, 3 i 4 niže).
+
+---
+
 ## Faza 7 — Extensibility layer (platforma za buduće apps)
 
 Ovo formalizuje ono što je već implicitno urađeno kroz Faze 1-6.
@@ -416,8 +463,11 @@ Ovo formalizuje ono što je već implicitno urađeno kroz Faze 1-6.
 2. Dokumentovan checklist za dodavanje nove app (vidi `CLAUDE.md`).
 3. Graceful degradation — testirati da sistem radi i kada je opcioni modul
    isključen (npr. ugasiti Finansije i provjeriti da ništa ne puca).
+   **Uključuje i navigaciju:** isključen modul mora nestati i iz menija, ne samo
+   s dashboarda/pretrage (vidi QA napomenu iznad).
 4. Access/permission scoping po modulu (household odlučuje šta modul smije
-   vidjeti).
+   vidjeti) — uz to i UI kojim vlasnik domaćinstva pali/gasi module po sebi
+   (`enabled` prelazi iz globalne konfiguracije u postavku po domaćinstvu).
 
 **Definition of done:** Nova probna "dummy" app se doda prateći checklist i
 pojavi se na dashboardu/search-u/navigaciji bez izmjene postojećeg koda.

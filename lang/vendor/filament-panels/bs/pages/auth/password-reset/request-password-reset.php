@@ -2,9 +2,9 @@
 
 return [
 
-    'title' => 'Resetujte šifru',
+    'title' => 'Resetujte lozinku',
 
-    'heading' => 'Zaboravili ste šifru?',
+    'heading' => 'Zaboravili ste lozinku?',
 
     'actions' => [
 

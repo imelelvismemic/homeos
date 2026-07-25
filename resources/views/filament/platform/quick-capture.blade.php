@@ -17,9 +17,17 @@
         errors: {},
         saving: false,
         saved: false,
+        prefillDate: null,
         get activeItem() { return this.items.find((i) => i.key === this.activeKey) || null; },
-        openModal() { this.open = true; this.reset(); },
-        reset() { this.activeKey = null; this.form = {}; this.errors = {}; this.saved = false; },
+        openModal(date = null) { this.open = true; this.reset(); this.prefillDate = this.normalizeDate(date); },
+        reset() { this.activeKey = null; this.form = {}; this.errors = {}; this.saved = false; this.prefillDate = null; },
+        // Kalendar javlja dan (ili tačan termin) klikom — pretvori u 'Y-m-d H:i'
+        // koji očekuje flatpickr; za cijeli dan uzmi 09:00 kao razuman početak.
+        normalizeDate(raw) {
+            if (! raw) return null;
+            if (raw.length <= 10) return raw + ' 09:00';
+            return raw.slice(0, 10) + ' ' + raw.slice(11, 16);
+        },
         close() { this.open = false; },
         pick(key) {
             this.activeKey = key;
@@ -30,7 +38,7 @@
                 this.$root.querySelectorAll('[data-qc-datetime]').forEach((el) => {
                     if (el._flatpickr || ! window.flatpickr) return;
                     const name = el.getAttribute('data-qc-datetime');
-                    window.flatpickr(el, {
+                    const picker = window.flatpickr(el, {
                         enableTime: true,
                         time_24hr: true,
                         dateFormat: 'Y-m-d H:i',
@@ -38,6 +46,11 @@
                         altFormat: 'd.m.Y H:i',
                         onChange: (dates, str) => { this.form[name] = str; },
                     });
+
+                    // Dan izabran u kalendaru → već upisan u polje vremena.
+                    if (this.prefillDate) {
+                        picker.setDate(this.prefillDate, true);
+                    }
                 });
                 this.$root.querySelector('[data-qc-field]')?.focus();
             });
@@ -72,6 +85,7 @@
         },
     }"
     x-on:keydown.escape.window="close()"
+    x-on:homeos-quick-capture.window="openModal($event.detail?.date)"
 >
     <x-filament::button icon="heroicon-m-plus" size="sm" color="primary" x-on:click="openModal()">
         {{ __('platform.quick_capture.button') }}

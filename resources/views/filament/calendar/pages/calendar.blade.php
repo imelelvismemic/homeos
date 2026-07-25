@@ -24,6 +24,11 @@
         .dark #homeos-calendar .fc-list-empty { background: transparent; }
     </style>
 
+    <p class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+        <x-filament::icon icon="heroicon-m-cursor-arrow-rays" class="h-4 w-4 shrink-0" />
+        {{ __('calendar.day_click_hint') }}
+    </p>
+
     {{-- FullCalendar montira se na ovaj element; wire:ignore da ga Livewire ne dira. --}}
     <div
         wire:ignore

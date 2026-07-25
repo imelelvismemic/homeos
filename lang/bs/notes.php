@@ -11,18 +11,21 @@ return [
     'fields' => [
         'title' => 'Naslov',
         'body' => 'Sadržaj',
+        'body_help' => 'Za dokumente i slike koristite Administraciju → Dokumenti; ovdje ide tekst.',
         'journal_date' => 'Datum dnevnika',
-        'journal_date_help' => 'Postavite datum da bilješka postane unos dnevnika.',
+        'journal_date_help' => 'Postavite datum da bilješka postane unos dnevnika. Unosi dnevnika se prikazuju i u kalendaru.',
         'tags' => 'Oznake',
         'updated_at' => 'Zadnja izmjena',
     ],
 
-    'filters' => [
-        'journal_only' => 'Samo dnevnik',
+    'tabs' => [
+        'all' => 'Sve bilješke',
+        'journal' => 'Dnevnik',
     ],
 
     'actions' => [
         'create' => 'Dodaj bilješku',
+        'create_journal' => 'Dnevnik za danas',
     ],
 
     'headings' => [

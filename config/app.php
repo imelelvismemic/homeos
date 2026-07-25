@@ -65,7 +65,10 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // Home OS je aplikacija jednog domaćinstva — sve (rokovi, okidanje podsjetnika,
+    // "danas" na dashboardu, pozdrav po dobu dana) mora ići po LOKALNOM vremenu.
+    // Hardkodovan 'UTC' je ignorisao APP_TIMEZONE iz .env-a.
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------

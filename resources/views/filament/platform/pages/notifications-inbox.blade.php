@@ -1,20 +1,33 @@
 <x-filament-panels::page>
     @php($notifications = $this->notifications())
 
-    @if ($this->unreadCount() > 0)
-        <div class="flex justify-end">
+    <div class="flex flex-wrap items-center justify-end gap-2">
+        <x-filament::button
+            :color="$showRead ? 'primary' : 'gray'"
+            size="sm"
+            icon="{{ $showRead ? 'heroicon-m-eye' : 'heroicon-m-eye-slash' }}"
+            wire:click="toggleShowRead"
+        >
+            {{ $showRead ? __('platform.inbox.hide_read') : __('platform.inbox.show_read') }}
+        </x-filament::button>
+
+        @if ($this->unreadCount() > 0)
             <x-filament::button color="gray" size="sm" wire:click="markAllRead">
                 {{ __('platform.inbox.mark_all_read') }}
             </x-filament::button>
-        </div>
-    @endif
+        @endif
+    </div>
 
     @if ($notifications->isEmpty())
         <x-filament::section>
             <div class="flex flex-col items-center gap-2 py-8 text-center">
                 <x-filament::icon icon="heroicon-o-bell-slash" class="h-8 w-8 text-gray-400" />
-                <p class="text-sm font-medium text-gray-950 dark:text-white">{{ __('platform.inbox.empty_heading') }}</p>
-                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('platform.inbox.empty_description') }}</p>
+                <p class="text-sm font-medium text-gray-950 dark:text-white">
+                    {{ $showRead ? __('platform.inbox.empty_heading') : __('platform.inbox.empty_unread_heading') }}
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $showRead ? __('platform.inbox.empty_description') : __('platform.inbox.empty_unread_description') }}
+                </p>
             </div>
         </x-filament::section>
     @else

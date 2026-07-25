@@ -2,6 +2,7 @@
 
 use App\Modules\Notes\Events\NoteCreated;
 use App\Modules\Notes\Models\Note;
+use App\Platform\Calendar\CalendarService;
 use App\Platform\Enums\Visibility;
 use Illuminate\Support\Facades\Event;
 
@@ -40,4 +41,30 @@ it('supports tags scoped to the household and a journal date', function () {
     expect($note->journal_date->toDateString())->toBe('2026-07-24');
     expect($note->tagNames())->toContain('dnevnik')->toContain('porodica');
     expect($note->tags->first()->household_id)->toBe($note->household_id);
+});
+
+it('puts journal entries on the calendar and leaves plain notes out', function () {
+    [$household, $owner] = makeHousehold();
+    test()->actingAs($owner->user);
+
+    $journal = Note::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => 'Dnevnik: prvi dan',
+        'body' => '<p>Zapis dana</p>',
+        'journal_date' => today(),
+    ]);
+
+    Note::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => 'Obična bilješka',
+        'body' => '<p>Bez datuma</p>',
+    ]);
+
+    $events = app(CalendarService::class)
+        ->eventsBetween(now()->subWeek(), now()->addWeek(), $household);
+
+    expect($events->contains(fn ($e) => $e->type === 'journal' && $e->title === $journal->title))->toBeTrue();
+    expect($events->contains(fn ($e) => $e->title === 'Obična bilješka'))->toBeFalse();
 });

@@ -38,6 +38,7 @@ return [
     'actions' => [
         'create' => 'Dodaj podsjetnik',
         'complete' => 'Označi okinutim',
+        'completed_notice' => 'Podsjetnik je okinut — obavještenje je poslano.',
     ],
 
     'headings' => [

@@ -48,6 +48,12 @@ return [
         'only_owner' => 'Samo vlasnik domaćinstva može uraditi ovu radnju.',
     ],
 
+    'profile' => [
+        'title' => 'Moj profil',
+        'current_password' => 'Trenutna lozinka',
+        'current_password_help' => 'Radi sigurnosti potvrdite lozinku kojom se sada prijavljujete.',
+    ],
+
     'sharing' => [
         'action' => 'Podijeli',
         'modal_heading' => 'Privatnost i dijeljenje',
@@ -119,8 +125,12 @@ return [
         'title' => 'Obavještenja',
         'mark_read' => 'Pročitano',
         'mark_all_read' => 'Označi sve pročitanim',
+        'show_read' => 'Prikaži i pročitane',
+        'hide_read' => 'Sakrij pročitane',
         'empty_heading' => 'Nema obavještenja',
         'empty_description' => 'Ovdje stižu obavještenja iz aplikacije — dodijeljeni zadaci, podsjetnici, dijeljenje i drugo.',
+        'empty_unread_heading' => 'Nema novih obavještenja',
+        'empty_unread_description' => 'Sve ste pročitali. Kliknite „Prikaži i pročitane“ za raniju historiju.',
         'lines' => [
             'task_assigned' => 'Dodijeljen ti je zadatak „:title“',
             'task_due_soon' => 'Zadatak „:title“ uskoro ističe',

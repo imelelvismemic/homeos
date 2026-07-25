@@ -74,6 +74,9 @@ COPY --from=vendor /app/vendor ./vendor
 COPY --from=assets /app/public/build ./public/build
 COPY . .
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+# Bazni image ne aktivira php.ini (upload_max_filesize bi ostao 2M — prilozi
+# dokumenata veći od toga tiho padnu). Prefiks zz- da nadjača ext ini fajlove.
+COPY docker/php.ini /usr/local/etc/php/conf.d/zz-homeos.ini
 
 RUN addgroup -g 1000 www \
     && adduser -G www -g www -s /bin/sh -D www \

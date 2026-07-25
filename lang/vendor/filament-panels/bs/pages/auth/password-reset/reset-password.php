@@ -2,9 +2,9 @@
 
 return [
 
-    'title' => 'Resetujte šifru',
+    'title' => 'Resetujte lozinku',
 
-    'heading' => 'Resetujte šifru',
+    'heading' => 'Resetujte lozinku',
 
     'form' => [
 
@@ -13,18 +13,18 @@ return [
         ],
 
         'password' => [
-            'label' => 'Šifra',
-            'validation_attribute' => 'šifra',
+            'label' => 'Nova lozinka',
+            'validation_attribute' => 'lozinka',
         ],
 
         'password_confirmation' => [
-            'label' => 'Potvrda šifre',
+            'label' => 'Potvrda lozinke',
         ],
 
         'actions' => [
 
             'reset' => [
-                'label' => 'Resetuj šifru',
+                'label' => 'Resetuj lozinku',
             ],
 
         ],

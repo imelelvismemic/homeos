@@ -15,18 +15,16 @@ return [
 
     ],
 
-    // "Columns" menadžer kolona nije preveden u paketskoj bs verziji.
-    'column_manager' => [
+    // Naslov padajućeg menija za prikaz/skrivanje kolona ("Columns"). Paketski bs
+    // fajl nema ovaj ključ, pa je Laravel padao na engleski fallback na SVIM
+    // listama (ne samo zadacima) — vidi docs/PRAVILA.md §1.
+    'column_toggle' => [
         'heading' => 'Kolone',
     ],
 
     'actions' => [
 
         'toggle_columns' => [
-            'label' => 'Kolone',
-        ],
-
-        'column_manager' => [
             'label' => 'Kolone',
         ],
 

@@ -28,6 +28,20 @@ class SpawnRecurringReminder
             return;
         }
 
+        // Ako je podsjetnik dugo stajao neokinut (ili je okinut ručno prije roka),
+        // sljedeći termin može ispasti u prošlosti — tada bi scheduler odmah okinuo
+        // i novu instancu, pa opet, i tako u nizu obavještenja. Preskoči na prvi
+        // termin u budućnosti (granica čuva od beskonačne petlje kod loše rule).
+        for ($guard = 0; $guard < 1000 && $next->isPast(); $guard++) {
+            $following = $this->recurrence->nextDueDate($reminder->recurrence_rule, $next);
+
+            if ($following === null || $following->lessThanOrEqualTo($next)) {
+                break;
+            }
+
+            $next = $following;
+        }
+
         Reminder::create([
             'household_id' => $reminder->household_id,
             'created_by' => $reminder->created_by,

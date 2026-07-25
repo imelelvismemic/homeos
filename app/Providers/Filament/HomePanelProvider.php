@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Platform\Filament\Pages\Dashboard;
+use App\Platform\Filament\Pages\EditProfile;
 use App\Platform\Filament\Pages\NotificationsInbox;
 use App\Platform\Filament\Pages\RegisterHousehold;
 use App\Platform\Http\QuickCreateController;
@@ -37,6 +38,9 @@ class HomePanelProvider extends PanelProvider
             ->login()
             ->registration()
             ->passwordReset()
+            // Profil (ime, e-mail, promjena lozinke) — naša verzija traži i
+            // potvrdu trenutne lozinke prije promjene.
+            ->profile(EditProfile::class, isSimple: false)
             ->tenant(Household::class)
             ->tenantRegistration(RegisterHousehold::class)
             // Endpointi koje topbar modali (pretraga, brzo dodavanje) zovu fetch-om.
@@ -89,8 +93,11 @@ class HomePanelProvider extends PanelProvider
             // pozadina, kao command palette): korisnik doda minimalne podatke,
             // snimi šalje fetch POST na /brzo/{key}, modal se zatvori i korisnik
             // ostaje gdje je bio (bez navigacije, bez Livewire → bez 419).
+            // GLOBAL_SEARCH_AFTER (a ne TOPBAR_END) jer se TOPBAR_END renderuje
+            // NAKON korisničkog menija — a redoslijed s desna nalijevo treba biti:
+            // profil, zvonce, "Brzo dodaj".
             ->renderHook(
-                PanelsRenderHook::TOPBAR_END,
+                PanelsRenderHook::GLOBAL_SEARCH_AFTER,
                 function (): string {
                     $tenant = Filament::getTenant();
 
@@ -108,7 +115,7 @@ class HomePanelProvider extends PanelProvider
             )
             // Zvonce obavještenja — link na sanduče trenutnog člana + brojač nepročitanih.
             ->renderHook(
-                PanelsRenderHook::TOPBAR_END,
+                PanelsRenderHook::GLOBAL_SEARCH_AFTER,
                 function (): string {
                     $tenant = Filament::getTenant();
 

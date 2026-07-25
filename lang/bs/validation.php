@@ -2,7 +2,7 @@
 
 /**
  * Bosanski prijevodi validacijskih poruka (Laravel). Bez ovog fajla Laravel
- * pada nazad na engleski, pa se npr. na registraciji i obnovi šifre miješao
+ * pada nazad na engleski, pa se npr. na registraciji i obnovi lozinke miješao
  * engleski tekst (CLAUDE.md §13 — sav korisnički tekst na bosanskom).
  */
 
@@ -26,7 +26,7 @@ return [
     ],
     'boolean' => 'Polje :attribute mora biti tačno ili netačno.',
     'confirmed' => 'Potvrda polja :attribute se ne podudara.',
-    'current_password' => 'Šifra nije ispravna.',
+    'current_password' => 'Trenutna lozinka nije ispravna.',
     'date' => 'Polje :attribute nije ispravan datum.',
     'date_equals' => 'Polje :attribute mora biti datum jednak :date.',
     'date_format' => 'Polje :attribute ne odgovara formatu :format.',
@@ -72,7 +72,7 @@ return [
     ],
     'not_in' => 'Odabrana vrijednost za :attribute nije ispravna.',
     'numeric' => 'Polje :attribute mora biti broj.',
-    'password' => 'Šifra nije ispravna.',
+    'password' => 'Lozinka nije ispravna.',
     'present' => 'Polje :attribute mora biti prisutno.',
     'regex' => 'Format polja :attribute nije ispravan.',
     'required' => 'Polje :attribute je obavezno.',
@@ -94,15 +94,15 @@ return [
     'attributes' => [
         'name' => 'ime',
         'email' => 'email adresa',
-        'password' => 'šifra',
-        'passwordConfirmation' => 'potvrda šifre',
-        'password_confirmation' => 'potvrda šifre',
+        'password' => 'lozinka',
+        'passwordConfirmation' => 'potvrda lozinke',
+        'password_confirmation' => 'potvrda lozinke',
         'title' => 'naslov',
     ],
 
     'custom' => [
         'password' => [
-            'same' => 'Šifra i potvrda šifre se moraju podudarati.',
+            'same' => 'Lozinka i potvrda lozinke se moraju podudarati.',
         ],
     ],
 

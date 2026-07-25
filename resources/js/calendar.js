@@ -58,6 +58,10 @@ window.initHomeosCalendar = function (el, events) {
         },
         allDayText: 'Cijeli dan',
         noEventsText: 'Nema događaja za prikaz',
+        // 24-satni format bez AM/PM (docs/PRAVILA.md §6) — FullCalendar po
+        // defaultu koristi engleski 12-satni prikaz u sedmici/danu/listi.
+        eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+        slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
         height: 'auto',
         nowIndicator: true,
         events: events || [],
@@ -75,6 +79,14 @@ window.initHomeosCalendar = function (el, events) {
             if (title) {
                 title.textContent = bsTitle(arg.view);
             }
+        },
+        // Klik na prazan dan/termin otvara "Brzo dodaj" s već postavljenim datumom
+        // ("dodajte zadatak, bilješku ili podsjetnik odakle god" iz specifikacije).
+        // Kalendar ne zna koje tipove nudi — samo javi datum, registry odlučuje.
+        dateClick: function (info) {
+            window.dispatchEvent(new CustomEvent('homeos-quick-capture', {
+                detail: { date: info.dateStr, allDay: info.allDay },
+            }));
         },
         // Klik na događaj vodi na njegov izvor (npr. edit zadatka).
         eventClick: function (info) {

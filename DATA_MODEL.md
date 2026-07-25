@@ -171,6 +171,20 @@ Napomene:
 - **Ponavljajući podsjetnik:** kad okine, spawn sljedeće instance (isto kao Task);
   koristi zajednički `App\Platform\Recurrence\RecurrenceService`.
 - `reminder_fired` kategorija notifikacija (§5) — šalje je scheduler kad podsjetnik okine.
+- **Okidanje ide isključivo kroz `App\Modules\Reminders\Services\ReminderFirer`**
+  (QA prije Faze 7). Bilo koji ulaz — scheduler (`reminders:fire`, svake minute),
+  akcija „Označi okinutim“ na listi i na formi podsjetnika, ili dugme na dashboard
+  widgetu — radi istu stvar:
+  1. upiše `completed_at` (idempotentno: već okinut podsjetnik se preskače),
+  2. tek onda dispatch-uje `ReminderFired` → obavještenje odgovornoj osobi
+     (ili kreatoru) + spawn sljedeće instance ako se ponavlja.
+
+  Redoslijed je bitan: dok se `completed_at` upisivao POSLIJE eventa, pad slanja
+  obavještenja (npr. mail provider) ostavljao je podsjetnik neokinutim, pa ga je
+  scheduler ponovo okidao **svake minute** i punio sanduče istim obavještenjem.
+  Komanda zato i logira grešku po podsjetniku umjesto da prekine cijeli prolaz.
+  Ručno okidanje šalje isto obavještenje kao i automatsko — „okinut“ znači
+  okinut, bez obzira ko ga je pokrenuo.
 
 ---
 

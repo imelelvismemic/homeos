@@ -4,6 +4,14 @@
 // (Laravel spaja ovo preko postojećeg prijevoda — vidi FileLoader::loadNamespaceOverrides).
 return [
 
+    'form' => [
+
+        'password' => [
+            'label' => 'Lozinka',
+        ],
+
+    ],
+
     'actions' => [
 
         'register' => [
@@ -12,7 +20,7 @@ return [
         ],
 
         'request_password_reset' => [
-            'label' => 'Zaboravili ste šifru?',
+            'label' => 'Zaboravili ste lozinku?',
         ],
 
     ],

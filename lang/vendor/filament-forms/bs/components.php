@@ -8,11 +8,11 @@ return [
         'actions' => [
 
             'hide_password' => [
-                'label' => 'Sakrij šifru',
+                'label' => 'Sakrij lozinku',
             ],
 
             'show_password' => [
-                'label' => 'Prikaži šifru',
+                'label' => 'Prikaži lozinku',
             ],
 
         ],
