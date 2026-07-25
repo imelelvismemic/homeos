@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * "ko duguje kome" (BalanceService). Shareable (privatnost).
  */
 #[Fillable([
-    'household_id', 'created_by', 'category_id', 'type', 'title', 'amount', 'date', 'paid_by',
+    'household_id', 'created_by', 'category_id', 'type', 'title', 'amount', 'date', 'paid_by', 'bill_id',
 ])]
 class Transaction extends Model
 {
@@ -56,6 +56,12 @@ class Transaction extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /** Račun čijim je plaćanjem ovaj trošak nastao (ako ga ima). */
+    public function bill(): BelongsTo
+    {
+        return $this->belongsTo(Bill::class);
     }
 
     /** Ko je platio. */

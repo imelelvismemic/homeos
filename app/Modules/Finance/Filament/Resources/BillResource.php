@@ -104,7 +104,7 @@ class BillResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('title')->label(__('finance.bills.fields.title'))->searchable()->weight('medium'),
-                TextColumn::make('category.name')->label(__('finance.bills.fields.category'))->placeholder('—')->toggleable(),
+                TextColumn::make('category.name')->label(__('finance.bills.fields.category'))->placeholder('—')->searchable()->toggleable(),
                 TextColumn::make('amount')->label(__('finance.bills.fields.amount'))->formatStateUsing(fn ($state) => Money::km($state))->sortable(),
                 TextColumn::make('due_date')
                     ->label(__('finance.bills.fields.due_date'))

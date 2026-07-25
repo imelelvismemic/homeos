@@ -314,3 +314,15 @@ model/DoD/ponavljanje/saldo/oba Resource-a/integracija); Pint čist.
   naziv zapisa u modalu kao ostali moduli.
 - **Odabir mjeseca budžeta** je sada `Select` (mjesec+godina), bez biranja dana.
 - **Račun**: inline "brzo dodaj kategoriju" na formi + filter po kategoriji na listi.
+
+**QA prolaz Finansije (2)** (dodatna korisnička provjera):
+
+- **Brzo dodaj kategoriju** i na formi budžeta (kao na računu).
+- **Pretraga liste računa** sada hvata i naziv kategorije (kolona `category.name`
+  označena `searchable`).
+- **Plaćanje računa → trošak** (novo, "sve je povezano"): kad se račun označi
+  plaćenim, Finance automatski bilježi `expense` transakciju vezanu za taj račun
+  (`bill_id`) pa se pojavljuje u mjesečnom pregledu; veza daje idempotenciju (jedan
+  trošak po plaćanju) i nasljeđuje privatnost računa. Event-driven (`BillPaid` →
+  `RecordBillPayment`), bez koda van modula Finansije. Pokriveno testovima
+  (kreiranje/idempotencija/privatnost).

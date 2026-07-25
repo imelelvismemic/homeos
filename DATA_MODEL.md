@@ -197,6 +197,7 @@ finance_transactions                            (Shareable)
   amount            decimal(12,2)
   date              date
   paid_by           nullable FK → household_members.id  (ko je platio — spec)
+  bill_id           nullable FK → finance_bills.id (nullOnDelete) (trošak nastao plaćanjem računa)
   timestamps
   index (household_id, date)
 
@@ -242,6 +243,13 @@ Napomene:
   van modula Finansije nije potrebno. Bill se pojavljuje i na kalendaru (`due_date`).
 - **Ponavljajući račun:** kad se označi plaćenim, spawn sljedeće instance (zajednički
   `RecurrenceService`), koja pri kreiranju ponovo dispatch-uje svoj podsjetnik.
+- **Plaćanje računa → trošak:** kad se račun označi plaćenim (`BillPaid`), Finance
+  automatski bilježi `expense` transakciju vezanu za taj račun (`bill_id`) — plaćeni
+  račun je stvarni rashod pa ulazi u mjesečni pregled/kategorije kao i svaki drugi
+  trošak ("sve je povezano", "ne dupliraj"). Veza `bill_id` daje provenance i
+  idempotenciju (jedan trošak po plaćenom računu). Izvedeni trošak nema `paid_by`/
+  učesnike (ne ulazi u saldo dok ga korisnik ručno ne podijeli) i nasljeđuje
+  privatnost računa (privatni račun ne postaje vidljiv domaćinstvu kroz trošak).
 - `bill_due` kategorija (§5) je pokrivena kroz `reminder_fired` (podsjetnik računa);
   zaseban Finance digest može doći u Fazi 6.
 

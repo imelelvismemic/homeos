@@ -72,6 +72,8 @@ class BudgetResource extends Resource
                 ->label(__('finance.budgets.fields.category'))
                 ->options(fn () => Category::query()->where('household_id', Filament::getTenant()?->id)->pluck('name', 'id'))
                 ->searchable()
+                ->createOptionForm(CategoryResource::formSchema())
+                ->createOptionUsing(fn (array $data) => CategoryResource::createOption($data))
                 ->required(),
 
             // Izbor mjeseca/godine (bez nepotrebnog odabira dana) — vrijednost je
