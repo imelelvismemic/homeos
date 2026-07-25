@@ -12,6 +12,16 @@ class CreateBill extends CreateRecord
 {
     protected static string $resource = BillResource::class;
 
+    public function getTitle(): string
+    {
+        return __('finance.bills.headings.create');
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return __('finance.bills.headings.create');
+    }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['household_id'] = Filament::getTenant()?->getKey();

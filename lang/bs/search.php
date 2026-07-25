@@ -17,6 +17,8 @@ return [
         'note' => 'Bilješke',
         'bill' => 'Računi',
         'transaction' => 'Transakcije',
+        'category' => 'Kategorije',
+        'budget' => 'Budžeti',
     ],
 
 ];

@@ -5,8 +5,8 @@ namespace App\Modules\Finance\Filament\Resources;
 use App\Modules\Finance\Filament\Resources\BudgetResource\Pages;
 use App\Modules\Finance\Models\Budget;
 use App\Modules\Finance\Models\Category;
+use App\Modules\Finance\Support\Money;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -15,7 +15,7 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class BudgetResource extends Resource
 {
@@ -47,6 +47,24 @@ class BudgetResource extends Resource
         return __('finance.navigation_group');
     }
 
+    /**
+     * Mjeseci za odabir (prvi dan mjeseca → naziv), raspon oko sadašnjeg.
+     *
+     * @return array<string, string>
+     */
+    public static function monthOptions(): array
+    {
+        $options = [];
+        $start = now()->startOfMonth()->subMonths(18);
+
+        for ($i = 0; $i < 31; $i++) {
+            $month = $start->copy()->addMonths($i);
+            $options[$month->toDateString()] = Str::ucfirst($month->translatedFormat('F Y.'));
+        }
+
+        return $options;
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -56,14 +74,13 @@ class BudgetResource extends Resource
                 ->searchable()
                 ->required(),
 
-            DatePicker::make('month')
+            // Izbor mjeseca/godine (bez nepotrebnog odabira dana) — vrijednost je
+            // prvi dan mjeseca (unique po household+kategorija+mjesec).
+            Select::make('month')
                 ->label(__('finance.budgets.fields.month'))
-                ->native(false)
-                ->displayFormat('m.Y.')
-                ->default(now()->startOfMonth())
-                ->required()
-                // Uvijek prvi dan mjeseca (unique po household+kategorija+mjesec).
-                ->dehydrateStateUsing(fn ($state) => Carbon::parse($state)->startOfMonth()->toDateString()),
+                ->options(fn () => static::monthOptions())
+                ->default(now()->startOfMonth()->toDateString())
+                ->required(),
 
             TextInput::make('amount')
                 ->label(__('finance.budgets.fields.amount'))
@@ -77,12 +94,17 @@ class BudgetResource extends Resource
             ->columns([
                 TextColumn::make('category.name')->label(__('finance.budgets.fields.category'))->searchable()->weight('medium'),
                 TextColumn::make('month')->label(__('finance.budgets.fields.month'))->date('m.Y.')->sortable(),
-                TextColumn::make('amount')->label(__('finance.budgets.fields.amount'))->money('BAM')->sortable(),
+                TextColumn::make('amount')->label(__('finance.budgets.fields.amount'))->formatStateUsing(fn ($state) => Money::km($state))->sortable(),
             ])
             ->defaultSort('month', 'desc')
             ->actions([
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->modalHeading(__('finance.budgets.delete'))
+                    ->modalDescription(fn (Budget $r) => __('finance.budgets.delete_description', [
+                        'category' => $r->category?->name ?? '—',
+                        'month' => $r->month?->translatedFormat('F Y.') ?? '',
+                    ])),
             ])
             ->emptyStateHeading(__('finance.budgets.empty.heading'))
             ->emptyStateDescription(__('finance.budgets.empty.description'))

@@ -19,7 +19,7 @@
                                 <span class="truncate text-sm text-gray-950 dark:text-white">{{ $bill->title }}</span>
                             </div>
                             <div class="flex shrink-0 items-center gap-3">
-                                <span class="text-sm tabular-nums text-gray-700 dark:text-gray-300">{{ number_format((float) $bill->amount, 2, ',', '.') }} KM</span>
+                                <span class="text-sm tabular-nums text-gray-700 dark:text-gray-300">{{ \App\Modules\Finance\Support\Money::km($bill->amount) }}</span>
                                 <span @class([
                                     'text-xs',
                                     'text-danger-600 dark:text-danger-400 font-medium' => $bill->due_date->isPast(),

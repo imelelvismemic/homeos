@@ -12,6 +12,16 @@ class CreateTransaction extends CreateRecord
 
     protected static string $resource = TransactionResource::class;
 
+    public function getTitle(): string
+    {
+        return __('finance.transactions.headings.create');
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return __('finance.transactions.headings.create');
+    }
+
     protected function afterCreate(): void
     {
         $this->record->participants()->sync($this->data['participants'] ?? []);

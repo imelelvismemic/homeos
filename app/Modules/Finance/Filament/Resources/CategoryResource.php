@@ -4,7 +4,9 @@ namespace App\Modules\Finance\Filament\Resources;
 
 use App\Modules\Finance\Filament\Resources\CategoryResource\Pages;
 use App\Modules\Finance\Models\Category;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -46,7 +48,17 @@ class CategoryResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
+        return $form->schema(static::formSchema());
+    }
+
+    /**
+     * Dijeljena šema — koristi je i "brzo dodaj kategoriju" iz forme računa/transakcije.
+     *
+     * @return array<int, Component>
+     */
+    public static function formSchema(): array
+    {
+        return [
             TextInput::make('name')
                 ->label(__('finance.categories.fields.name'))
                 ->required()
@@ -54,7 +66,18 @@ class CategoryResource extends Resource
 
             ColorPicker::make('color')
                 ->label(__('finance.categories.fields.color')),
-        ]);
+        ];
+    }
+
+    /** Kreira kategoriju iz inline "createOption" forme (household/creator stamp). */
+    public static function createOption(array $data): int
+    {
+        return Category::create([
+            'household_id' => Filament::getTenant()?->getKey(),
+            'created_by' => auth()->id(),
+            'name' => $data['name'],
+            'color' => $data['color'] ?? null,
+        ])->getKey();
     }
 
     public static function table(Table $table): Table

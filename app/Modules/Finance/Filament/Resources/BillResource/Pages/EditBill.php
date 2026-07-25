@@ -11,9 +11,18 @@ class EditBill extends EditRecord
 {
     protected static string $resource = BillResource::class;
 
+    public function getTitle(): string
+    {
+        return __('finance.bills.headings.edit');
+    }
+
     protected function getHeaderActions(): array
     {
-        return [DeleteAction::make()];
+        return [
+            DeleteAction::make()
+                ->modalHeading(__('finance.bills.delete'))
+                ->modalDescription(fn () => __('finance.bills.delete_description', ['title' => $this->record->title])),
+        ];
     }
 
     protected function mutateFormDataBeforeFill(array $data): array

@@ -17,7 +17,7 @@ return [
     ],
 
     'reminder' => [
-        'bill_due' => 'Račun dospijeva: :title (:amount KM)',
+        'bill_due' => 'Račun dospijeva: :title (:amount)',
     ],
 
     'transactions' => [
@@ -38,6 +38,7 @@ return [
             'this_month' => 'Ovaj mjesec',
         ],
         'actions' => ['create' => 'Dodaj transakciju'],
+        'headings' => ['create' => 'Dodaj transakciju', 'edit' => 'Uredi transakciju'],
         'delete' => 'Brisanje transakcije',
         'delete_description' => 'Sigurno želite obrisati transakciju ":title"? Ova radnja je nepovratna.',
         'empty' => [
@@ -65,6 +66,7 @@ return [
             'create' => 'Dodaj račun',
             'mark_paid' => 'Označi plaćenim',
         ],
+        'headings' => ['create' => 'Dodaj račun', 'edit' => 'Uredi račun'],
         'delete' => 'Brisanje računa',
         'delete_description' => 'Sigurno želite obrisati račun ":title"? Ova radnja je nepovratna.',
         'empty' => [
@@ -83,6 +85,7 @@ return [
             'transactions' => 'Transakcija',
         ],
         'actions' => ['create' => 'Dodaj kategoriju'],
+        'headings' => ['create' => 'Dodaj kategoriju', 'edit' => 'Uredi kategoriju'],
         'delete' => 'Brisanje kategorije',
         'delete_description' => 'Sigurno želite obrisati kategoriju ":name"? Transakcije ostaju bez kategorije.',
         'empty' => [
@@ -101,6 +104,9 @@ return [
             'amount' => 'Iznos',
         ],
         'actions' => ['create' => 'Dodaj budžet'],
+        'headings' => ['create' => 'Dodaj budžet', 'edit' => 'Uredi budžet'],
+        'delete' => 'Brisanje budžeta',
+        'delete_description' => 'Sigurno želite obrisati budžet za ":category" (:month)? Ova radnja je nepovratna.',
         'empty' => [
             'heading' => 'Još nema budžeta',
             'description' => 'Postavite mjesečni budžet po kategoriji — mjesečni pregled pokazuje potrošeno naspram budžeta.',

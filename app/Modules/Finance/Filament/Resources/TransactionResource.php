@@ -6,6 +6,7 @@ use App\Modules\Finance\Enums\TransactionType;
 use App\Modules\Finance\Filament\Resources\TransactionResource\Pages;
 use App\Modules\Finance\Models\Category;
 use App\Modules\Finance\Models\Transaction;
+use App\Modules\Finance\Support\Money;
 use App\Platform\Models\HouseholdMember;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
@@ -103,7 +104,9 @@ class TransactionResource extends Resource
             Select::make('category_id')
                 ->label(__('finance.transactions.fields.category'))
                 ->options(fn () => Category::query()->where('household_id', Filament::getTenant()?->id)->pluck('name', 'id'))
-                ->searchable(),
+                ->searchable()
+                ->createOptionForm(CategoryResource::formSchema())
+                ->createOptionUsing(fn (array $data) => CategoryResource::createOption($data)),
 
             Select::make('paid_by')
                 ->label(__('finance.transactions.fields.paid_by'))
@@ -136,7 +139,7 @@ class TransactionResource extends Resource
                 TextColumn::make('category.name')->label(__('finance.transactions.fields.category'))->placeholder('—')->toggleable(),
                 TextColumn::make('amount')
                     ->label(__('finance.transactions.fields.amount'))
-                    ->money('BAM')
+                    ->formatStateUsing(fn ($state) => Money::km($state))
                     ->sortable()
                     ->color(fn (Transaction $r) => $r->type->color()),
                 TextColumn::make('payer.user.name')->label(__('finance.transactions.fields.paid_by'))->placeholder('—')->toggleable(),

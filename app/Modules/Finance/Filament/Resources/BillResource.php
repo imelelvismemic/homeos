@@ -5,6 +5,7 @@ namespace App\Modules\Finance\Filament\Resources;
 use App\Modules\Finance\Filament\Resources\BillResource\Pages;
 use App\Modules\Finance\Models\Bill;
 use App\Modules\Finance\Models\Category;
+use App\Modules\Finance\Support\Money;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -17,6 +18,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -75,7 +77,9 @@ class BillResource extends Resource
             Select::make('category_id')
                 ->label(__('finance.bills.fields.category'))
                 ->options(fn () => Category::query()->where('household_id', Filament::getTenant()?->id)->pluck('name', 'id'))
-                ->searchable(),
+                ->searchable()
+                ->createOptionForm(CategoryResource::formSchema())
+                ->createOptionUsing(fn (array $data) => CategoryResource::createOption($data)),
 
             TextInput::make('remind_days_before')
                 ->label(__('finance.bills.fields.remind_days_before'))
@@ -101,7 +105,7 @@ class BillResource extends Resource
             ->columns([
                 TextColumn::make('title')->label(__('finance.bills.fields.title'))->searchable()->weight('medium'),
                 TextColumn::make('category.name')->label(__('finance.bills.fields.category'))->placeholder('—')->toggleable(),
-                TextColumn::make('amount')->label(__('finance.bills.fields.amount'))->money('BAM')->sortable(),
+                TextColumn::make('amount')->label(__('finance.bills.fields.amount'))->formatStateUsing(fn ($state) => Money::km($state))->sortable(),
                 TextColumn::make('due_date')
                     ->label(__('finance.bills.fields.due_date'))
                     ->date('d.m.Y.')
@@ -118,6 +122,9 @@ class BillResource extends Resource
                     ->label(__('finance.bills.filters.unpaid'))
                     ->query(fn (Builder $query) => $query->whereNull('paid_at'))
                     ->default(),
+                SelectFilter::make('category_id')
+                    ->label(__('finance.bills.fields.category'))
+                    ->options(fn () => Category::query()->where('household_id', Filament::getTenant()?->id)->pluck('name', 'id')),
             ])
             ->actions([
                 Action::make('markPaid')

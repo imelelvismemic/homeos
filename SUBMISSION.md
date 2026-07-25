@@ -301,3 +301,16 @@ vezivanje i integracija kalendar+dashboard+pretraga); Pint čist.
 
 Testirano: **84 testa / 261 assertion** (cijeli paket, uklj. 15 novih za Fazu 5a —
 model/DoD/ponavljanje/saldo/oba Resource-a/integracija); Pint čist.
+
+**QA prolaz Finansije** (nakon korisničke provjere):
+
+- **Univerzalna pretraga** sada uključuje i kategorije i budžete (uz račune i
+  transakcije); pretraga računa/transakcija hvata i naziv kategorije.
+- **Format iznosa** ujednačen kroz cijeli modul preko `Finance\Support\Money::km()`
+  → `700.00 KM` (umjesto Filament defaulta `BAM 700.00`) — liste, kalendar,
+  mjesečni pregled, widget, podsjetnik.
+- **Naslovi formi** (dodaj/uredi) za kategorije/budžete/račune/transakcije usklađeni
+  s `docs/PRAVILA.md` (malo slovo u drugoj riječi); **brisanje budžeta** prikazuje
+  naziv zapisa u modalu kao ostali moduli.
+- **Odabir mjeseca budžeta** je sada `Select` (mjesec+godina), bez biranja dana.
+- **Račun**: inline "brzo dodaj kategoriju" na formi + filter po kategoriji na listi.

@@ -10,8 +10,17 @@ class EditCategory extends EditRecord
 {
     protected static string $resource = CategoryResource::class;
 
+    public function getTitle(): string
+    {
+        return __('finance.categories.headings.edit');
+    }
+
     protected function getHeaderActions(): array
     {
-        return [DeleteAction::make()];
+        return [
+            DeleteAction::make()
+                ->modalHeading(__('finance.categories.delete'))
+                ->modalDescription(fn () => __('finance.categories.delete_description', ['name' => $this->record->name])),
+        ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Modules\Finance\Listeners;
 
 use App\Modules\Finance\Events\BillCreated;
+use App\Modules\Finance\Support\Money;
 use App\Platform\Events\ReminderRequested;
 
 /**
@@ -21,7 +22,7 @@ class RequestBillReminder
             $bill->reminderDate(),
             __('finance.reminder.bill_due', [
                 'title' => $bill->title,
-                'amount' => number_format((float) $bill->amount, 2, ',', '.'),
+                'amount' => Money::km($bill->amount),
             ]),
         );
     }

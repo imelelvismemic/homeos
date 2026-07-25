@@ -4,6 +4,7 @@ namespace App\Modules\Finance\Calendar;
 
 use App\Modules\Finance\Filament\Resources\BillResource;
 use App\Modules\Finance\Models\Bill;
+use App\Modules\Finance\Support\Money;
 use App\Platform\Calendar\CalendarEvent;
 use App\Platform\Contracts\CalendarSourceContract;
 use App\Platform\Models\Household;
@@ -27,7 +28,7 @@ class BillCalendarSource implements CalendarSourceContract
             ->map(fn (Bill $bill) => new CalendarEvent(
                 type: 'bill',
                 id: $bill->id,
-                title: $bill->title.' ('.number_format((float) $bill->amount, 2, ',', '.').' KM)',
+                title: $bill->title.' ('.Money::km($bill->amount).')',
                 start: $bill->due_date->toIso8601String(),
                 url: BillResource::getUrl('edit', ['record' => $bill, 'tenant' => $household]),
                 color: $bill->isPaid() ? '#5E8C6A' : ($bill->due_date->isPast() ? '#B23B2E' : '#3E7C8C'),

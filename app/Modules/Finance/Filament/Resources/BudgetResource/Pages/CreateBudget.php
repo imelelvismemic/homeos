@@ -11,4 +11,14 @@ class CreateBudget extends CreateRecord
     use CreatesForCurrentHousehold;
 
     protected static string $resource = BudgetResource::class;
+
+    public function getTitle(): string
+    {
+        return __('finance.budgets.headings.create');
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return __('finance.budgets.headings.create');
+    }
 }

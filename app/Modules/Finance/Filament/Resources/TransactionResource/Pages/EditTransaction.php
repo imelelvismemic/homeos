@@ -10,9 +10,18 @@ class EditTransaction extends EditRecord
 {
     protected static string $resource = TransactionResource::class;
 
+    public function getTitle(): string
+    {
+        return __('finance.transactions.headings.edit');
+    }
+
     protected function getHeaderActions(): array
     {
-        return [DeleteAction::make()];
+        return [
+            DeleteAction::make()
+                ->modalHeading(__('finance.transactions.delete'))
+                ->modalDescription(fn () => __('finance.transactions.delete_description', ['title' => $this->record->title])),
+        ];
     }
 
     protected function mutateFormDataBeforeFill(array $data): array

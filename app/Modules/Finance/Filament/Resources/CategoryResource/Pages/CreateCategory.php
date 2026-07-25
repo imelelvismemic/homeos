@@ -11,4 +11,14 @@ class CreateCategory extends CreateRecord
     use CreatesForCurrentHousehold;
 
     protected static string $resource = CategoryResource::class;
+
+    public function getTitle(): string
+    {
+        return __('finance.categories.headings.create');
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return __('finance.categories.headings.create');
+    }
 }
