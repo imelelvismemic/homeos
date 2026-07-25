@@ -10,6 +10,13 @@ class ListShoppingLists extends ListRecords
 {
     protected static string $resource = ShoppingListResource::class;
 
+    // Filament default heading title-case-uje plural label ("Liste Za Kupovinu").
+    // Bosanski je rečenična kapitalizacija (PRAVILA.md) — koristimo label kako jeste.
+    public function getTitle(): string
+    {
+        return __('lifeadmin.lists.plural_label');
+    }
+
     protected function getHeaderActions(): array
     {
         return [CreateAction::make()->label(__('lifeadmin.lists.headings.create'))];
