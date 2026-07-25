@@ -131,6 +131,10 @@ helper iz `tests/Pest.php`. Filament testovi: `Livewire::test(...)`, uz
   `Filament::getTenant()`.
 - **Panel rute traže `{tenant}` parametar** — `route('filament.app.resources.x.create')`
   puca bez `['tenant' => Filament::getTenant()]`.
+- **MySQL limit imena identifikatora = 64 znaka.** Testovi rade na sqlite (nema
+  limita) pa ovo promakne lokalno, ali CI migrira na MySQL i pukne. Za duge
+  composite unique/index nazive (npr. pivot s dva `_id` FK) daj EKSPLICITNO
+  kratko ime: `$table->unique(['a_id','b_id'], 'kratko_unique')`.
 
 ## Obrasci naučeni u Fazi 4 (Podsjetnici/Bilješke)
 

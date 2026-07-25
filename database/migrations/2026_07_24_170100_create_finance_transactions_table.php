@@ -29,7 +29,8 @@ return new class extends Migration
             $table->foreignId('household_member_id')->constrained('household_members')->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['transaction_id', 'household_member_id']);
+            // Eksplicitno kratko ime — auto-generisano (73 zn.) prelazi MySQL limit od 64.
+            $table->unique(['transaction_id', 'household_member_id'], 'fin_tx_participant_unique');
         });
     }
 
