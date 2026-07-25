@@ -4,6 +4,9 @@ use App\Modules\Finance\Calendar\BillCalendarSource;
 use App\Modules\Finance\Dashboard\FinanceDashboardWidget;
 use App\Modules\Finance\QuickCapture\FinanceQuickCreate;
 use App\Modules\Finance\Search\FinanceSearchProvider;
+use App\Modules\LifeAdmin\Calendar\DocumentExpiryCalendarSource;
+use App\Modules\LifeAdmin\Dashboard\LifeAdminDashboardWidget;
+use App\Modules\LifeAdmin\Search\LifeAdminSearchProvider;
 use App\Modules\Notes\Dashboard\NoteDashboardWidget;
 use App\Modules\Notes\QuickCapture\NoteQuickCreate;
 use App\Modules\Notes\Search\NoteSearchProvider;
@@ -94,6 +97,15 @@ return [
                 ['name' => 'amount', 'label' => 'Iznos (KM)', 'type' => 'number', 'required' => true],
             ],
         ],
+    ],
+
+    'lifeadmin' => [
+        'name' => 'Administracija',
+        'icon' => 'heroicon-o-folder',
+        'enabled' => true,
+        'dashboard_widget' => LifeAdminDashboardWidget::class,
+        'search_provider' => LifeAdminSearchProvider::class,
+        'calendar_source' => DocumentExpiryCalendarSource::class,
     ],
 
 ];

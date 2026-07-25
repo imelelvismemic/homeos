@@ -326,3 +326,24 @@ model/DoD/ponavljanje/saldo/oba Resource-a/integracija); Pint čist.
   trošak po plaćanju) i nasljeđuje privatnost računa. Event-driven (`BillPaid` →
   `RecordBillPayment`), bez koda van modula Finansije. Pokriveno testovima
   (kreiranje/idempotencija/privatnost).
+
+**Faza 5b završena** — Life admin (Administracija domaćinstva):
+
+- **Evidencija** — jedinstven model **Dokument** s tipom (lična isprava, garancija,
+  obnova/registracija, ugovor, ostalo), datumom isteka i **prilogom** (skenovi/PDF).
+  Zaseban model **Kontakti** (majstori, ljekari, komšije — bez datuma).
+- **Prilozi na privatnom disku** — skenovi se čuvaju na disku `documents`
+  (`storage/app/documents`), NIKAD u `public/`; preuzimanje ide kroz autentikovanu
+  Filament akciju (Policy `view`), pa privatni dokument ne curi direktnim URL-om.
+  Dodan perzistentni Docker volumen `app-storage` (dijeljen app/queue/scheduler) da
+  upload-i prežive redeploy.
+- **Zajedničke liste za kupovinu** — lista + stavke koje se štikliraju (`is_done`,
+  ToggleColumn — niska frikcija). Kućanski poslovi idu kroz modul Zadaci (odluka
+  vlasnika), bez dupliranja.
+- **Dokaz "sve je povezano" (DoD Faze 5b):** na kreiranju dokumenta s datumom isteka
+  Life admin emituje `App\Platform\Events\ReminderRequested` (X dana ranije, default
+  30) → Podsjetnici kreiraju podsjetnik → scheduler → `reminder_fired` email. Nijedna
+  linija van modula; dokument se pojavljuje i na kalendaru/dashboardu/pretrazi.
+- Registrovan u `config/homeos-apps.php` (dashboard widget, search provider, calendar
+  source); prijevodi u `lang/bs/lifeadmin.php`; tri Policy klase; DATA_MODEL.md §4c.
+  Pokriveno testovima (model/DoD/privatnost/upload/oba Resource-a/integracija).

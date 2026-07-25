@@ -150,6 +150,31 @@ helper iz `tests/Pest.php`. Filament testovi: `Livewire::test(...)`, uz
   preko istih kontrakata kao Task — samo registruj `calendar_source`/
   `dashboard_widget`/`search_provider`.
 
+## Obrasci naučeni u Fazi 5b (Life admin — upload fajlova)
+
+- **Prilozi (upload) idu na PRIVATNI disk, nikad `public/`.** Za dokumente/skenove
+  napravi zaseban disk u `config/filesystems.php` (`'documents'` → `storage/app/...`,
+  bez `url`, `visibility: private`). Fajl pod `public/` bi bio dostupan direktnim
+  URL-om i procurio bi privatni sadržaj (krši §11).
+- **Preuzimanje kroz Filament akciju, ne kroz core rutu.** `Action::make('download')
+  ->action(fn ($r) => Storage::disk('documents')->download($r->file_path, $r->file_name))`
+  — akcija je na zapisu koji korisnik ionako smije vidjeti (Resource `visibleTo` +
+  Policy), pa je autorizacija pokrivena. Izbjegava se registracija modul-specifične
+  rute u `HomePanelProvider->routes()` (to bi spojilo core → modul).
+- **Upload zahtijeva PERZISTENTNI Docker volumen.** Bez njega fajlovi žive u
+  efemernom sloju kontejnera i nestaju pri redeployu, a ne dijele se između
+  `app`/`queue-worker`/`scheduler` (svaki ima svoju kopiju iz image-a). Dodaj named
+  volume mapiran na `storage/app` na SVA TRI servisa u `docker-compose.prod.yml`.
+  Named volume se seed-a iz image-a pri prvom kreiranju (`www:www` vlasništvo), pa je
+  zapisiv bez ručnog `chown`.
+- **FileUpload na lokalnom privatnom disku:** ugasi `previewable/openable/downloadable`
+  (traže javni URL kojeg local disk nema) i uhvati originalni naziv preko
+  `->storeFileNamesIn('file_name')`.
+- **DB default ≠ in-memory default.** `->default(false)` u migraciji NE postavlja
+  atribut na svježe `Model::create([...])` bez tog ključa (ostane `null` do refresha).
+  Ako se na atribut oslanjaš odmah, dodaj `protected $attributes = ['is_done' => false]`
+  na model.
+
 ## Verifikacija prije "gotovo"
 
 - `php vendor/bin/pest` zeleno (lokalno u kontejneru s `intl`, i CI).

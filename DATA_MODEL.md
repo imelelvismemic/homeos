@@ -253,6 +253,62 @@ Napomene:
 - `bill_due` kategorija (§5) je pokrivena kroz `reminder_fired` (podsjetnik računa);
   zaseban Finance digest može doći u Fazi 6.
 
+### 4c. Life admin (Faza 5b, `app/Modules/LifeAdmin`)
+
+```
+life_admin_documents                            (Shareable) — dokumenti/garancije/obnove
+  id
+  household_id      → households.id
+  created_by        → users.id
+  type              string (enum: id_document, warranty, renewal, contract, other)
+  title             string
+  expiry_date       nullable date               (istek/obnova — ime po §3, isti kao due_date koncept)
+  remind_days_before unsigned int, default 30    (koliko dana prije isteka da podsjeti)
+  file_path         nullable string             (putanja na privatnom disku 'documents')
+  file_name         nullable string             (originalni naziv za download)
+  notes             nullable text
+  timestamps
+  index (household_id, expiry_date)
+
+life_admin_contacts                             (Shareable) — važni kontakti
+  id
+  household_id      → households.id
+  created_by        → users.id
+  name              string
+  relationship      nullable string             (npr. vodoinstalater, ljekar, komšija)
+  phone             nullable string
+  email             nullable string
+  notes             nullable text
+  timestamps
+
+life_admin_lists                                (Shareable) — zajedničke liste (kupovina)
+  id
+  household_id      → households.id
+  created_by        → users.id
+  name              string
+  timestamps
+
+life_admin_list_items                           — stavke liste (štikliranje)
+  id
+  list_id           FK → life_admin_lists.id (cascade)
+  name              string
+  is_done           boolean, default false
+  timestamps
+```
+
+Napomene:
+- **Datum isteka → podsjetnik (isti DoD mehanizam kao računi):** na kreiranju
+  dokumenta s `expiry_date` Life admin emituje
+  `App\Platform\Events\ReminderRequested($document, expiry_date − remind_days_before, …)`;
+  Reminders kreira podsjetnik → scheduler okine → `reminder_fired` email. NIŠTA van
+  modula Life admin. Dokument s `expiry_date` se pojavljuje i na kalendaru.
+- **Prilozi (skenovi/PDF):** čuvaju se na privatnom disku `documents`
+  (`storage/app/documents`, perzistentni Docker volumen), NIKAD u `public/` — pristup
+  isključivo kroz autentikovanu rutu s Policy provjerom (`view`), da privatni dokument
+  ne procuri direktnim URL-om.
+- **Kućanski poslovi** se NE modeliraju ovdje — idu kroz postojeći modul Zadaci
+  (imaju status/dodjelu/rok). Life admin liste su samo za kupovinu (odluka vlasnika).
+
 ---
 
 ## 5. Lista notifikacijskih kategorija (raste kroz faze, popuniti pri dodavanju)

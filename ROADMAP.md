@@ -363,8 +363,14 @@ Finansije.
   DoD ispunjen: na kreiranju računa Finance emituje `ReminderRequested` (X dana
   prije dospijeća) → Reminders kreira podsjetnik → scheduler okine → email; ništa
   van Finansija. Račun se pojavljuje i na kalendaru/dashboardu/pretrazi.
-- **Faza 5b — Life admin: sljedeće** (dokumenti/garancije/kontakti + rokovi →
-  podsjetnici, zajedničke liste).
+- **Faza 5b — Life admin: GOTOVO i deployano.** Jedinstven model Dokument (tip +
+  datum isteka + privatni prilog/sken), zaseban model Kontakti, zajedničke liste za
+  kupovinu (štikliranje). DoD ispunjen: dokument s datumom isteka emituje
+  `ReminderRequested` (X dana ranije, default 30) → Podsjetnici → scheduler → email;
+  ništa van Life admina. Dokument se pojavljuje i na kalendaru/dashboardu/pretrazi.
+  Prilozi na privatnom disku `documents` (autentikovano preuzimanje, Policy), uz
+  perzistentni Docker volumen `app-storage`. Kućanski poslovi idu kroz modul Zadaci
+  (odluka vlasnika), bez dupliranja.
 
 ---
 

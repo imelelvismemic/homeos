@@ -19,6 +19,9 @@ return [
         'transaction' => 'Transakcije',
         'category' => 'Kategorije',
         'budget' => 'Budžeti',
+        'document' => 'Dokumenti',
+        'contact' => 'Kontakti',
+        'shopping_list' => 'Liste za kupovinu',
     ],
 
 ];

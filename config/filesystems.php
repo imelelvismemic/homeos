@@ -47,6 +47,18 @@ return [
             'report' => false,
         ],
 
+        // Privatni disk za priloge Life admina (skenovi dokumenata/garancija).
+        // NIJE web-dostupan (nema 'url', nije symlinkovan u public/) — pristup
+        // isključivo kroz autentikovanu rutu s Policy provjerom (CLAUDE.md §11).
+        // Root je pod storage/app → pokriveno perzistentnim Docker volumenom.
+        'documents' => [
+            'driver' => 'local',
+            'root' => storage_path('app/documents'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

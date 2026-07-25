@@ -25,6 +25,12 @@ services:
       RUN_MIGRATIONS: "false"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    # Perzistentni volumen za korisničke priloge (skenovi dokumenata, Life admin).
+    # Bez ovoga bi upload-ovani fajlovi živjeli u efemernom sloju kontejnera i
+    # nestali pri svakom redeployu; dijeli se s queue-worker/scheduler servisima.
+    # Volumen se seed-a iz image-a pri prvom kreiranju (www:www vlasništvo).
+    volumes:
+      - app-storage:/var/www/html/storage/app
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "9000"]
       interval: 10s
@@ -84,6 +90,8 @@ services:
       RUN_MIGRATIONS: "false"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - app-storage:/var/www/html/storage/app
     depends_on:
       app:
         condition: service_healthy
@@ -107,6 +115,8 @@ services:
       RUN_MIGRATIONS: "false"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - app-storage:/var/www/html/storage/app
     depends_on:
       app:
         condition: service_healthy
@@ -120,3 +130,4 @@ services:
 
 volumes:
   redis-data:
+  app-storage:
