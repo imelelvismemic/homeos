@@ -4,6 +4,7 @@ namespace App\Modules\LifeAdmin\Filament\Resources;
 
 use App\Modules\LifeAdmin\Filament\Resources\ContactResource\Pages;
 use App\Modules\LifeAdmin\Models\Contact;
+use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -91,6 +92,7 @@ class ContactResource extends Resource
             ->defaultSort('name')
             ->actions([
                 EditAction::make(),
+                SharingForm::tableAction(),
                 DeleteAction::make()
                     ->modalHeading(__('lifeadmin.contacts.delete'))
                     ->modalDescription(fn (Contact $r) => __('lifeadmin.contacts.delete_description', ['name' => $r->name])),

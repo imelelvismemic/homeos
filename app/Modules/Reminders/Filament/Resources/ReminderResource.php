@@ -4,6 +4,7 @@ namespace App\Modules\Reminders\Filament\Resources;
 
 use App\Modules\Reminders\Filament\Resources\ReminderResource\Pages;
 use App\Modules\Reminders\Models\Reminder;
+use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Models\HouseholdMember;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Actions\Action as FormAction;
@@ -149,6 +150,7 @@ class ReminderResource extends Resource
                     ->visible(fn (Reminder $r) => $r->completed_at === null)
                     ->action(fn (Reminder $r) => $r->update(['completed_at' => now()])),
                 EditAction::make(),
+                SharingForm::tableAction(),
                 DeleteAction::make()
                     ->modalHeading(__('reminders.headings.delete'))
                     ->modalDescription(fn (Reminder $r) => __('reminders.headings.delete_description', ['title' => $r->title])),

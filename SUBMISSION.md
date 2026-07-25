@@ -347,3 +347,16 @@ model/DoD/ponavljanje/saldo/oba Resource-a/integracija); Pint čist.
 - Registrovan u `config/homeos-apps.php` (dashboard widget, search provider, calendar
   source); prijevodi u `lang/bs/lifeadmin.php`; tri Policy klase; DATA_MODEL.md §4c.
   Pokriveno testovima (model/DoD/privatnost/upload/oba Resource-a/integracija).
+
+**Faza 6a — Dijeljenje + upravljanje članovima** (dio 1 od 2; 6b: obavještenja + digest):
+
+- **Zajednički "Podijeli" mehanizam** (`App\Platform\Filament\Sharing\SharingForm`)
+  — modul-neutralna akcija (na listi i na edit stranici) za svaki Shareable entitet:
+  Privatno / Cijelo domaćinstvo / Određeni članovi. Vidljivost se čuva u `shares`
+  tabeli (Shareable trait), ne na modelu. Zakačeno na svih 8 entiteta (zadaci,
+  bilješke, podsjetnici, računi, transakcije, dokumenti, kontakti, liste).
+- **Upravljanje članovima** (`HouseholdMemberService` + akcije na Resource-u):
+  promjena uloge, uklanjanje člana, prijenos vlasništva — sve vlasnik-only, uz
+  invariantu "domaćinstvo uvijek ima bar jednog vlasnika".
+- Testovi: Share akcija (privatno/određeni članovi), member admin (uloga/uklanjanje/
+  zadnji vlasnik/prijenos). Pint čist.

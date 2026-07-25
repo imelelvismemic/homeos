@@ -6,6 +6,7 @@ use App\Modules\Finance\Filament\Resources\BillResource\Pages;
 use App\Modules\Finance\Models\Bill;
 use App\Modules\Finance\Models\Category;
 use App\Modules\Finance\Support\Money;
+use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -135,6 +136,7 @@ class BillResource extends Resource
                     ->requiresConfirmation()
                     ->action(fn (Bill $r) => $r->update(['paid_at' => now()])),
                 EditAction::make(),
+                SharingForm::tableAction(),
                 DeleteAction::make()
                     ->modalHeading(__('finance.bills.delete'))
                     ->modalDescription(fn (Bill $r) => __('finance.bills.delete_description', ['title' => $r->title])),

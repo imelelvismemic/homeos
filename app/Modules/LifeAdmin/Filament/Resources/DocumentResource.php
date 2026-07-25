@@ -5,6 +5,7 @@ namespace App\Modules\LifeAdmin\Filament\Resources;
 use App\Modules\LifeAdmin\Enums\DocumentType;
 use App\Modules\LifeAdmin\Filament\Resources\DocumentResource\Pages;
 use App\Modules\LifeAdmin\Models\Document;
+use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -140,6 +141,7 @@ class DocumentResource extends Resource
                     ->visible(fn (Document $r) => $r->hasFile())
                     ->action(fn (Document $r) => Storage::disk('documents')->download($r->file_path, $r->file_name ?? $r->title)),
                 EditAction::make(),
+                SharingForm::tableAction(),
                 DeleteAction::make()
                     ->modalHeading(__('lifeadmin.documents.delete'))
                     ->modalDescription(fn (Document $r) => __('lifeadmin.documents.delete_description', ['title' => $r->title])),

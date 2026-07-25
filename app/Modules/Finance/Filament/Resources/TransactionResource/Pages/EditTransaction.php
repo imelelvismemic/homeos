@@ -3,6 +3,7 @@
 namespace App\Modules\Finance\Filament\Resources\TransactionResource\Pages;
 
 use App\Modules\Finance\Filament\Resources\TransactionResource;
+use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -18,6 +19,7 @@ class EditTransaction extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            SharingForm::pageAction(),
             DeleteAction::make()
                 ->modalHeading(__('finance.transactions.delete'))
                 ->modalDescription(fn () => __('finance.transactions.delete_description', ['title' => $this->record->title])),

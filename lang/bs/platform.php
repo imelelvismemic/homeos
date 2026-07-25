@@ -31,6 +31,30 @@ return [
         'user_not_found' => 'Nema registrovanog korisnika sa ovom email adresom. Korisnik se prvo mora registrovati u sistemu.',
         'empty_state_heading' => 'Još nema članova',
         'empty_state_description' => 'Pozovite prvog člana svog domaćinstva da biste počeli dijeliti obaveze.',
+        'actions' => 'Radnje',
+        'change_role' => 'Promijeni ulogu',
+        'change_role_heading' => 'Promjena uloge člana',
+        'change_role_submit' => 'Sačuvaj',
+        'remove' => 'Ukloni',
+        'remove_heading' => 'Uklanjanje člana',
+        'remove_description' => 'Sigurno želite ukloniti člana ":name" iz domaćinstva? Gubi pristup dijeljenim podacima.',
+        'transfer' => 'Prenesi vlasništvo',
+        'transfer_heading' => 'Prijenos vlasništva',
+        'transfer_description' => 'Vlasništvo nad domaćinstvom prelazi na ":name". Vi postajete običan član. Nastaviti?',
+        'transfer_submit' => 'Prenesi vlasništvo',
+        'transfer_target' => 'Novi vlasnik',
+        'error_last_owner' => 'Domaćinstvo mora imati bar jednog vlasnika.',
+        'error_self_remove' => 'Ne možete ukloniti sami sebe. Koristite prijenos vlasništva ili napuštanje.',
+        'only_owner' => 'Samo vlasnik domaćinstva može uraditi ovu radnju.',
+    ],
+
+    'sharing' => [
+        'action' => 'Podijeli',
+        'modal_heading' => 'Privatnost i dijeljenje',
+        'submit' => 'Sačuvaj',
+        'visibility' => 'Vidljivost',
+        'members' => 'Podijeli s članovima',
+        'members_help' => 'Odaberite članove koji smiju vidjeti ovu stavku.',
     ],
 
     'dashboard' => [
@@ -67,6 +91,42 @@ return [
             'subject' => 'Nešto je podijeljeno sa vama',
             'line' => 'Podijeljeno je sa vama: :title',
         ],
+        'categories' => [
+            'task_assigned' => 'Dodijeljen zadatak',
+            'task_due_soon' => 'Zadatak pred rokom',
+            'reminder_fired' => 'Podsjetnik',
+            'bill_due' => 'Račun pred dospijećem',
+            'shared_with_you' => 'Nešto podijeljeno sa mnom',
+        ],
+    ],
+
+    'settings' => [
+        'navigation_label' => 'Obavještenja',
+        'title' => 'Postavke obavještenja',
+        'subheading' => 'Odaberite koja email obavještenja želite primati. Obavještenja u aplikaciji uvijek stižu.',
+        'email_section' => 'Email obavještenja po kategoriji',
+        'email_enabled' => 'Email',
+        'category' => 'Kategorija',
+        'digest_section' => 'Sažetak',
+        'digest_help' => 'Povremeni email sa pregledom nadolazećeg (zadaci, računi, podsjetnici, istek dokumenata).',
+        'digest_frequency' => 'Šalji sažetak',
+        'saved' => 'Postavke su sačuvane.',
+        'save' => 'Sačuvaj postavke',
+    ],
+
+    'digest' => [
+        'frequency' => [
+            'none' => 'Ne šalji',
+            'daily' => 'Dnevno',
+            'weekly' => 'Sedmično',
+        ],
+        'subject_daily' => 'Vaš dnevni sažetak — Home OS',
+        'subject_weekly' => 'Vaš sedmični sažetak — Home OS',
+        'greeting' => 'Zdravo, :name',
+        'intro_daily' => 'Evo šta vas čeka danas i narednih dana:',
+        'intro_weekly' => 'Evo šta vas čeka naredne sedmice:',
+        'nothing' => 'Nema ništa hitno u ovom periodu — uživajte u miru.',
+        'outro' => 'Ugodan dan želi vam Home OS.',
     ],
 
 ];

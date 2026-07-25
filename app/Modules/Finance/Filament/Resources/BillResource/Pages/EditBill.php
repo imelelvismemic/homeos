@@ -3,6 +3,7 @@
 namespace App\Modules\Finance\Filament\Resources\BillResource\Pages;
 
 use App\Modules\Finance\Filament\Resources\BillResource;
+use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Recurrence\RecurrenceService;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -20,6 +21,7 @@ class EditBill extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            SharingForm::pageAction(),
             Action::make('markPaid')
                 ->label(__('finance.bills.actions.mark_paid'))
                 ->icon('heroicon-m-check')

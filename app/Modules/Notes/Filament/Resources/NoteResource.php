@@ -4,6 +4,7 @@ namespace App\Modules\Notes\Filament\Resources;
 
 use App\Modules\Notes\Filament\Resources\NoteResource\Pages;
 use App\Modules\Notes\Models\Note;
+use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TagsInput;
@@ -114,6 +115,7 @@ class NoteResource extends Resource
             ])
             ->actions([
                 EditAction::make(),
+                SharingForm::tableAction(),
                 DeleteAction::make()
                     ->modalHeading(__('notes.headings.delete'))
                     ->modalDescription(fn (Note $r) => __('notes.headings.delete_description', ['title' => $r->displayTitle()])),

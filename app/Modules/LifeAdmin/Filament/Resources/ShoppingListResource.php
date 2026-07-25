@@ -5,6 +5,7 @@ namespace App\Modules\LifeAdmin\Filament\Resources;
 use App\Modules\LifeAdmin\Filament\Resources\ShoppingListResource\Pages;
 use App\Modules\LifeAdmin\Filament\Resources\ShoppingListResource\RelationManagers\ItemsRelationManager;
 use App\Modules\LifeAdmin\Models\ShoppingList;
+use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -72,6 +73,7 @@ class ShoppingListResource extends Resource
             ->defaultSort('name')
             ->actions([
                 EditAction::make(),
+                SharingForm::tableAction(),
                 DeleteAction::make()
                     ->modalHeading(__('lifeadmin.lists.delete'))
                     ->modalDescription(fn (ShoppingList $r) => __('lifeadmin.lists.delete_description', ['name' => $r->name])),

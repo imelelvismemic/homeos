@@ -3,6 +3,7 @@
 namespace App\Modules\Reminders\Filament\Resources\ReminderResource\Pages;
 
 use App\Modules\Reminders\Filament\Resources\ReminderResource;
+use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Recurrence\RecurrenceService;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -20,6 +21,7 @@ class EditReminder extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            SharingForm::pageAction(),
             Action::make('complete')
                 ->label(__('reminders.actions.complete'))
                 ->icon('heroicon-m-check')

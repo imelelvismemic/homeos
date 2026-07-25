@@ -7,6 +7,7 @@ use App\Modules\Finance\Filament\Resources\TransactionResource\Pages;
 use App\Modules\Finance\Models\Category;
 use App\Modules\Finance\Models\Transaction;
 use App\Modules\Finance\Support\Money;
+use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Models\HouseholdMember;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
@@ -155,6 +156,7 @@ class TransactionResource extends Resource
             ])
             ->actions([
                 EditAction::make(),
+                SharingForm::tableAction(),
                 DeleteAction::make()
                     ->modalHeading(__('finance.transactions.delete'))
                     ->modalDescription(fn (Transaction $r) => __('finance.transactions.delete_description', ['title' => $r->title])),

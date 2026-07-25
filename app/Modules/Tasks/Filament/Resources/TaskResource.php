@@ -9,6 +9,7 @@ use App\Modules\Tasks\Models\Board;
 use App\Modules\Tasks\Models\Task;
 use App\Platform\Events\NoteRequested;
 use App\Platform\Events\ReminderRequested;
+use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Models\HouseholdMember;
 use Carbon\Carbon;
 use Filament\Facades\Filament;
@@ -269,6 +270,7 @@ class TaskResource extends Resource
                             $data['body'],
                             __('tasks.note.title', ['title' => $record->title]),
                         )),
+                    SharingForm::tableAction(),
                     DeleteAction::make()
                         ->modalHeading(__('tasks.headings.delete'))
                         ->modalDescription(fn (Task $r) => __('tasks.headings.delete_description', ['title' => $r->title])),
