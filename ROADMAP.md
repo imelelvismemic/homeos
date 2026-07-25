@@ -395,10 +395,14 @@ Finansije.
   (`DigestService`/`DigestNotification`, mail-only) agregira module kroz
   `DigestSourceContract` (registry `digest_source`); dnevni/sedmični scheduler; polje
   `household_members.digest_frequency`. DoD ispunjen (član isključi sve osim `bill_due`).
-- **Poznata stavka (Faza 5 nasljeđe, za ubuduće):** podsjetnik koji se automatski
-  kreira za PRIVATAN račun je household-vidljiv i u naslovu nosi naziv računa —
-  privatnost izvora se ne prenosi na izvedeni podsjetnik. Kandidat za ispravku
-  (podsjetnik nasljeđuje vidljivost izvora) u zasebnom prolazu.
+  **In-app sanduče** (`NotificationsInbox`) + zvonce s brojačem nepročitanih —
+  scope-ovano na trenutnog člana (obavještenja idu na `HouseholdMember`, pa native
+  Filament zvonce ne bi radilo).
+- **Privatnost izvedenih zapisa (ispravljeno):** izvedeni podsjetnik/bilješka/trošak
+  nasljeđuje vidljivost izvora. Zajednički `App\Platform\Sharing\VisibilityMirror` +
+  novi event `VisibilityChanged` (emituje ga Shareable na makePrivate/shareWith/
+  shareWithHousehold); Reminders/Notes slušaju i usklađuju svoje izvedene zapise. Time
+  privatan račun povlači privatan podsjetnik (naziv više ne curi domaćinstvu).
 
 ---
 

@@ -4,6 +4,7 @@ namespace App\Modules\Reminders\Listeners;
 
 use App\Modules\Reminders\Models\Reminder;
 use App\Platform\Events\ReminderRequested;
+use App\Platform\Sharing\VisibilityMirror;
 
 /**
  * Auto-discoveran listener (CLAUDE.md §9): kreira podsjetnik vezan za entitet
@@ -16,7 +17,7 @@ class CreateRequestedReminder
     {
         $remindable = $event->remindable;
 
-        Reminder::create([
+        $reminder = Reminder::create([
             'household_id' => $remindable->household_id,
             'created_by' => auth()->id() ?? $remindable->created_by,
             'assigned_to' => $event->assignedTo,
@@ -26,5 +27,9 @@ class CreateRequestedReminder
             'remindable_type' => $remindable->getMorphClass(),
             'remindable_id' => $remindable->getKey(),
         ]);
+
+        // Podsjetnik nasljeđuje vidljivost izvora (privatan račun → privatan
+        // podsjetnik) — inače bi naslov (naziv izvora) procurio domaćinstvu.
+        VisibilityMirror::mirror($remindable, $reminder);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Platform\Concerns;
 use App\Models\User;
 use App\Platform\Enums\Visibility;
 use App\Platform\Events\Shared;
+use App\Platform\Events\VisibilityChanged;
 use App\Platform\Models\HouseholdMember;
 use App\Platform\Models\Share;
 use Illuminate\Database\Eloquent\Builder;
@@ -54,6 +55,8 @@ trait Shareable
         $this->share->recipients()->delete();
         $this->share()->update(['visibility' => Visibility::Private]);
         $this->unsetRelation('share');
+
+        VisibilityChanged::dispatch($this);
     }
 
     public function shareWithHousehold(): void
@@ -61,6 +64,8 @@ trait Shareable
         $this->share->recipients()->delete();
         $this->share()->update(['visibility' => Visibility::Household]);
         $this->unsetRelation('share');
+
+        VisibilityChanged::dispatch($this);
     }
 
     /**
@@ -86,6 +91,8 @@ trait Shareable
         }
 
         $this->unsetRelation('share');
+
+        VisibilityChanged::dispatch($this);
 
         if ($new !== []) {
             $recipients = HouseholdMember::whereIn('id', $new)->get();

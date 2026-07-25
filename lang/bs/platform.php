@@ -114,6 +114,22 @@ return [
         'save' => 'Sačuvaj postavke',
     ],
 
+    'inbox' => [
+        'navigation_label' => 'Obavještenja',
+        'title' => 'Obavještenja',
+        'mark_read' => 'Pročitano',
+        'mark_all_read' => 'Označi sve pročitanim',
+        'empty_heading' => 'Nema obavještenja',
+        'empty_description' => 'Ovdje stižu obavještenja iz aplikacije — dodijeljeni zadaci, podsjetnici, dijeljenje i drugo.',
+        'lines' => [
+            'task_assigned' => 'Dodijeljen ti je zadatak „:title“',
+            'task_due_soon' => 'Zadatak „:title“ uskoro ističe',
+            'reminder_fired' => ':title',
+            'bill_due' => ':title',
+            'shared_with_you' => 'Podijeljeno je s tobom: :title',
+        ],
+    ],
+
     'digest' => [
         'frequency' => [
             'none' => 'Ne šalji',

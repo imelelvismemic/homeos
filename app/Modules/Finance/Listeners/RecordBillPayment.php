@@ -4,9 +4,8 @@ namespace App\Modules\Finance\Listeners;
 
 use App\Modules\Finance\Enums\TransactionType;
 use App\Modules\Finance\Events\BillPaid;
-use App\Modules\Finance\Models\Bill;
 use App\Modules\Finance\Models\Transaction;
-use App\Platform\Enums\Visibility;
+use App\Platform\Sharing\VisibilityMirror;
 
 /**
  * Kad se račun označi plaćenim, automatski se bilježi trošak (DATA_MODEL.md §4b,
@@ -41,35 +40,7 @@ class RecordBillPayment
             'bill_id' => $bill->id,
         ]);
 
-        $this->mirrorVisibility($bill, $transaction);
-    }
-
-    /**
-     * Nasljeđuje privatnost računa: privatni račun ne smije postati vidljiv
-     * domaćinstvu preko izvedenog troška (CLAUDE.md §11 — domaćinstvo zadržava
-     * kontrolu). Trošak se po defaultu kreira kao household-vidljiv (Shareable), pa
-     * ovdje samo suzimo ako je račun uži.
-     */
-    private function mirrorVisibility(Bill $bill, Transaction $transaction): void
-    {
-        $share = $bill->share;
-
-        if ($share === null) {
-            return;
-        }
-
-        if ($share->visibility === Visibility::Private) {
-            $transaction->makePrivate();
-
-            return;
-        }
-
-        if ($share->visibility === Visibility::Specific) {
-            $memberIds = $share->recipients()->pluck('household_member_id')->all();
-
-            if ($memberIds !== []) {
-                $transaction->shareWith($memberIds);
-            }
-        }
+        // Trošak nasljeđuje privatnost računa (privatan račun → privatan trošak).
+        VisibilityMirror::mirror($bill, $transaction);
     }
 }

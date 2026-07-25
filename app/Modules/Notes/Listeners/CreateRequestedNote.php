@@ -4,6 +4,7 @@ namespace App\Modules\Notes\Listeners;
 
 use App\Modules\Notes\Models\Note;
 use App\Platform\Events\NoteRequested;
+use App\Platform\Sharing\VisibilityMirror;
 
 /**
  * Auto-discoveran listener (CLAUDE.md §9): kreira bilješku vezanu za entitet koji
@@ -16,7 +17,7 @@ class CreateRequestedNote
     {
         $notable = $event->notable;
 
-        Note::create([
+        $note = Note::create([
             'household_id' => $notable->household_id,
             'created_by' => auth()->id() ?? $notable->created_by,
             'title' => $event->title,
@@ -24,5 +25,8 @@ class CreateRequestedNote
             'notable_type' => $notable->getMorphClass(),
             'notable_id' => $notable->getKey(),
         ]);
+
+        // Bilješka nasljeđuje vidljivost izvora (privatan izvor → privatna bilješka).
+        VisibilityMirror::mirror($notable, $note);
     }
 }

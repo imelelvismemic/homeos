@@ -122,6 +122,34 @@ it('does not create a duplicate expense when a bill payment is re-triggered (ide
     expect(Transaction::query()->where('bill_id', $bill->id)->count())->toBe(1);
 });
 
+it('propagates a bill going private to its auto-created reminder (no name leak)', function () {
+    [$household, $owner, $members] = makeHousehold(extraMembers: 1);
+    $other = $members[0];
+
+    $bill = Bill::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => 'Tajni račun',
+        'amount' => 99,
+        'due_date' => now()->addDays(10)->toDateString(),
+        'remind_days_before' => 3,
+    ]);
+
+    $reminder = Reminder::query()
+        ->where('remindable_type', $bill->getMorphClass())
+        ->where('remindable_id', $bill->id)
+        ->first();
+
+    // Podsjetnik je na početku household-vidljiv (naslov nosi naziv računa).
+    expect($reminder->isVisibleTo($other->user))->toBeTrue();
+
+    // Korisnik označi račun privatnim → podsjetnik mora naslijediti privatnost.
+    $bill->makePrivate();
+
+    expect($reminder->fresh()->isVisibleTo($other->user))->toBeFalse();
+    expect($reminder->fresh()->isVisibleTo($owner->user))->toBeTrue();
+});
+
 it('mirrors a private bill onto its derived expense transaction (privacy)', function () {
     [$household, $owner] = makeHousehold();
 

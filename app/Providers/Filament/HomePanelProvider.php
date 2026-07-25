@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Platform\Filament\Pages\Dashboard;
+use App\Platform\Filament\Pages\NotificationsInbox;
 use App\Platform\Filament\Pages\RegisterHousehold;
 use App\Platform\Http\QuickCreateController;
 use App\Platform\Http\SearchController;
@@ -102,6 +103,24 @@ class HomePanelProvider extends PanelProvider
                         // Placeholder ključ mijenja Alpine po tipu; h je tenant.
                         'postUrlTemplate' => route('filament.app.quick-create', ['key' => '__KEY__', 'h' => $tenant->getKey()]),
                         'csrfToken' => csrf_token(),
+                    ])->render();
+                },
+            )
+            // Zvonce obavještenja — link na sanduče trenutnog člana + brojač nepročitanih.
+            ->renderHook(
+                PanelsRenderHook::TOPBAR_END,
+                function (): string {
+                    $tenant = Filament::getTenant();
+
+                    if (! $tenant) {
+                        return '';
+                    }
+
+                    $member = $tenant->members()->where('user_id', auth()->id())->first();
+
+                    return view('filament.platform.notification-bell', [
+                        'inboxUrl' => NotificationsInbox::getUrl(tenant: $tenant),
+                        'unreadCount' => $member?->unreadNotifications()->count() ?? 0,
                     ])->render();
                 },
             )

@@ -375,5 +375,15 @@ model/DoD/ponavljanje/saldo/oba Resource-a/integracija); Pint čist.
   sve module kroz `DigestSourceContract` (registry `digest_source`) — nadolazeći
   zadaci, računi, podsjetnici i istek dokumenata koje član smije vidjeti. Prazan
   digest se ne šalje. Novo polje `household_members.digest_frequency` (opt-in).
+- **In-app sanduče** (`NotificationsInbox`) + zvonce u topbaru s brojačem
+  nepročitanih. Obavještenja idu na `HouseholdMember` (per-domaćinstvo + email
+  preferencije po članu), pa native Filament zvonce (koje čita `User`) ne bi radilo —
+  sanduče je scope-ovano na trenutnog člana, uz "označi pročitanim".
+- **Privatnost izvedenih zapisa (ispravka):** izvedeni podsjetnik/bilješka/trošak
+  sada nasljeđuje vidljivost izvora (`App\Platform\Sharing\VisibilityMirror` + event
+  `VisibilityChanged` koji Shareable emituje pri promjeni vidljivosti; Reminders/Notes
+  slušaju i usklade svoje izvedene zapise). Privatan račun povlači privatan podsjetnik
+  — naziv privatne stavke više ne curi domaćinstvu kroz izvedeni zapis.
 - Testovi: registry kategorija, agregacija digesta uz poštovanje privatnosti, slanje
-  po ritmu/prazan digest/mail-only kanal, snimanje postavki na stranici.
+  po ritmu/prazan digest/mail-only kanal, snimanje postavki, in-app sanduče
+  (nepročitano/označi pročitanim), propagacija privatnosti računa na podsjetnik.
