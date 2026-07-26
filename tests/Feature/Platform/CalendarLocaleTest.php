@@ -46,19 +46,39 @@ it('falls back to the household language when the member has not chosen one', fu
     expect($html)->toContain('Sedmica');
 });
 
-it('never hardcodes month or day names in the calendar script', function () {
+it('formats Bosnian itself and leaves the other languages to the library', function () {
     $js = File::get(resource_path('js/calendar.js'));
 
-    // Ovo je greška koja se vraća „sama": neko doda naziv da bi popravio jedan
-    // prikaz i time ga zamrzne na jednom jeziku. Nazivi smiju doći isključivo iz
-    // locale sloja biblioteke.
-    foreach (['januar', 'februar', 'decembar', 'nedjelja', 'ponedjeljak', 'srijeda'] as $name) {
-        expect($js)->not->toContain("'{$name}'");
-    }
+    // Prva verzija ove ispravke je nazive prepustila `Intl`-u za sva tri jezika i
+    // bila pogrešna: pretraživači na Windowsu ne nose `bs` ICU podatke, pa je
+    // naslov ispisivao CLDR root („2026 M07") uz engleske nazive dana. Zato
+    // bosanski MORA imati vlastite nazive u kodu…
+    expect($js)->toContain('BS_MONTHS');
+    expect($js)->toContain('BS_DAYS_SHORT');
+    expect($js)->toContain('BS_DAYS_LONG');
 
-    // Locale bundlovi za bs i de moraju biti uvezeni; en je ugrađen u biblioteku.
+    // …ali smiju se primijeniti SAMO na bosanskom. Bez tog uslova bi engleski i
+    // njemački opet dobili bosanske nazive — greška zbog koje je ovo i prijavljeno.
+    expect($js)->toContain("locale === 'bs'");
+    expect($js)->toContain('isBosnian');
+
+    // Locale bundlovi za bs i de ostaju uvezeni (dugmad, hintovi, weekText).
     expect($js)->toContain('locales/bs');
     expect($js)->toContain('locales/de');
+});
+
+it('keeps the agreed Bosnian date formats in one place', function () {
+    $js = File::get(resource_path('js/calendar.js'));
+
+    // Dogovoreni format: „Juli, 2026" (naslov mjeseca, veliko slovo),
+    // „26.juli, 2026" (datum) i „20 – 26.juli, 2026" (raspon).
+    expect($js)->toContain('bsMonthTitle');
+    expect($js)->toContain('bsFullDate');
+    expect($js)->toContain('bsRange');
+
+    // Naziv mjeseca u datumu ostaje malim slovom, veliko je samo na početku
+    // naslova (RULES.md §2) — zato kapitalizacija stoji na jednom mjestu.
+    expect($js)->toContain('toUpperCase');
 });
 
 it('completes the Bosnian locale, which the library ships without hints', function () {
