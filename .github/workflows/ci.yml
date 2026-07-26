@@ -22,11 +22,17 @@ jobs:
           MYSQL_ROOT_PASSWORD: secret
         ports:
           - 3306:3306
+        # `--health-start-period` daje bazi vremena za prvi start prije nego se
+        # neuspjeli health check počne brojati; retries su podignuti sa 5 na 10.
+        # Razlog: CI je jednom pao na koraku "Initialize containers" na promjeni
+        # koja je dirala samo dokumentaciju — MySQL 8.4 na sporijem runneru ne
+        # stigne postati zdrav u 50 s, pa je cijeli set pao bez ijednog testa.
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=5
+          --health-retries=10
+          --health-start-period=30s
       redis:
         image: redis:7-alpine
         ports:
@@ -35,7 +41,8 @@ jobs:
           --health-cmd="redis-cli ping"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=5
+          --health-retries=10
+          --health-start-period=10s
 
     steps:
       - uses: actions/checkout@v4
