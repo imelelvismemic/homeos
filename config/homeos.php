@@ -8,14 +8,9 @@ return [
     |--------------------------------------------------------------------------
     | Jedno mjesto istine — koristi je health endpoint (i footer u Fazi 9), da se
     | broj ne prepisuje po layoutima.
-    |
-    | NAMJERNO nije `env()`: verzija je svojstvo KODA, ne instalacije. Dok je
-    | stajala u `.env`, morala se ručno mijenjati na serveru pri svakom izdanju —
-    | i već je odstupila (kod 1.0.1, server .env 1.0.0), pa bi footer mirno
-    | prikazivao pogrešan broj. Ovako se podiže u commitu, kao i sve ostalo.
     */
 
-    'version' => '1.0.1',
+    'version' => env('HOMEOS_VERSION', '1.0.0'),
 
     /*
     |--------------------------------------------------------------------------

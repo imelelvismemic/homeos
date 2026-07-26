@@ -741,13 +741,12 @@ smisla tek nakon njih:**
    „Powered by @elvismemic" + verzija. Footer ide kroz Filament render hook
    (`PanelsRenderHook::FOOTER`), diskretno, u skladu s temom i u light/dark
    varijanti.
-   - **Verzija se NE piše u layout.** Postoji od Faze 8 u `config('homeos.version')`.
-     Footer čita tu istu vrijednost koju prikazuje i health endpoint, pa su uvijek
-     u skladu (usput je i dokaz koje je izdanje na produkciji).
-   - **Nije u `.env`** (ispravljeno tokom rollback testa Faze 8): dok je bila env
-     varijabla, morala se ručno mijenjati na serveru pri svakom izdanju i već je
-     odstupila — kod je govorio 1.0.1, serverski `.env` 1.0.0, i `.env` je
-     pobjeđivao. Verzija je svojstvo koda, pa se podiže u commitu.
+   - **Verzija se NE piše u layout.** Već postoji od Faze 8: `HOMEOS_VERSION` u
+     `.env` → `config('homeos.version')`. Footer čita tu istu vrijednost koju
+     prikazuje i health endpoint `/zdravlje`, pa su uvijek u skladu i verzija se
+     mijenja na jednom mjestu (usput je i dokaz koje je izdanje na produkciji).
+   - Podizanje verzije ide uz izmjenu `.env.example` i `.env.prod.example`, da
+     nova instalacija ne krene s pogrešnim brojem.
 
 8. **Zvonce se osvježava samo od sebe.** Brojač nepročitanih je server-renderovan
    u topbaru, pa nova obavijest stigne tek na sljedeće učitavanje stranice —
