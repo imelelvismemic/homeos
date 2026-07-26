@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Platform\Models\HouseholdMember;
 use App\Platform\Modules\ModuleRegistry;
 use App\Platform\Services\HouseholdMemberService;
+use App\Platform\Support\Currency;
 use Filament\Actions\Action as PageAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Section;
@@ -62,11 +63,30 @@ class EditHouseholdProfile extends EditTenantProfile implements HasTable
                 ->maxLength(255)
                 ->disabled(fn (): bool => ! static::currentUserIsOwner()),
 
+            Select::make('currency')
+                ->label(__('platform.household.currency'))
+                ->helperText(__('platform.household.currency_help'))
+                ->options(Currency::options())
+                ->searchable()
+                ->required()
+                ->disabled(fn (): bool => ! static::currentUserIsOwner())
+                // Valuta se nudi samo ako je uključena aplikacija kojoj treba.
+                // Pita se registry (`uses_currency`), ne konkretan modul po imenu —
+                // buduća app s iznosima dobija isto ponašanje bez izmjene ovdje.
+                ->visible(fn (): bool => $this->anyEnabledModuleUsesCurrency()),
+
             Section::make(__('platform.modules.section'))
                 ->description(__('platform.modules.description'))
                 ->schema($this->moduleToggles())
                 ->columns(2),
         ]);
+    }
+
+    /** Ima li ijedna uključena aplikacija iznose (registry ključ `uses_currency`). */
+    private function anyEnabledModuleUsesCurrency(): bool
+    {
+        return app(ModuleRegistry::class)->enabled($this->tenant)
+            ->contains(fn (array $app) => (bool) ($app['uses_currency'] ?? false));
     }
 
     /**

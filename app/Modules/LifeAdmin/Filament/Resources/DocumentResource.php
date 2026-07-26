@@ -5,7 +5,7 @@ namespace App\Modules\LifeAdmin\Filament\Resources;
 use App\Modules\LifeAdmin\Enums\DocumentType;
 use App\Modules\LifeAdmin\Filament\Resources\DocumentResource\Pages;
 use App\Modules\LifeAdmin\Models\Document;
-use App\Platform\Filament\Concerns\BelongsToModule;
+use App\Platform\Filament\Resources\ModuleResource;
 use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -13,7 +13,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
@@ -24,10 +23,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 
-class DocumentResource extends Resource
+class DocumentResource extends ModuleResource
 {
-    use BelongsToModule;
-
     protected static ?string $model = Document::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-folder';

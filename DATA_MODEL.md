@@ -403,6 +403,14 @@ return [
 ];
 ```
 
+**Valuta domaćinstva (Faza 7c).** `households.currency` (string(3), default
+`EUR`; postojeća domaćinstva su migracijom prebačena na `BAM` jer su iznosi
+unošeni kao marke). Iznosi u tabelama ostaju `decimal(12,2)` bez valute — valuta
+je svojstvo domaćinstva, ne pojedinačnog zapisa. Ispis ide isključivo kroz
+`App\Platform\Support\Currency` (`docs/PRAVILA.md` §10); modul koji prikazuje
+iznose deklariše `'uses_currency' => true` u registryju, čime se izbor valute
+pojavi u postavkama domaćinstva.
+
 **Uključenost po domaćinstvu (Faza 7).** `enabled` u configu je samo
 PODRAZUMIJEVANA vrijednost. Stvarni odgovor daje
 `App\Platform\Modules\ModuleRegistry`, koji na config nakalemi izbor domaćinstva:

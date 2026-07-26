@@ -22,7 +22,7 @@ class RequestBillReminder
             $bill->reminderDate(),
             __('finance.reminder.bill_due', [
                 'title' => $bill->title,
-                'amount' => Money::km($bill->amount),
+                'amount' => Money::format($bill->amount),
             ]),
         );
     }

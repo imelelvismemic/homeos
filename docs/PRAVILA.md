@@ -40,6 +40,13 @@ Nastao je iz QA prolaza nakon Faze 3 — svaki novi modul ga mora poštovati, a
   "Zadatak"/"Zadaci" (za nav/liste), ali naslove stranica koji umeću labelu u
   rečenicu (`Dodaj :label`) postavljamo eksplicitno malim slovom
   (`getTitle()` → `tasks.headings.create`).
+- **Filament sam title-case-uje naslove izvedene iz labela** ("Kućni Ljubimci",
+  "Liste Za Kupovinu"). To se NE krpi override-om `getTitle()` po stranici —
+  tako se greška vraćala sa svakim novim modulom. Rješenje je jednom, u osnovi:
+  svaki Resource modula nasljeđuje
+  `App\Platform\Filament\Resources\ModuleResource`, koja gasi Filamentov
+  `$hasTitleCaseModelLabel`. Novi modul time dobija ispravnu kapitalizaciju bez
+  ijedne dodatne linije (checklist u `CLAUDE.md` §14).
 
 ## 3. Terminologija dugmadi (imperativ, dosljedno svuda)
 
@@ -137,3 +144,22 @@ taj član odgovorna osoba.
 - Realizacija: svaka `EditRecord` stranica koristi
   `App\Platform\Filament\Concerns\CancelReturnsToList` (uklanja `history.back()`
   i postavlja URL liste). Dio je checkliste za novi modul (`CLAUDE.md` §14).
+
+## 10. Iznosi i valuta
+
+- **Valuta se nikad ne piše u kod.** Do Faze 7c je „KM“ bio hardkodiran po
+  Finance formama i kolonama; sada je postavka domaćinstva
+  (`households.currency`, podrazumijevano `EUR`, bira se u Postavkama domaćinstva;
+  postojeća domaćinstva su migracijom prebačena na `BAM`, jer su njihovi iznosi
+  unošeni kao marke — tihi prelazak na EUR bi promijenio značenje podataka).
+- Svaki ispis iznosa ide kroz `App\Platform\Support\Currency`:
+  `Currency::format($iznos)` → `1.234,56` u obliku `1,234.56 €`,
+  `Currency::symbol()` za prefiks polja u formi. Finance modul ima tanki omotač
+  `Money::format()` koji samo delegira — ne pravi vlastito formatiranje.
+- Format je namjerno isti za sve valute (`iznos` pa simbol), a ne Intl po lokalu
+  („BAM 700.00“) — tabele i widgeti tako ostaju poravnati i čitljivi.
+- **Novi modul s iznosima** deklariše `'uses_currency' => true` u
+  `config/homeos-apps.php`. Time se polje za izbor valute pojavi u postavkama
+  domaćinstva čim je taj modul uključen — platforma ne poznaje module po imenu.
+- Iznosi u bazi su uvijek `decimal(12,2)`, bez valute u koloni: valuta je
+  svojstvo domaćinstva, ne pojedinačnog zapisa.

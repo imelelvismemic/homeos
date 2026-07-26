@@ -6,22 +6,20 @@ use App\Modules\Finance\Filament\Resources\BudgetResource\Pages;
 use App\Modules\Finance\Models\Budget;
 use App\Modules\Finance\Models\Category;
 use App\Modules\Finance\Support\Money;
-use App\Platform\Filament\Concerns\BelongsToModule;
+use App\Platform\Filament\Resources\ModuleResource;
+use App\Platform\Support\Currency;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
-class BudgetResource extends Resource
+class BudgetResource extends ModuleResource
 {
-    use BelongsToModule;
-
     protected static ?string $model = Budget::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chart-pie';
@@ -89,7 +87,7 @@ class BudgetResource extends Resource
 
             TextInput::make('amount')
                 ->label(__('finance.budgets.fields.amount'))
-                ->numeric()->minValue(0)->step('0.01')->prefix('KM')->required(),
+                ->numeric()->minValue(0)->step('0.01')->prefix(fn (): string => Currency::symbol())->required(),
         ]);
     }
 
@@ -99,7 +97,7 @@ class BudgetResource extends Resource
             ->columns([
                 TextColumn::make('category.name')->label(__('finance.budgets.fields.category'))->searchable()->weight('medium'),
                 TextColumn::make('month')->label(__('finance.budgets.fields.month'))->date('m.Y.')->sortable(),
-                TextColumn::make('amount')->label(__('finance.budgets.fields.amount'))->formatStateUsing(fn ($state) => Money::km($state))->sortable(),
+                TextColumn::make('amount')->label(__('finance.budgets.fields.amount'))->formatStateUsing(fn ($state) => Money::format($state))->sortable(),
             ])
             ->defaultSort('month', 'desc')
             ->actions([

@@ -4,23 +4,20 @@ namespace App\Modules\Finance\Filament\Resources;
 
 use App\Modules\Finance\Filament\Resources\CategoryResource\Pages;
 use App\Modules\Finance\Models\Category;
-use App\Platform\Filament\Concerns\BelongsToModule;
+use App\Platform\Filament\Resources\ModuleResource;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class CategoryResource extends Resource
+class CategoryResource extends ModuleResource
 {
-    use BelongsToModule;
-
     protected static ?string $model = Category::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';

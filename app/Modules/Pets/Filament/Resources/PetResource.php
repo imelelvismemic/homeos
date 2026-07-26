@@ -6,14 +6,13 @@ use App\Modules\Pets\Enums\PetSpecies;
 use App\Modules\Pets\Filament\Resources\PetResource\Pages;
 use App\Modules\Pets\Filament\Resources\PetResource\RelationManagers\CareRecordsRelationManager;
 use App\Modules\Pets\Models\Pet;
-use App\Platform\Filament\Concerns\BelongsToModule;
+use App\Platform\Filament\Resources\ModuleResource;
 use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -21,10 +20,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class PetResource extends Resource
+class PetResource extends ModuleResource
 {
-    use BelongsToModule;
-
     protected static ?string $model = Pet::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-heart';

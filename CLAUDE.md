@@ -391,7 +391,9 @@ Prije nego što se modul smatra gotovim, mora ispuniti sve tačke:
       minimalan/prazan widget, ali mora postojati
 - [ ] Implementira `SearchProviderContract` (tačka 8)
 - [ ] Filament Resource prati konvenciju auto-discovery iz tačke 5
-- [ ] Svaki Resource i svaka Page modula koriste
+- [ ] Svaki Resource modula nasljeđuje
+      `App\Platform\Filament\Resources\ModuleResource` (nosi pripadnost modulu +
+      rečeničnu kapitalizaciju naslova); custom Page klase modula koriste
       `App\Platform\Filament\Concerns\BelongsToModule` — isključen modul nestaje
       i iz menija i s rute (tačka 12)
 - [ ] Ako modul uvodi novu navigacionu grupu, grupa se dodaje u

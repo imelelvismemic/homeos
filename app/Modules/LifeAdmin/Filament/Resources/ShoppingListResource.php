@@ -5,21 +5,18 @@ namespace App\Modules\LifeAdmin\Filament\Resources;
 use App\Modules\LifeAdmin\Filament\Resources\ShoppingListResource\Pages;
 use App\Modules\LifeAdmin\Filament\Resources\ShoppingListResource\RelationManagers\ItemsRelationManager;
 use App\Modules\LifeAdmin\Models\ShoppingList;
-use App\Platform\Filament\Concerns\BelongsToModule;
+use App\Platform\Filament\Resources\ModuleResource;
 use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class ShoppingListResource extends Resource
+class ShoppingListResource extends ModuleResource
 {
-    use BelongsToModule;
-
     protected static ?string $model = ShoppingList::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';

@@ -17,6 +17,7 @@ use App\Modules\Notes\Search\NoteSearchProvider;
 use App\Modules\Pets\Calendar\CareCalendarSource;
 use App\Modules\Pets\Dashboard\PetsDashboardWidget;
 use App\Modules\Pets\Digest\CareDigestSource;
+use App\Modules\Pets\Enums\PetSpecies;
 use App\Modules\Pets\QuickCapture\PetQuickCreate;
 use App\Modules\Pets\Search\PetSearchProvider;
 use App\Modules\Reminders\Calendar\ReminderCalendarSource;
@@ -115,6 +116,8 @@ return [
         'calendar_source' => BillCalendarSource::class,
         'digest_source' => BillDigestSource::class,
         'notification_categories' => ['bill_due'],
+        // Modul prikazuje iznose → domaćinstvo dobija izbor valute u postavkama.
+        'uses_currency' => true,
         // Finansije nude dva tipa brzog unosa — lista definicija, javni ključevi
         // su `finance.expense` i `finance.bill` (vidi QuickCaptureRegistry).
         'quick_capture' => [
@@ -125,7 +128,7 @@ return [
                 'handler' => FinanceQuickCreate::class,
                 'fields' => [
                     ['name' => 'title', 'label' => 'Naziv', 'type' => 'text', 'required' => true],
-                    ['name' => 'amount', 'label' => 'Iznos (KM)', 'type' => 'number', 'required' => true],
+                    ['name' => 'amount', 'label' => 'Iznos', 'type' => 'number', 'required' => true],
                 ],
             ],
             [
@@ -135,7 +138,7 @@ return [
                 'handler' => BillQuickCreate::class,
                 'fields' => [
                     ['name' => 'title', 'label' => 'Naziv', 'type' => 'text', 'required' => true],
-                    ['name' => 'amount', 'label' => 'Iznos (KM)', 'type' => 'number', 'required' => true],
+                    ['name' => 'amount', 'label' => 'Iznos', 'type' => 'number', 'required' => true],
                     ['name' => 'due_date', 'label' => 'Rok plaćanja', 'type' => 'date', 'required' => true],
                 ],
             ],
@@ -159,6 +162,10 @@ return [
             'handler' => PetQuickCreate::class,
             'fields' => [
                 ['name' => 'name', 'label' => 'Ime', 'type' => 'text', 'required' => true],
+                // Opcije kao callable — razrješavaju se u zahtjevu, jer prijevodi
+                // nisu dostupni dok se config učitava (QuickCaptureRegistry).
+                ['name' => 'species', 'label' => 'Vrsta', 'type' => 'select', 'required' => true,
+                    'options' => [PetSpecies::class, 'options']],
             ],
         ],
     ],

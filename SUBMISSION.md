@@ -541,3 +541,21 @@ proširivosti" iznad; ukratko:
 - Uz to: „Pozovi člana" premješteno uz samu listu članova, i razdvojene dvije
   prazne poruke na početnoj („nema uključenih aplikacija" vs. „danas nema šta
   prikazati") — ranije je i drugi slučaj tvrdio da aplikacije nisu instalirane.
+
+**Valuta i kapitalizacija** (uz Fazu 7c, prijavljeno tokom provjere 7b):
+
+- **Valuta je postavka domaćinstva** (`households.currency`, izbor iz 29 svjetskih
+  valuta, podrazumijevano EUR). Hardkodirani „KM" je uklonjen iz svih formi,
+  tabela, widgeta, kalendara, sažetka i podsjetnika — ispis ide kroz
+  `App\Platform\Support\Currency`. Polje se nudi samo ako je uključena aplikacija
+  s iznosima, i to preko registry ključa `uses_currency` — platforma ne poznaje
+  modul „finance" po imenu. Postojeća domaćinstva su migracijom prebačena na BAM
+  (njihovi iznosi su unošeni kao marke; tihi prelazak na EUR bi promijenio
+  značenje podataka). Pravilo: `docs/PRAVILA.md` §10.
+- **Kapitalizacija naslova riješena na izvoru:** Filament title-case-uje naslove
+  izvedene iz labela („Kućni Ljubimci"), što se dotad krpilo po stranici i vraćalo
+  sa svakim novim modulom. Sada svi Resource-i modula nasljeđuju
+  `App\Platform\Filament\Resources\ModuleResource`, koja gasi taj Filament
+  prekidač (i nosi pripadnost modulu iz 7a). Pravilo: `docs/PRAVILA.md` §2.
+- Brzo dodavanje je dobilo tip polja `select` (opcije se razrješavaju u zahtjevu,
+  radi prijevoda), pa je vrsta ljubimca obavezna i tamo, kao i na punoj formi.

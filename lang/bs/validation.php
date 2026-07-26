@@ -98,6 +98,11 @@ return [
         'passwordConfirmation' => 'potvrda lozinke',
         'password_confirmation' => 'potvrda lozinke',
         'title' => 'naslov',
+        'species' => 'vrsta',
+        'amount' => 'iznos',
+        'due_date' => 'rok',
+        'body' => 'sadržaj',
+        'currency' => 'valuta',
     ],
 
     'custom' => [

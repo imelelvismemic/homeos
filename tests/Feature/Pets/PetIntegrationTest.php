@@ -81,15 +81,29 @@ it('finds a pet through the aggregated search', function () {
 it('offers the pet in quick capture and creates it through the generic endpoint', function () {
     [$household, $owner] = petContext();
 
-    expect(app(QuickCaptureRegistry::class)->items()->pluck('key'))->toContain('pets');
+    $item = app(QuickCaptureRegistry::class)->items()->firstWhere('key', 'pets');
 
-    test()->actingAs($owner->user)
-        ->postJson(route('filament.app.quick-create', ['key' => 'pets', 'h' => $household->getKey()]), [
-            'name' => 'Mrvica',
-        ])
+    expect($item)->not->toBeNull();
+
+    // Vrsta je obavezna i na punoj formi, pa je i brzi unos mora ponuditi —
+    // opcije se razrješavaju u zahtjevu (prevedene labele), ne iz configa.
+    $species = collect($item['fields'])->firstWhere('name', 'species');
+    expect($species['type'])->toBe('select');
+    expect(collect($species['options'])->pluck('value'))->toContain('dog');
+
+    $url = route('filament.app.quick-create', ['key' => 'pets', 'h' => $household->getKey()]);
+
+    test()->actingAs($owner->user)->postJson($url, ['name' => 'Mrvica'])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('species');
+
+    test()->actingAs($owner->user)->postJson($url, ['name' => 'Mrvica', 'species' => 'cat'])
         ->assertOk();
 
-    expect(Pet::where('name', 'Mrvica')->where('household_id', $household->id)->exists())->toBeTrue();
+    $pet = Pet::where('name', 'Mrvica')->where('household_id', $household->id)->first();
+
+    expect($pet)->not->toBeNull();
+    expect($pet->species)->toBe(PetSpecies::Cat);
 });
 
 it('contributes upcoming care to the digest', function () {

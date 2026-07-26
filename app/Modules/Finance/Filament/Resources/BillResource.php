@@ -6,14 +6,14 @@ use App\Modules\Finance\Filament\Resources\BillResource\Pages;
 use App\Modules\Finance\Models\Bill;
 use App\Modules\Finance\Models\Category;
 use App\Modules\Finance\Support\Money;
-use App\Platform\Filament\Concerns\BelongsToModule;
+use App\Platform\Filament\Resources\ModuleResource;
 use App\Platform\Filament\Sharing\SharingForm;
+use App\Platform\Support\Currency;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
@@ -24,10 +24,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class BillResource extends Resource
+class BillResource extends ModuleResource
 {
-    use BelongsToModule;
-
     protected static ?string $model = Bill::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-currency-euro';
@@ -72,7 +70,7 @@ class BillResource extends Resource
 
             TextInput::make('amount')
                 ->label(__('finance.bills.fields.amount'))
-                ->numeric()->minValue(0)->step('0.01')->prefix('KM')->required(),
+                ->numeric()->minValue(0)->step('0.01')->prefix(fn (): string => Currency::symbol())->required(),
 
             DatePicker::make('due_date')
                 ->label(__('finance.bills.fields.due_date'))
@@ -109,7 +107,7 @@ class BillResource extends Resource
             ->columns([
                 TextColumn::make('title')->label(__('finance.bills.fields.title'))->searchable()->weight('medium'),
                 TextColumn::make('category.name')->label(__('finance.bills.fields.category'))->placeholder('—')->searchable()->toggleable(),
-                TextColumn::make('amount')->label(__('finance.bills.fields.amount'))->formatStateUsing(fn ($state) => Money::km($state))->sortable(),
+                TextColumn::make('amount')->label(__('finance.bills.fields.amount'))->formatStateUsing(fn ($state) => Money::format($state))->sortable(),
                 TextColumn::make('due_date')
                     ->label(__('finance.bills.fields.due_date'))
                     ->date('d.m.Y.')

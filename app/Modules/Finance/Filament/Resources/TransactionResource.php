@@ -7,15 +7,15 @@ use App\Modules\Finance\Filament\Resources\TransactionResource\Pages;
 use App\Modules\Finance\Models\Category;
 use App\Modules\Finance\Models\Transaction;
 use App\Modules\Finance\Support\Money;
-use App\Platform\Filament\Concerns\BelongsToModule;
+use App\Platform\Filament\Resources\ModuleResource;
 use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Models\HouseholdMember;
+use App\Platform\Support\Currency;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -24,10 +24,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class TransactionResource extends Resource
+class TransactionResource extends ModuleResource
 {
-    use BelongsToModule;
-
     protected static ?string $model = Transaction::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
@@ -95,7 +93,7 @@ class TransactionResource extends Resource
                 ->numeric()
                 ->minValue(0)
                 ->step('0.01')
-                ->prefix('KM')
+                ->prefix(fn (): string => Currency::symbol())
                 ->required(),
 
             DatePicker::make('date')
@@ -143,7 +141,7 @@ class TransactionResource extends Resource
                 TextColumn::make('category.name')->label(__('finance.transactions.fields.category'))->placeholder('—')->toggleable(),
                 TextColumn::make('amount')
                     ->label(__('finance.transactions.fields.amount'))
-                    ->formatStateUsing(fn ($state) => Money::km($state))
+                    ->formatStateUsing(fn ($state) => Money::format($state))
                     ->sortable()
                     ->color(fn (Transaction $r) => $r->type->color()),
                 TextColumn::make('payer.user.name')->label(__('finance.transactions.fields.paid_by'))->placeholder('—')->toggleable(),

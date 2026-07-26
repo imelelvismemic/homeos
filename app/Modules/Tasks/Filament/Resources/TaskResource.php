@@ -9,7 +9,7 @@ use App\Modules\Tasks\Models\Board;
 use App\Modules\Tasks\Models\Task;
 use App\Platform\Events\NoteRequested;
 use App\Platform\Events\ReminderRequested;
-use App\Platform\Filament\Concerns\BelongsToModule;
+use App\Platform\Filament\Resources\ModuleResource;
 use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Models\HouseholdMember;
 use Carbon\Carbon;
@@ -23,7 +23,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
-use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -34,10 +33,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class TaskResource extends Resource
+class TaskResource extends ModuleResource
 {
-    use BelongsToModule;
-
     protected static ?string $model = Task::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-check-circle';

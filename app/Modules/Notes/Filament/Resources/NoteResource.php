@@ -4,24 +4,21 @@ namespace App\Modules\Notes\Filament\Resources;
 
 use App\Modules\Notes\Filament\Resources\NoteResource\Pages;
 use App\Modules\Notes\Models\Note;
-use App\Platform\Filament\Concerns\BelongsToModule;
+use App\Platform\Filament\Resources\ModuleResource;
 use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class NoteResource extends Resource
+class NoteResource extends ModuleResource
 {
-    use BelongsToModule;
-
     protected static ?string $model = Note::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';

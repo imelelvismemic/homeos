@@ -201,6 +201,6 @@ class MonthlyOverview extends Page
 
     public function money(float $value): string
     {
-        return Money::km($value);
+        return Money::format($value);
     }
 }

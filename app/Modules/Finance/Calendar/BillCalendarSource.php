@@ -28,7 +28,7 @@ class BillCalendarSource implements CalendarSourceContract
             ->map(fn (Bill $bill) => new CalendarEvent(
                 type: 'bill',
                 id: $bill->id,
-                title: $bill->title.' ('.Money::km($bill->amount).')',
+                title: $bill->title.' ('.Money::format($bill->amount).')',
                 start: $bill->due_date->toIso8601String(),
                 url: BillResource::getUrl('edit', ['record' => $bill, 'tenant' => $household]),
                 color: $bill->isPaid() ? '#5E8C6A' : ($bill->due_date->isPast() ? '#B23B2E' : '#3E7C8C'),

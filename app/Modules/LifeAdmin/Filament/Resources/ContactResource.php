@@ -4,22 +4,19 @@ namespace App\Modules\LifeAdmin\Filament\Resources;
 
 use App\Modules\LifeAdmin\Filament\Resources\ContactResource\Pages;
 use App\Modules\LifeAdmin\Models\Contact;
-use App\Platform\Filament\Concerns\BelongsToModule;
+use App\Platform\Filament\Resources\ModuleResource;
 use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class ContactResource extends Resource
+class ContactResource extends ModuleResource
 {
-    use BelongsToModule;
-
     protected static ?string $model = Contact::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-circle';

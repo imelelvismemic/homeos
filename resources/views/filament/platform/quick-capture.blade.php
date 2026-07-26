@@ -183,6 +183,18 @@
                                             class="block w-full rounded-lg border-none bg-white text-sm text-gray-950 shadow-sm ring-1 ring-gray-950/10 focus:ring-2 focus:ring-primary-500 dark:bg-white/5 dark:text-white dark:ring-white/20"
                                         />
                                     </template>
+                                    <template x-if="field.type === 'select'">
+                                        <select
+                                            data-qc-field
+                                            x-model="form[field.name]"
+                                            class="block w-full rounded-lg border-none bg-white text-sm text-gray-950 shadow-sm ring-1 ring-gray-950/10 focus:ring-2 focus:ring-primary-500 dark:bg-white/5 dark:text-white dark:ring-white/20"
+                                        >
+                                            <option value="">—</option>
+                                            <template x-for="option in field.options" :key="option.value">
+                                                <option :value="option.value" x-text="option.label"></option>
+                                            </template>
+                                        </select>
+                                    </template>
                                     <template x-if="field.type === 'number'">
                                         <input
                                             type="number"

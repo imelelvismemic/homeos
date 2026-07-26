@@ -11,6 +11,8 @@ return [
         'register_subheading' => 'Ovo je prostor u kojem ćete dijeliti zadatke, kalendar, bilješke i još mnogo toga sa članovima porodice.',
         'register_submit' => 'Kreiraj domaćinstvo',
         'settings_label' => 'Postavke domaćinstva',
+        'currency' => 'Valuta',
+        'currency_help' => 'Valuta u kojoj se prikazuju svi iznosi u domaćinstvu.',
     ],
 
     'members' => [

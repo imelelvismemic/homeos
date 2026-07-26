@@ -49,7 +49,7 @@ class QuickCaptureRegistry
                     'key' => $this->keyFor($moduleKey, $app, $definition),
                     'label' => $definition['label'] ?? ($app['name'] ?? $moduleKey),
                     'icon' => $definition['icon'] ?? $app['icon'] ?? null,
-                    'fields' => array_values($definition['fields'] ?? []),
+                    'fields' => $this->fields($definition),
                 ])
                 ->values())
             ->values();
@@ -85,6 +85,40 @@ class QuickCaptureRegistry
         $handler = $this->handlerClassFor($key);
 
         return $handler ? app($handler)->rules() : [];
+    }
+
+    /**
+     * Polja jedne definicije, spremna za modal.
+     *
+     * Opcije `select` polja modul može dati i kao callable (`[Enum::class,
+     * 'options']`) — tada se razrješavaju u zahtjevu, ne pri učitavanju configa,
+     * jer prijevodi (`__()`) tada još nisu dostupni. Rezultat je uvijek lista
+     * `{value, label}`, koju Alpine može iterirati.
+     *
+     * @param  array<string, mixed>  $definition
+     * @return array<int, array<string, mixed>>
+     */
+    private function fields(array $definition): array
+    {
+        return collect($definition['fields'] ?? [])
+            ->map(function (array $field): array {
+                $options = $field['options'] ?? null;
+
+                if (is_callable($options)) {
+                    $options = $options();
+                }
+
+                if (is_array($options)) {
+                    $field['options'] = collect($options)
+                        ->map(fn (string $label, string|int $value) => ['value' => (string) $value, 'label' => $label])
+                        ->values()
+                        ->all();
+                }
+
+                return $field;
+            })
+            ->values()
+            ->all();
     }
 
     /**

@@ -33,7 +33,7 @@ class BillDigestSource implements DigestSourceContract
 
         return new DigestSection(
             __('finance.bills.plural_label'),
-            $bills->map(fn (Bill $b) => '• '.$b->title.' ('.Money::km($b->amount).') — '.$b->due_date->translatedFormat('d.m.'))->all(),
+            $bills->map(fn (Bill $b) => '• '.$b->title.' ('.Money::format($b->amount).') — '.$b->due_date->translatedFormat('d.m.'))->all(),
         );
     }
 }
