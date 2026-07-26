@@ -652,6 +652,35 @@ i sadrži prave podatke.
 na produkciju, dnevni backup radi, i probni rollback je uspješno testiran
 bez gubitka podataka.
 
+**Status: GOTOVO** (osim rollback testa, koji se izvodi odmah nakon ovog deploya
+— vidi niže).
+
+- **Backup** (tačka 1): artisan komanda `homeos:backup` u repou, pokreće je
+  centralni scheduler svaki dan u 03:15. Radi dump baze (`mysqldump` prema
+  hostovom MariaDB-u preko `host.docker.internal`) **i** ZIP arhivu korisničkih
+  priloga — bez priloga bi vraćena baza pokazivala na nepostojeće fajlove.
+  Rotacija briše starije od `BACKUP_KEEP_DAYS` (14). Deploy dodatno radi backup
+  **prije migracija** (`CLAUDE.md` §17).
+  - Backupi idu u imenovani volumen `app-backups`, **ne** u bind mount na host:
+    dump baze bi tada morao biti čitljiv kontejnerskom korisniku, a na serveru s
+    desetinama tuđih vhostova to znači i čitljiv drugima. Volumen se seed-a kao
+    `www:www`, pa je zapisiv bez labavih dozvola.
+  - Preuzimanje/kopija van servera:
+    `docker compose -f docker-compose.prod.yml cp scheduler:/var/www/html/storage/backups ./backups`
+  - Vraćanje: `mysql -u homeos -p homeosdb < baza_….sql`, pa raspakovati
+    `prilozi_….zip` u `storage/app` (volumen `app-storage`).
+- **Monitoring** (tačka 2): javni `/zdravlje` provjerava bazu, cache i storage i
+  vraća **503** ako je bilo šta palo — deploy ga sada koristi umjesto `/login`,
+  pa "stranica se renderuje, ali baza je pala" više ne prolazi kao uspješan
+  deploy. Neuspio noćni backup šalje email na `HOMEOS_ALERT_EMAIL` (fallback:
+  vlasnik prvog domaćinstva), kroz Notification sistem.
+- **Resource limits** (tačka 4): scheduler podignut na 512M — noću radi
+  `mysqldump` + ZIP arhivu, pa mu je 256M tijesno. Ostali servisi ostaju kako
+  jesu; opterećenje je i dalje jednog domaćinstva.
+- **Izolacija** (tačka 5): zahtijeva shell na serveru, pa je ostavljena kao
+  kontrolna lista za vlasnika (vidi `SUBMISSION.md`) — Docker stack i dalje
+  izlaže samo `127.0.0.1:8091`, a novi volumen ne dira ništa izvan projekta.
+
 ---
 
 ## Faza 9 — Polish i dokumentacija
@@ -702,10 +731,28 @@ smisla tek nakon njih:**
      da nema nedostajućih ključeva (usporedba skupa ključeva `bs` vs `en`/`de`).
 
 7. **Footer aplikacije** — tanka traka na dnu svake stranice panela:
-   „Powered by @elvismemic" + verzija (`v1.0`). Verzija se čita iz jednog mjesta
-   (npr. `config('app.version')`), ne hardkodovano po layoutu; footer ide kroz
-   Filament render hook (`PanelsRenderHook::FOOTER`), diskretno, u skladu s
-   temom i u light/dark varijanti.
+   „Powered by @elvismemic" + verzija. Footer ide kroz Filament render hook
+   (`PanelsRenderHook::FOOTER`), diskretno, u skladu s temom i u light/dark
+   varijanti.
+   - **Verzija se NE piše u layout.** Već postoji od Faze 8: `HOMEOS_VERSION` u
+     `.env` → `config('homeos.version')`. Footer čita tu istu vrijednost koju
+     prikazuje i health endpoint `/zdravlje`, pa su uvijek u skladu i verzija se
+     mijenja na jednom mjestu (usput je i dokaz koje je izdanje na produkciji).
+   - Podizanje verzije ide uz izmjenu `.env.example` i `.env.prod.example`, da
+     nova instalacija ne krene s pogrešnim brojem.
+
+8. **Zvonce se osvježava samo od sebe.** Brojač nepročitanih je server-renderovan
+   u topbaru, pa nova obavijest stigne tek na sljedeće učitavanje stranice —
+   npr. kad se podsjetnik okine s liste, obavijest je u sanducetu, a zvonce i
+   dalje pokazuje staro stanje. (Postojeći `homeos-notifications-read` event
+   pokriva samo suprotan smjer: kad se poruke označe pročitanim.)
+   - Minimalno rješenje: zvonce postaje mala Livewire komponenta s `wire:poll`
+     (npr. 30s) koja čita broj nepročitanih za trenutnog člana.
+   - Ispravnije, ako vrijeme dozvoli: broadcast preko **Reverb**-a (već u stacku,
+     `CLAUDE.md` §2) na privatni kanal člana kad stigne `database` obavještenje —
+     bez pollinga i s trenutnim osvježavanjem.
+   - Šta god se izabere, brojač mora ostati tačan i nakon „označi pročitanim“
+     (ne smije se vratiti na staru vrijednost pri sljedećem pollu).
 
 ---
 

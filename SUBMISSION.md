@@ -577,3 +577,38 @@ proširivosti" iznad; ukratko:
 - Vlasnik na stranici Postavke domaćinstva vidi poslane pozivnice i može ih
   povući; član ih ne vidi.
 - 8 testova pokriva sva četiri toka i sve tri sigurnosne provjere.
+
+**Faza 8 završena — produkcijsko dovršavanje deploy lanca:**
+
+- **Dnevni backup** je artisan komanda u repou (`homeos:backup`), a ne cron
+  skripta na serveru — tako je strategija vidljiva u kodu, pokrivena testovima i
+  preživi seobu servera. Pokreće je postojeći scheduler u 03:15: dump baze
+  (`mysqldump` prema hostovom MariaDB-u) **i** arhiva korisničkih priloga, uz
+  rotaciju starijih od 14 dana. Deploy dodatno radi backup **prije migracija**.
+- Backupi idu u imenovani Docker volumen, **namjerno ne u folder na hostu**: dump
+  baze bi tada morao biti čitljiv kontejnerskom korisniku, a server hostuje
+  desetine tuđih domena — to bi značilo i čitljiv drugima. Komanda za preuzimanje
+  je u `ROADMAP.md` (Faza 8).
+- **Health endpoint `/zdravlje`** provjerava bazu, cache i storage i vraća 503 ako
+  je bilo šta palo. Deploy ga sada koristi umjesto `/login`, pa „stranica se
+  renderuje, ali baza je pala" više ne prolazi kao uspješan deploy. Spreman je i
+  za vanjski uptime monitor.
+- **Neuspio backup ne prolazi tiho** — ide email na adresu za tehnička upozorenja
+  (`HOMEOS_ALERT_EMAIL`, fallback vlasnik prvog domaćinstva), kroz Notification
+  sistem, a ne kao `Mail::send`.
+- 10 testova: sadržaj arhive, rotacija (i da ne dira tuđe fajlove u folderu),
+  email na neuspjeh, fallback adresa, sigurnost `mysqldump` poziva (lozinka nikad
+  u argumentima, jer su vidljivi u `ps`), i tri za health endpoint.
+
+**Kontrolna lista za vlasnika** (traži shell na serveru, ne može iz koda):
+
+```bash
+# 1. Docker i dalje sluša samo na loopbacku
+sudo ss -tlnp | grep 8091          # očekivano: 127.0.0.1:8091
+
+# 2. MySQL korisnik vidi samo svoju bazu
+mysql -e "SHOW GRANTS FOR 'homeos'@'localhost';"   # očekivano: GRANT ... ON `homeosdb`.*
+
+# 3. Backup stvarno nastaje
+docker compose -f docker-compose.prod.yml exec scheduler ls -lh storage/backups
+```

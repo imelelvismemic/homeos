@@ -58,12 +58,17 @@ jobs:
             rm -rf public/build
             docker compose -f docker-compose.prod.yml cp app:/var/www/html/public/build public/build
 
+            echo "==> backup baze prije migracija (CLAUDE.md §17)"
+            docker compose -f docker-compose.prod.yml exec -T app php artisan homeos:backup || echo "UPOZORENJE: backup nije uspio — provjeri log."
+
             echo "==> migracije"
             docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
 
             echo "==> health-check na internom portu (ne preko javnog URL-a / Apache-a)"
+            # /zdravlje provjerava bazu, cache i storage — ne samo da se stranica
+            # renderuje (Faza 8). Vraća 503 ako je bilo šta od toga palo.
             for i in $(seq 1 12); do
-              code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8091/login || true)
+              code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8091/zdravlje || true)
               echo "  http $code"
               [ "$code" = "200" ] && { echo "deploy OK"; exit 0; }
               sleep 5

@@ -92,6 +92,12 @@ return [
         ],
     ],
 
+    'backup' => [
+        'failed_subject' => 'Home OS: noćni backup nije uspio',
+        'failed_line' => 'Automatski backup baze i priloga nije uspio. Razlog:',
+        'failed_hint' => 'Provjerite prostor na disku i log aplikacije. Backup se ponovo pokušava sutra u isto vrijeme.',
+    ],
+
     'modules' => [
         'section' => 'Aplikacije',
         'description' => 'Isključena aplikacija nestaje iz menija, s početne strane, iz pretrage, kalendara i brzog dodavanja. Podaci ostaju sačuvani i vraćaju se čim je ponovo uključite.',

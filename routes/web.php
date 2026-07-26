@@ -1,5 +1,6 @@
 <?php
 
+use App\Platform\Http\HealthController;
 use App\Platform\Http\HouseholdInvitationController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,3 +12,7 @@ use Illuminate\Support\Facades\Route;
 // isti razlog zbog kojeg je i link za obnovu lozinke javan.
 Route::get('/pozivnica/{token}', HouseholdInvitationController::class)
     ->name('household-invitation');
+
+// Health endpoint (Faza 8) — koristi ga deploy da potvrdi da nova verzija radi,
+// i eventualni vanjski uptime monitor. Javan, ali bez detalja o infrastrukturi.
+Route::get('/zdravlje', HealthController::class)->name('health');

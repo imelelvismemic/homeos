@@ -31,6 +31,12 @@ services:
     # Volumen se seed-a iz image-a pri prvom kreiranju (www:www vlasništvo).
     volumes:
       - app-storage:/var/www/html/storage/app
+      # Backupi u zasebnom imenovanom volumenu (Faza 8). NE bind mount na host:
+      # dump baze bi tada morao biti čitljiv kontejnerskom korisniku (uid 1000),
+      # što na serveru s desetinama tuđih vhostova znači i čitljiv drugima.
+      # Volumen se seed-a kao www:www, pa je zapisiv bez labavih dozvola.
+      # Preuzimanje: docker compose -f docker-compose.prod.yml cp       #   scheduler:/var/www/html/storage/backups ./backups
+      - app-backups:/var/www/html/storage/backups
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "9000"]
       interval: 10s
@@ -117,6 +123,7 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - app-storage:/var/www/html/storage/app
+      - app-backups:/var/www/html/storage/backups
     depends_on:
       app:
         condition: service_healthy
@@ -126,8 +133,11 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: 256M
+          # Više od ostalih servisa: scheduler noću radi backup (mysqldump +
+          # ZIP arhiva priloga), pa mu 256M zna biti tijesno (Faza 8).
+          memory: 512M
 
 volumes:
   redis-data:
   app-storage:
+  app-backups:

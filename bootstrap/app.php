@@ -1,5 +1,6 @@
 <?php
 
+use App\Platform\Console\BackupCommand;
 use App\Platform\Digest\DigestService;
 use App\Platform\Enums\DigestFrequency;
 use App\Platform\Scheduling\ModuleSchedule;
@@ -15,9 +16,13 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    // Artisan komande modula (npr. tasks:notify-due-soon) — svaki modul ih drži
-    // u svom Console/ folderu; core ih pokupi bez hardkodovane liste.
-    ->withCommands(glob(__DIR__.'/../app/Modules/*/Console', GLOB_ONLYDIR) ?: [])
+    // Platformske komande (homeos:backup) + komande modula (npr.
+    // tasks:notify-due-soon) — svaki modul ih drži u svom Console/ folderu, pa
+    // ih core pokupi bez hardkodovane liste.
+    ->withCommands([
+        __DIR__.'/../app/Platform/Console',
+        ...(glob(__DIR__.'/../app/Modules/*/Console', GLOB_ONLYDIR) ?: []),
+    ])
     // Event/Listener auto-discovery (CLAUDE.md §9): Laravel skenira ove foldere,
     // mapira listener po tipu u handle() i registruje ga — modul dodaje listener
     // u svoj Listeners/ folder i reaguje na tuđe evente bez diranja core-a.
@@ -40,6 +45,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->call(fn () => app(DigestService::class)->sendDue(DigestFrequency::Weekly))
             ->weeklyOn(1, '07:30')
             ->name('digest-weekly')
+            ->withoutOverlapping();
+
+        // Dnevni backup baze i priloga (Faza 8) — u gluho doba, prije nego iko
+        // počne raditi. Neuspjeh šalje email na adresu za tehnička upozorenja.
+        $schedule->command(BackupCommand::class)
+            ->dailyAt('03:15')
+            ->name('homeos-backup')
             ->withoutOverlapping();
     })
     ->withMiddleware(function (Middleware $middleware): void {

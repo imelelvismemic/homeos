@@ -58,6 +58,7 @@ RUN apk add --no-cache \
         icu-libs \
         libzip \
         oniguruma \
+        mariadb-client \
     && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         icu-dev \
