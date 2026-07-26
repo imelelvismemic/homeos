@@ -559,3 +559,21 @@ proširivosti" iznad; ukratko:
   prekidač (i nosi pripadnost modulu iz 7a). Pravilo: `docs/PRAVILA.md` §2.
 - Brzo dodavanje je dobilo tip polja `select` (opcije se razrješavaju u zahtjevu,
   radi prijevoda), pa je vrsta ljubimca obavezna i tamo, kao i na punoj formi.
+
+**Faza 7c završena — pozivnica putem linka** (dio 3 od 3; Faza 7 je time zatvorena):
+
+- Vlasnik unosi email **bez obzira ima li osoba nalog**. Ako ima — odmah postaje
+  član (kao i ranije). Ako nema — dobija email s jednokratnim linkom.
+- Link vodi na registraciju s **popunjenim i zaključanim** emailom; po otvaranju
+  naloga osoba ulazi **pravo u domaćinstvo** u koje je pozvana, bez koraka
+  „kreirajte svoje domaćinstvo“. Time je zatvorena rupa u kojoj je pozvani član
+  morao prvo napraviti prazno domaćinstvo koje mu ne treba.
+- Prihvatanje radi listener na **Login** eventu, pa isti mehanizam pokriva i
+  onoga ko se registruje kroz link i onoga ko već ima nalog pa se prijavi.
+- Sigurnost: u bazi stoji samo **hash** tokena (sam token postoji jedino u linku),
+  pozivnica je jednokratna i ističe za 7 dana, a prihvatanje provjerava da se
+  email naloga poklapa s emailom pozivnice — proslijeđen link ne uvodi tuđi nalog
+  u domaćinstvo. Email ide kroz Notification sistem, nikad direktan `Mail::send`.
+- Vlasnik na stranici Postavke domaćinstva vidi poslane pozivnice i može ih
+  povući; član ih ne vidi.
+- 8 testova pokriva sva četiri toka i sve tri sigurnosne provjere.

@@ -3,7 +3,10 @@
 use App\Models\User;
 use App\Platform\Filament\Tenancy\EditHouseholdProfile;
 use App\Platform\Models\Household;
+use App\Platform\Models\HouseholdInvitation;
+use App\Platform\Notifications\HouseholdInvited;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
@@ -44,18 +47,24 @@ it('lets the owner invite an existing registered user by email', function () {
     expect($household->members()->where('user_id', $invitee->id)->exists())->toBeTrue();
 });
 
-it('rejects inviting an email with no registered user', function () {
+it('sends an invitation link when the email has no account yet', function () {
     [$household, $owner] = makeHouseholdWithOwner();
+    Notification::fake();
 
     test()->actingAs($owner);
     Filament::setTenant($household);
 
+    // Ranije je ovo bila greška („korisnik se prvo mora registrovati“); od Faze 7c
+    // takva osoba dobija pozivnicu s linkom i registruje se kroz nju.
     householdProfile($household)
         ->callTableAction('invite', data: [
             'email' => 'nobody@example.com',
             'role' => 'member',
         ])
-        ->assertHasTableActionErrors(['email']);
+        ->assertHasNoTableActionErrors();
+
+    expect(HouseholdInvitation::firstWhere('email', 'nobody@example.com'))->not->toBeNull();
+    Notification::assertSentOnDemand(HouseholdInvited::class);
 });
 
 it('rejects inviting a user who is already a member', function () {

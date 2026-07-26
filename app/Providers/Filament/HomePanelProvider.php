@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Platform\Filament\Pages\Dashboard;
 use App\Platform\Filament\Pages\NotificationsInbox;
 use App\Platform\Filament\Pages\RegisterHousehold;
+use App\Platform\Filament\Pages\RegisterUser;
 use App\Platform\Filament\Pages\UserProfile;
 use App\Platform\Filament\Tenancy\EditHouseholdProfile;
 use App\Platform\Http\AvatarController;
@@ -40,7 +41,9 @@ class HomePanelProvider extends PanelProvider
             ->id('app')
             ->path('')
             ->login()
-            ->registration()
+            // Registracija zna za pozivnicu: email je popunjen i zaključan, a po
+            // kreiranju naloga korisnik odmah ulazi u domaćinstvo (Faza 7c).
+            ->registration(RegisterUser::class)
             ->passwordReset()
             // Profil NIJE Filamentov ->profile(): ta stranica se registruje izvan
             // tenant rute, pa panel layout puca (500) jer navigacija traži tenant.

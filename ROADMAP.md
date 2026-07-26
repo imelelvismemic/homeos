@@ -550,7 +550,14 @@ Ovo formalizuje ono što je već implicitno urađeno kroz Faze 1-6.
   14 testova, uključujući rad kad su svi ostali moduli isključeni. Uz to:
   „Pozovi člana" premješteno uz listu članova i razdvojene dvije prazne poruke
   na početnoj strani.
-- **7c** — pozivnica putem linka (tačka 5 niže).
+- **7c — GOTOVO:** pozivnica putem linka (tačka 5 niže) + valuta kao postavka
+  domaćinstva i kapitalizacija naslova riješena u osnovi (`ModuleResource`).
+  Vlasnik unosi email bez obzira ima li osoba nalog: ako ima — odmah je član, ako
+  nema — dobija email s jednokratnim linkom (vrijedi 7 dana, u bazi je samo hash
+  tokena). Kroz link se registruje s **zaključanim** emailom i ulazi pravo u
+  domaćinstvo, bez koraka „kreirajte svoje domaćinstvo“. Prihvatanje radi listener
+  na Login eventu, pa isti put pokriva i onoga ko već ima nalog. Poslane pozivnice
+  vlasnik vidi i može ih povući.
 
 1. App registry — mehanizam kojim se modul "registruje" u sistem (naziv,
    ikonica, dashboard widget, search provider, meni stavka) kroz
@@ -616,6 +623,9 @@ Ovo formalizuje ono što je već implicitno urađeno kroz Faze 1-6.
 
 **Definition of done:** Nova probna "dummy" app se doda prateći checklist i
 pojavi se na dashboardu/search-u/navigaciji bez izmjene postojećeg koda.
+
+**Ispunjeno** modulom Kućni ljubimci (7b) — vidi `SUBMISSION.md`, sekcija „Dokaz
+proširivosti“. Faza 7 je time zatvorena (7a + 7b + 7c).
 
 ---
 

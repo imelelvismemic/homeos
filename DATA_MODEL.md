@@ -44,6 +44,29 @@ sa svojim domaćinstvom, ali još vezana za roditeljsko). Svaka sesija ima
 - `digest_enabled` (bool, default `false`) — uključen u dnevni/sedmični digest
 - `timestamps`
 
+### `household_invitations` (Faza 7c)
+
+Poziv osobi koja **još nije registrovana**. Registrovanog korisnika vlasnik i
+dalje dodaje odmah, bez pozivnice.
+
+- `id`
+- `household_id` → `households.id`
+- `invited_by` → `users.id` (vlasnik koji poziva)
+- `email` (string) — kome je pozivnica poslana
+- `role` (enum: `owner`, `member`) — uloga koju dobija prihvatanjem
+- `token` (string, unique) — jednokratni ključ iz linka; čuva se **hash**, ne sam token
+- `expires_at` (datetime) — rok važenja (7 dana)
+- `accepted_at` (nullable datetime) — kad je iskorištena
+- `timestamps`
+- `unique(household_id, email)` → index `household_invites_unique`
+
+Pravila:
+- Token je jednokratan: prihvatanje upisuje `accepted_at`, druga upotreba pada.
+- Poruka pozivaocu ne otkriva postoji li nalog s tim emailom.
+- Pozivnicu šalje i povlači samo vlasnik; prihvatanje provjerava da se email
+  naloga poklapa s emailom pozivnice.
+- Email ide kroz Notification sistem (`CLAUDE.md` §10), nikad direktan `Mail::send`.
+
 ---
 
 ## 2. Sharing / privatnost (Faza 1, `Shareable` mehanizam)

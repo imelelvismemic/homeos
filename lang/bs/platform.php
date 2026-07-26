@@ -20,7 +20,8 @@ return [
         'plural_label' => 'Članovi',
         'navigation_label' => 'Članovi domaćinstva',
         'user' => 'Registrovani korisnik',
-        'user_helper' => 'Unesite email adresu korisnika koji je već registrovan u sistemu.',
+        'user_helper' => 'Unesite email adresu. Ako osoba već ima nalog, odmah postaje član; ako nema, dobija pozivnicu s linkom.',
+        'added' => 'Član je dodan u domaćinstvo.',
         'column_user' => 'Korisnik',
         'column_email' => 'E-mail adresa',
         'role' => 'Uloga',
@@ -31,7 +32,6 @@ return [
         'invite_modal_heading' => 'Pozovi člana u domaćinstvo',
         'invite_modal_submit' => 'Pozovi',
         'already_member' => 'Ovaj korisnik je već član ovog domaćinstva.',
-        'user_not_found' => 'Nema registrovanog korisnika sa ovom email adresom. Korisnik se prvo mora registrovati u sistemu.',
         'empty_state_heading' => 'Još nema članova',
         'empty_state_description' => 'Pozovite prvog člana svog domaćinstva da biste počeli dijeliti obaveze.',
         'actions' => 'Radnje',
@@ -66,6 +66,30 @@ return [
         'current_password_help' => 'Radi sigurnosti potvrdite lozinku kojom se sada prijavljujete.',
         'save' => 'Sačuvaj',
         'saved' => 'Profil je sačuvan.',
+    ],
+
+    'invitations' => [
+        'sent' => 'Pozivnica je poslana na :email.',
+        'revoked' => 'Pozivnica je povučena.',
+        'revoke' => 'Povuci',
+        'pending_heading' => 'Poslane pozivnice',
+        'pending_description' => 'Osobe koje su pozvane, a još nisu otvorile nalog. Pozivnica vrijedi 7 dana.',
+        'expires_at' => 'Uloga: :role · vrijedi do :date',
+        'invalid' => 'Pozivnica više ne vrijedi. Zatražite novu od vlasnika domaćinstva.',
+        'wrong_account' => 'Ova pozivnica je poslana na drugu email adresu. Prijavite se s nalogom na koji je stigla.',
+        'please_register' => 'Otvorite nalog da se pridružite domaćinstvu „:household“.',
+        'please_log_in' => 'Prijavite se da se pridružite domaćinstvu „:household“.',
+        'joined' => 'Pridružili ste se domaćinstvu „:household“.',
+        'email_locked' => 'Email je preuzet iz pozivnice i ne može se mijenjati.',
+
+        'mail' => [
+            'subject' => 'Poziv u domaćinstvo :household',
+            'greeting' => 'Zdravo,',
+            'line' => ':inviter vas poziva u domaćinstvo „:household“ na Home OS-u.',
+            'action' => 'Pridruži se domaćinstvu',
+            'expires' => 'Link vrijedi još :days dana. Ako niste očekivali ovaj poziv, slobodno ga ignorišite.',
+            'salutation' => 'Home OS',
+        ],
     ],
 
     'modules' => [

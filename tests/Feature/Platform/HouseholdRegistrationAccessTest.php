@@ -41,15 +41,36 @@ it('hides the create-household form from a user who already has a household', fu
     test()->get(filament()->getTenantRegistrationUrl())->assertNotFound();
 });
 
-it('hides the create-household form from an invited member who owns nothing', function () {
+it('still lets an invited member create their own household later', function () {
     [$household] = makeHousehold();
     $member = User::factory()->create();
     $household->members()->create(['user_id' => $member->id, 'role' => 'member', 'joined_at' => now()]);
 
     test()->actingAs($member);
 
-    // Pozvani član nema svoje domaćinstvo, ali ima gdje raditi — ne tjeramo ga
-    // da kreira vlastito.
+    // Pozvani član nema SVOJE domaćinstvo — forma mu mora ostati dostupna
+    // (DATA_MODEL.md §1: član može biti i u tuđem i u vlastitom domaćinstvu)...
     expect($member->ownedHouseholds()->doesntExist())->toBeTrue();
+    expect(RegisterHousehold::canView())->toBeTrue();
+    test()->get(filament()->getTenantRegistrationUrl())->assertOk();
+
+    // ...ali ga niko na nju ne tjera, jer već ima gdje raditi.
+    test()->get('/')->assertRedirect(filament()->getUrl($household));
+});
+
+it('lets that member end up in both households', function () {
+    [$parents] = makeHousehold();
+    $member = User::factory()->create();
+    $parents->members()->create(['user_id' => $member->id, 'role' => 'member', 'joined_at' => now()]);
+
+    test()->actingAs($member);
+
+    Livewire\Livewire::test(RegisterHousehold::class)
+        ->fillForm(['name' => 'Vlastito domaćinstvo'])
+        ->call('register');
+
+    expect($member->fresh()->households()->count())->toBe(2);
+    expect($member->fresh()->ownedHouseholds()->count())->toBe(1);
+    // Kad već ima svoje, opcija nestaje.
     expect(RegisterHousehold::canView())->toBeFalse();
 });

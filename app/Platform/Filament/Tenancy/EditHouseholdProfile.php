@@ -3,8 +3,10 @@
 namespace App\Platform\Filament\Tenancy;
 
 use App\Models\User;
+use App\Platform\Models\HouseholdInvitation;
 use App\Platform\Models\HouseholdMember;
 use App\Platform\Modules\ModuleRegistry;
+use App\Platform\Services\HouseholdInvitationService;
 use App\Platform\Services\HouseholdMemberService;
 use App\Platform\Support\Currency;
 use Filament\Actions\Action as PageAction;
@@ -23,6 +25,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use RuntimeException;
 
 /**
@@ -80,6 +83,40 @@ class EditHouseholdProfile extends EditTenantProfile implements HasTable
                 ->schema($this->moduleToggles())
                 ->columns(2),
         ]);
+    }
+
+    /**
+     * Poslane pozivnice koje još nisu iskorištene — prikazuju se ispod liste
+     * članova, da vlasnik vidi koga je pozvao i može povući poziv.
+     *
+     * @return Collection<int, HouseholdInvitation>
+     */
+    public function pendingInvitations(): Collection
+    {
+        if (! static::currentUserIsOwner()) {
+            return collect();
+        }
+
+        return HouseholdInvitation::query()
+            ->where('household_id', $this->tenant->getKey())
+            ->pending()
+            ->orderBy('email')
+            ->get();
+    }
+
+    /** Povuci poslanu pozivnicu (samo vlasnik). */
+    public function revokeInvitation(int $id): void
+    {
+        if (! static::currentUserIsOwner()) {
+            return;
+        }
+
+        HouseholdInvitation::query()
+            ->where('household_id', $this->tenant->getKey())
+            ->whereKey($id)
+            ->delete();
+
+        Notification::make()->title(__('platform.invitations.revoked'))->success()->send();
     }
 
     /** Ima li ijedna uključena aplikacija iznose (registry ključ `uses_currency`). */
@@ -180,8 +217,9 @@ class EditHouseholdProfile extends EditTenantProfile implements HasTable
                     ->helperText(__('platform.members.user_helper'))
                     ->email()
                     ->required()
-                    ->exists(table: 'users', column: 'email')
-                    ->validationMessages(['exists' => __('platform.members.user_not_found')])
+                    // Više se NE traži da osoba već ima nalog: ako ga nema, dobija
+                    // pozivnicu s linkom (Faza 7c). Ostaje samo provjera da nije
+                    // već član.
                     ->rule(fn () => function (string $attribute, $value, \Closure $fail): void {
                         $user = User::where('email', $value)->first();
 
@@ -199,13 +237,21 @@ class EditHouseholdProfile extends EditTenantProfile implements HasTable
                     ->required(),
             ])
             ->action(function (array $data): void {
-                $user = User::where('email', $data['email'])->firstOrFail();
+                static::run(function () use ($data): void {
+                    $addedImmediately = app(HouseholdInvitationService::class)->invite(
+                        $this->tenant,
+                        $data['email'],
+                        $data['role'],
+                        auth()->user(),
+                    );
 
-                $this->tenant->members()->create([
-                    'user_id' => $user->id,
-                    'role' => $data['role'],
-                    'joined_at' => now(),
-                ]);
+                    Notification::make()
+                        ->title(__($addedImmediately
+                            ? 'platform.members.added'
+                            : 'platform.invitations.sent', ['email' => $data['email']]))
+                        ->success()
+                        ->send();
+                });
             });
     }
 

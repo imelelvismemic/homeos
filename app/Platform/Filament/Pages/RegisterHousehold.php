@@ -16,19 +16,24 @@ class RegisterHousehold extends RegisterTenant
     }
 
     /**
-     * Kreiranje domaćinstva nije stalna opcija: stranicu vidi samo korisnik koji
-     * još nije ni u jednom domaćinstvu. Time nestaje i stavka iz padajućeg menija
-     * domaćinstva (Filament je krije po `canView`), a Filamentovo preusmjeravanje
-     * nakon prijave i dalje radi — korisnik koji se registrovao pa zatvorio browser
-     * prije nego je dovršio kreiranje, dobije formu odmah po prijavi.
+     * Kreiranje domaćinstva nije stalna opcija, ali mora ostati dostupno onome ko
+     * još nema SVOJE domaćinstvo — uključujući pozvanog člana (DATA_MODEL.md §1:
+     * odrasla djeca imaju svoje domaćinstvo, a i dalje su u roditeljskom).
      *
-     * Namjerno "nije ni u jednom domaćinstvu", ne "nije vlasnik nijednog": pozvani
-     * član nema svoje domaćinstvo, ali ima gdje raditi — ne smijemo ga svaki put
-     * tjerati da kreira vlastito.
+     * Zato je uslov "nije vlasnik nijednog domaćinstva", a ne "nije ni u jednom":
+     *  - potpuno nov korisnik → vidi formu, i Filament ga na nju preusmjeri nakon
+     *    prijave (nema nijedno domaćinstvo), čime je pokriven slučaj "registrovao
+     *    se pa zatvorio browser prije nego je dovršio kreiranje";
+     *  - pozvani član → forma mu je dostupna iz menija domaćinstva, ali ga niko na
+     *    nju ne tjera (ima gdje raditi);
+     *  - ko već ima svoje domaćinstvo → stavke nema, ni URL ne radi.
+     *
+     * Nametanje forme je odvojeno pitanje: njega radi Filament i dešava se samo
+     * kad korisnik nema NIJEDNO domaćinstvo.
      */
     public static function canView(): bool
     {
-        return auth()->user()?->households()->doesntExist() ?? false;
+        return auth()->user()?->ownedHouseholds()->doesntExist() ?? false;
     }
 
     public function form(Form $form): Form
