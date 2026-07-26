@@ -10,7 +10,7 @@ return [
     | broj ne prepisuje po layoutima.
     */
 
-    'version' => env('HOMEOS_VERSION', '1.0.0'),
+    'version' => env('HOMEOS_VERSION', '1.0.1'),
 
     /*
     |--------------------------------------------------------------------------
