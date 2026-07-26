@@ -3,6 +3,7 @@
 use App\Platform\Console\BackupCommand;
 use App\Platform\Digest\DigestService;
 use App\Platform\Enums\DigestFrequency;
+use App\Platform\Http\Middleware\SetLocale;
 use App\Platform\Scheduling\ModuleSchedule;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -62,6 +63,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // pa je povjerenje svim proxyjima u ovoj topologiji sigurno. Apache vhost
         // mora slati "X-Forwarded-Proto: https" (vidi uputstvo za Virtualmin).
         $middleware->trustProxies(at: '*');
+
+        // Jezik zahtjeva (Faza 9b) — za rute van panela (pozivnica, promjena
+        // jezika). Panel ima svoj lanac middleware-a, pa isti middleware stoji
+        // i u HomePanelProvider.
+        $middleware->web(append: SetLocale::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

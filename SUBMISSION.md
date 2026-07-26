@@ -641,3 +641,31 @@ docker compose -f docker-compose.prod.yml exec scheduler ls -lh storage/backups
   tek na sljedeće učitavanje stranice — npr. kad se podsjetnik okine s liste.
   (Reverb bi bio trenutan, ali traži novi kontejner i izmjenu Apache vhosta;
   odluka vlasnika je bila polling.)
+**Faza 9b — tri jezika** (dio 2 od 3):
+
+- **bs / en / de**, prevedeno je sve što korisnik vidi: svih 11 prijevodnih
+  fajlova po jeziku (~700 ključeva), prazna stanja, potvrde brisanja,
+  validacijske poruke, Laravelovi mail stringovi (`lang/de.json`). Filament
+  isporučuje svoje prijevode za sva tri jezika, pa paketski tekst prati izbor.
+- **Prekidač sa zastavicama** stoji u traci i na stranici prijave. Zastave su
+  inline SVG, ne emoji: Windows ne renderuje emoji zastave (🇧🇦 se prikaže kao
+  slova „BA"), pa bi prekidač na najčešćem korisničkom sistemu izgledao pokvareno.
+  Radi i bez JavaScripta — svaka opcija je obična forma.
+- **Izbor se pamti gdje pripada**: gost u sesiji, prijavljeni korisnik u
+  `users.locale` (kolona je postojala od Faze 7, pa nova migracija nije trebala).
+  Registracija zadržava jezik odabran na formi.
+- **Email ide na jeziku primaoca**, ne na jeziku procesa koji ga šalje. Laravel to
+  poštuje kroz `HasLocalePreference` — implementiran i na `User` i na
+  `HouseholdMember`, jer je notifiable član domaćinstva a jezik je korisnikov.
+  Pozivnica ide na jeziku onoga ko poziva (primalac još nema nalog).
+- **Nedostajući prijevod je greška, ne sirovi ključ u UI-ju**: test parnosti
+  poredi ključeve bs/en/de za svaki fajl. Odmah je i pronašao stvarnu grešku —
+  `validation.password` je u bosanskom bio zaostao kao ravan string iz starijeg
+  Laravela, pa su poruke o jačini lozinke tiho padale na engleski.
+- Labele navigacionih grupa su prebačene u closure. Panel se gradi pri
+  registraciji providera, **prije** nego middleware postavi jezik, pa je direktan
+  `__()` zamrzavao bosanske nazive: na njemačkom se grupe više nisu poklapale s
+  onim što moduli vraćaju i redoslijed menija se raspadao.
+- Email obavještenja se testiraju kroz **stvarni mailer** (`array` transport), ne
+  kroz `Notification::fake()` — fake ne poziva `toMail()`, pa bi test prošao i da
+  jezik primaoca uopšte ne radi (`docs/PRAVILA.md` §11).

@@ -72,7 +72,17 @@ return [
     ],
     'not_in' => 'Odabrana vrijednost za :attribute nije ispravna.',
     'numeric' => 'Polje :attribute mora biti broj.',
-    'password' => 'Lozinka nije ispravna.',
+    // `validation.password` je u današnjem Laravelu NIZ podporuka za pravilo
+    // jačine lozinke (Password::min()->letters()...), a ne jedna poruka —
+    // ravan string je bio zaostatak zbog kojeg su te poruke padale na engleski.
+    // Poruka "lozinka nije ispravna" živi pod `current_password`.
+    'password' => [
+        'letters' => 'Polje :attribute mora sadržavati bar jedno slovo.',
+        'mixed' => 'Polje :attribute mora sadržavati bar jedno veliko i jedno malo slovo.',
+        'numbers' => 'Polje :attribute mora sadržavati bar jedan broj.',
+        'symbols' => 'Polje :attribute mora sadržavati bar jedan poseban znak.',
+        'uncompromised' => 'Unesena vrijednost za :attribute se pojavila u nekom curenju podataka. Odaberite drugu.',
+    ],
     'present' => 'Polje :attribute mora biti prisutno.',
     'regex' => 'Format polja :attribute nije ispravan.',
     'required' => 'Polje :attribute je obavezno.',

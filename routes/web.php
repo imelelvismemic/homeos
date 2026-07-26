@@ -2,6 +2,7 @@
 
 use App\Platform\Http\HealthController;
 use App\Platform\Http\HouseholdInvitationController;
+use App\Platform\Http\LocaleController;
 use Illuminate\Support\Facades\Route;
 
 // Filament panel (app/Providers/Filament/HomePanelProvider.php) registruje sve
@@ -18,3 +19,7 @@ Route::get('/pozivnica/{token}', HouseholdInvitationController::class)
 // Putanja je ENGLESKI, za razliku od korisničkih ruta: ovo je tehnički endpoint
 // koji zovu skripte i monitori, i tako ga prepoznaje svako ko preuzme sistem.
 Route::get('/health', HealthController::class)->name('health');
+
+// Promjena jezika (Faza 9b). Van panela jer prekidač stoji i na prijavi, gdje
+// tenant još ne postoji. POST, jer mijenja stanje (sesija + users.locale).
+Route::post('/jezik/{locale}', LocaleController::class)->name('locale');

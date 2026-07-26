@@ -4,6 +4,7 @@ namespace App\Platform\Models;
 
 use App\Models\User;
 use App\Platform\Enums\DigestFrequency;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,7 +20,7 @@ use Illuminate\Notifications\Notifiable;
  * (CLAUDE.md §10, DATA_MODEL.md §1). Email se rutira na korisnikov email.
  */
 #[Fillable(['household_id', 'user_id', 'role', 'joined_at', 'digest_frequency'])]
-class HouseholdMember extends Pivot
+class HouseholdMember extends Pivot implements HasLocalePreference
 {
     use Notifiable;
 
@@ -57,5 +58,15 @@ class HouseholdMember extends Pivot
     public function routeNotificationForMail(): string
     {
         return $this->user->email;
+    }
+
+    /**
+     * Jezik emailova (Faza 9b). Notifiable je član, a jezik je korisnikov —
+     * bez ovog delegiranja bi obavještenja išla na jeziku procesa koji ih
+     * šalje (scheduler), ne na jeziku primaoca.
+     */
+    public function preferredLocale(): ?string
+    {
+        return $this->user?->locale;
     }
 }

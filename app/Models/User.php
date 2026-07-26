@@ -10,6 +10,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,10 +24,20 @@ use Illuminate\Support\Collection;
 
 #[Fillable(['name', 'email', 'password', 'avatar_path', 'timezone', 'locale', 'current_household_id'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements FilamentUser, HasAvatar, HasTenants
+class User extends Authenticatable implements FilamentUser, HasAvatar, HasLocalePreference, HasTenants
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * Jezik na kojem korisnik dobija emailove (Faza 9b). Laravel ovo sam
+     * poštuje pri slanju notifikacija — bez toga bi svaki email išao na
+     * jeziku procesa koji ga šalje (scheduler = APP_LOCALE), a ne primaoca.
+     */
+    public function preferredLocale(): ?string
+    {
+        return $this->locale;
+    }
 
     /**
      * Get the attributes that should be cast.

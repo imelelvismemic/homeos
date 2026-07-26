@@ -9,6 +9,7 @@ use App\Platform\Filament\Pages\UserProfile;
 use App\Platform\Filament\Tenancy\EditHouseholdProfile;
 use App\Platform\Http\AvatarController;
 use App\Platform\Http\CalendarEventsController;
+use App\Platform\Http\Middleware\SetLocale;
 use App\Platform\Http\QuickCreateController;
 use App\Platform\Http\SearchController;
 use App\Platform\Models\Household;
@@ -19,6 +20,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -103,11 +105,17 @@ class HomePanelProvider extends PanelProvider
             // Redoslijed grupa u meniju je fiksiran ovdje; bez ovoga ih Filament
             // slaže onim redom kojim ih zatekne kroz auto-discovery modula.
             // Nazivi moraju biti isti stringovi koje moduli vraćaju iz
-            // getNavigationGroup() (lang/bs/<modul>.php → navigation_group).
+            // getNavigationGroup() (lang/<jezik>/<modul>.php → navigation_group).
+            //
+            // Labele su NAMJERNO zatvorene u closure: panel se gradi pri
+            // registraciji providera, prije nego middleware postavi jezik
+            // (Faza 9b) — direktan __() bi zamrznuo bosanske nazive, pa se na
+            // engleskom/njemačkom ne bi poklopili s onim što vraćaju moduli i
+            // redoslijed grupa bi se raspao.
             ->navigationGroups([
-                __('tasks.navigation_group'),
-                __('finance.navigation_group'),
-                __('lifeadmin.navigation_group'),
+                'tasks' => NavigationGroup::make(fn (): string => __('tasks.navigation_group')),
+                'finance' => NavigationGroup::make(fn (): string => __('finance.navigation_group')),
+                'lifeadmin' => NavigationGroup::make(fn (): string => __('lifeadmin.navigation_group')),
             ])
             ->discoverResources(in: app_path('Platform/Filament/Resources'), for: 'App\\Platform\\Filament\\Resources')
             ->discoverPages(in: app_path('Platform/Filament/Pages'), for: 'App\\Platform\\Filament\\Pages')
@@ -134,6 +142,21 @@ class HomePanelProvider extends PanelProvider
                         'searchUrl' => route('filament.app.search', ['h' => $tenant->getKey()]),
                     ])->render();
                 },
+            )
+            // Prekidač jezika (Faza 9b) — prvi u nizu desnih alatki, jer je
+            // rijetko korišten: redoslijed s desna nalijevo ostaje profil,
+            // zvonce, "Brzo dodaj", jezik.
+            ->renderHook(
+                PanelsRenderHook::GLOBAL_SEARCH_AFTER,
+                fn (): string => view('filament.platform.language-switcher')->render(),
+            )
+            // Isti prekidač na "simple" stranicama (prijava, registracija,
+            // obnova lozinke, kreiranje prvog domaćinstva) — one nemaju traku,
+            // pa hook iznad tamo ne bi ništa dao. Prije prijave korisnik još
+            // nema `users.locale`, pa izbor pamti sesija.
+            ->renderHook(
+                PanelsRenderHook::SIMPLE_PAGE_START,
+                fn (): string => view('filament.platform.language-switcher-simple')->render(),
             )
             // "Brzo dodaj" — Alpine modal nad trenutnom stranicom (zamagljena
             // pozadina, kao command palette): korisnik doda minimalne podatke,
@@ -194,6 +217,9 @@ class HomePanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                // Jezik (Faza 9b) — nakon StartSession, jer gost svoj izbor
+                // nosi u sesiji; prijavljeni korisnik u users.locale.
+                SetLocale::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

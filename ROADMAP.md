@@ -711,8 +711,19 @@ bez gubitka podataka.
   „Home OSplus"); **email obavještenja su bila u kvaru** — notifikacije su gradile
   tenant-scoped URL bez tenanta, pa je u scheduler kontekstu email padao dok je
   in-app obavijest stizala. Zapisano u `docs/PRAVILA.md` §11.
-- **9b** — jezici bs/en/de (sve što korisnik vidi, uključujući email na jeziku
-  primaoca), izbor zastavicama na prijavi i u topbaru.
+- **9b — GOTOVO:** jezici bs/en/de. Puni prijevodi svih 11 fajlova po jeziku
+  (~700 ključeva) + `lang/de.json` za Laravelove mail stringove; prekidač sa
+  zastavicama (SVG, ne emoji — Windows ne renderuje emoji zastave) u traci i na
+  prijavi; jezik se pamti u sesiji za gosta i u `users.locale` za prijavljenog;
+  **email ide na jeziku primaoca** (`HasLocalePreference` na `User` i
+  `HouseholdMember`, jer je notifiable član, a jezik korisnikov); pozivnica na
+  jeziku onoga ko poziva (primalac još nema nalog). Test parnosti ključeva
+  (bs/en/de) čini nedostajući prijevod greškom, ne tihim sirovim ključem — i
+  odmah je otkrio da je `validation.password` u bosanskom bio zaostao kao ravan
+  string, pa su poruke o jačini lozinke padale na engleski.
+  Labele navigacionih grupa u `HomePanelProvider` su prebačene u closure:
+  panel se gradi prije nego middleware postavi jezik, pa je direktan `__()`
+  zamrzavao bosanske nazive i redoslijed menija se raspadao na drugom jeziku.
 - **9c** — finalni UX prolaz na tri širine, sigurnosni pregled, README/CLAUDE.
 
 1. Testno pokrivanje ključnih tokova (feature testovi po modulu).

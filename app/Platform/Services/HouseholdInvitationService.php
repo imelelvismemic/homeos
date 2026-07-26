@@ -3,6 +3,7 @@
 namespace App\Platform\Services;
 
 use App\Models\User;
+use App\Platform\Localization\Locales;
 use App\Platform\Models\Household;
 use App\Platform\Models\HouseholdInvitation;
 use App\Platform\Models\HouseholdMember;
@@ -69,8 +70,14 @@ class HouseholdInvitationService
 
         // Primalac još nema nalog (ni člana), pa notifikacija ide "on-demand" na
         // email adresu — i dalje kroz Notification sistem, nikad Mail::send (§10).
+        //
+        // Jezik primaoca ne postoji (nema nalog), pa pozivnica ide na jeziku
+        // onoga ko poziva — najbliža pretpostavka: poziva nekoga iz svoje kuće.
         Notification::route('mail', $email)
-            ->notify(new HouseholdInvited($invitation, $token, $household->name, $invitedBy->name));
+            ->notify(
+                (new HouseholdInvited($invitation, $token, $household->name, $invitedBy->name))
+                    ->locale(Locales::sanitize($invitedBy->locale)),
+            );
     }
 
     /**

@@ -27,6 +27,20 @@ Nastao je iz QA prolaza nakon Faze 3 — svaki novi modul ga mora poštovati, a
   ne da ga treba popravljati po Resource-u.
 - Laravel validacijske poruke su prevedene u `lang/bs/validation.php` (bez toga
   se miješa engleski na formama, npr. registracija/obnova šifre).
+- **Tri jezika od Faze 9b: `bs` (podrazumijevani), `en`, `de`.** Novi ključ ide u
+  **sva tri** fajla istovremeno — test parnosti (`tests/Feature/Platform/
+  LanguagesTest.php`) pada ako ključ postoji u jednom a fali u drugom. To je
+  namjerno: nedostajući prijevod se u UI-ju ne vidi kao greška nego kao sirovi
+  ključ (`tasks.fields.title`), obično na stranici koju niko ne otvara često.
+  Podržani jezici se dodaju na jednom mjestu: `App\Platform\Localization\Locales`.
+- **Jezik zavisi od trenutka izvršavanja.** `__()` u kodu koji se izvršava pri
+  registraciji service providera (npr. `->navigationGroups()` u
+  `HomePanelProvider`) zamrzne prijevod u jeziku procesa, jer middleware koji
+  postavlja jezik radi kasnije. Takav tekst ide u closure, da se izračuna po
+  zahtjevu.
+- **Email ide na jeziku primaoca, ne pošiljaoca.** Notifiable mora
+  implementirati `HasLocalePreference` (kod nas `User` i `HouseholdMember`, koji
+  delegira na korisnika) — inače scheduler šalje sve na `APP_LOCALE`.
 
 ## 2. Veliko/malo slovo (pravopis)
 
