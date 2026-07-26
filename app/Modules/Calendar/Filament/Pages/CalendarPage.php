@@ -21,7 +21,7 @@ class CalendarPage extends Page
 
     protected static string $view = 'filament.calendar.pages.calendar';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 5;
 
     public static function getNavigationLabel(): string
     {

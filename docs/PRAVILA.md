@@ -121,6 +121,11 @@ ide samo po **vlastitom tekstu** zapisa (naslov + opis/sadržaj), jer se rezulta
 svih modula miješaju u jednoj listi pa bi pogodak po imenu člana ili oznaci bio
 zbunjujuć. Pretraga po odgovornoj osobi/oznakama pripada listi tog modula.
 
+Izuzetak koji to potvrđuje: **članovi domaćinstva** su i sami rezultat pretrage
+(grupa „Članovi domaćinstva“, samo trenutno odabrano domaćinstvo). Ime člana je
+tu njegov *vlastiti* tekst — ali i dalje ne izvlači zadatke/račune na kojima je
+taj član odgovorna osoba.
+
 ## 9. Kretanje kroz forme („Nazad" uvijek vodi na listu)
 
 - Nakon **dodavanja** zapisa korisnik ostaje na formi **uređivanja** tog zapisa

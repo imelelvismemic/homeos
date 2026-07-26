@@ -49,9 +49,19 @@ class HomePanelProvider extends PanelProvider
                 'profile' => MenuItem::make()
                     ->label(fn (): string => __('platform.profile.title'))
                     ->icon('heroicon-m-user-circle')
-                    ->url(fn (): string => UserProfile::getUrl()),
+                    // Korisnički meni se renderuje i na stranicama BEZ domaćinstva
+                    // (npr. kreiranje prvog domaćinstva), a Filament računa URL prije
+                    // provjere vidljivosti — bez ovog guarda getUrl() puca na
+                    // nedostajućem {tenant} parametru i cijela stranica vrati 500.
+                    ->visible(fn (): bool => Filament::getTenant() !== null)
+                    ->url(fn (): ?string => Filament::getTenant() ? UserProfile::getUrl() : null),
             ])
             ->tenant(Household::class)
+            // Kreiranje domaćinstva se NE nudi kao stalna opcija u meniju — stranica
+            // je vidljiva samo korisniku koji još nema nijedno domaćinstvo
+            // (RegisterHousehold::canView). Filament tada sam preusmjeri na nju
+            // nakon prijave, čime je pokriven slučaj "registrovao se pa zatvorio
+            // browser prije nego je dovršio kreiranje".
             ->tenantRegistration(RegisterHousehold::class)
             // Izmjena naziva domaćinstva (samo vlasnik) — stranica je unutar
             // tenant ruta, pa ima puni kontekst domaćinstva.
@@ -148,6 +158,13 @@ class HomePanelProvider extends PanelProvider
                         'unreadCount' => $member?->unreadNotifications()->count() ?? 0,
                     ])->render();
                 },
+            )
+            // Na mobilnom: zatvori bočni meni kad korisnik klikne bilo koji link
+            // (Filament to radi samo za stavke menija, pa je npr. "Postavke
+            // domaćinstva" iz padajućeg menija ostavljalo meni otvorenim).
+            ->renderHook(
+                PanelsRenderHook::SCRIPTS_AFTER,
+                fn (): string => view('filament.platform.sidebar-autoclose')->render(),
             )
             ->middleware([
                 EncryptCookies::class,

@@ -18,7 +18,9 @@ class NotificationsInbox extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-bell';
 
-    protected static ?int $navigationSort = 89;
+    // Sanduče se otvara zvoncetom u topbaru (s brojačem nepročitanih) — druga
+    // stavka u meniju za istu stranicu bi bila suvišna.
+    protected static bool $shouldRegisterNavigation = false;
 
     protected static string $view = 'filament.platform.pages.notifications-inbox';
 

@@ -449,3 +449,19 @@ domaćinstva“ su svedene na dvije stranice umjesto četiri stavke menija.
   sada ide kroz istu autentikovanu rutu kao i avatar u panelu.
 - Prevedeni „Save changes“ i cijeli uređivač slike, kroz `lang/vendor/*` — dakle
   spremno i za engleski/njemački iz Faze 9.
+
+**Četvrti krug QA-a — navigacija i mobilni prikaz:**
+
+- **500 na kreiranju domaćinstva:** stavka „Moj profil“ u korisničkom meniju
+  gradi URL s `{tenant}` parametrom, a Filament ga računa prije provjere
+  vidljivosti — na stranici gdje domaćinstva još nema to je rušilo cijelu
+  stranicu. Sada se URL gradi samo uz tenant; test renderuje baš tu stranicu.
+- **Kreiranje domaćinstva** više nije stalna opcija u meniju: forma je vidljiva
+  samo korisniku koji još nije ni u jednom domaćinstvu, a Filament ga tamo i
+  preusmjeri nakon prijave (pokriva „registrovao se pa zatvorio browser“).
+- Meni je pročišćen: obavještenja se otvaraju zvoncetom, a grupa „Organizacija“
+  ide redom Zadaci → Podsjetnici → Bilješke → Kanban → Kalendar.
+- **Univerzalna pretraga** nalazi i članove trenutnog domaćinstva.
+- **Mobilni**: meni je koristio `100vh` (visina bez donje URL trake browsera) pa
+  se do zadnjih stavki nije moglo doskrolovati — sada `100dvh`; hamburger je
+  prvi s lijeva, pa pretraga; meni se zatvara na klik bilo kojeg linka.

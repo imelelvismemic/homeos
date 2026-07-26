@@ -31,6 +31,9 @@ class ReminderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-bell';
 
+    // Redoslijed u grupi Organizacija: Zadaci, Podsjetnici, Bilješke, Kanban, Kalendar.
+    protected static ?int $navigationSort = 2;
+
     // Tenancy preko relacije na zapisu (Reminder->household), ne na tenantu (§4).
     protected static ?string $tenantOwnershipRelationshipName = 'household';
 

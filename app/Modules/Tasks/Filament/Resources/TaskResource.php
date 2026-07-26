@@ -39,6 +39,9 @@ class TaskResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-check-circle';
 
+    // Redoslijed u grupi Organizacija: Zadaci, Podsjetnici, Bilješke, Kanban, Kalendar.
+    protected static ?int $navigationSort = 1;
+
     // Tenancy skoping ide preko relacije NA zapisu (Task->household), a ne preko
     // relacije na tenantu — Platform (Household) ne smije znati za module (§4).
     protected static ?string $tenantOwnershipRelationshipName = 'household';

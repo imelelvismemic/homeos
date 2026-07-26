@@ -26,7 +26,7 @@ class KanbanBoard extends Page
 
     protected static string $view = 'filament.tasks.pages.kanban-board';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     public ?int $boardId = null;
 

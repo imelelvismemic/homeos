@@ -41,3 +41,18 @@ it('skips disabled modules', function () {
 
     expect(app(SearchService::class)->search('zdravo', $household))->toBeEmpty();
 });
+
+it('finds household members in the universal search, scoped to the current household', function () {
+    [$household, $owner, $members] = makeHousehold(extraMembers: 1);
+    $members[0]->user->update(['name' => 'Amina Memić']);
+    test()->actingAs($owner->user);
+
+    [$otherHousehold, $otherOwner] = makeHousehold();
+    $otherOwner->user->update(['name' => 'Amina Tuđa']);
+
+    $results = app(SearchService::class)->search('Amina', $household);
+
+    expect($results->pluck('title'))->toContain('Amina Memić');
+    expect($results->pluck('title'))->not->toContain('Amina Tuđa');
+    expect($results->firstWhere('title', 'Amina Memić')->type)->toBe('member');
+});

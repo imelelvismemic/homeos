@@ -8,14 +8,26 @@ use Illuminate\Support\Collection;
 
 /**
  * Agregira rezultate svih registrovanih search providera (CLAUDE.md §8).
- * Providere čita ISKLJUČIVO iz config/homeos-apps.php (`search_provider` ključ,
+ * MODULE čita ISKLJUČIVO iz config/homeos-apps.php (`search_provider` ključ,
  * CLAUDE.md §12) — ne zna pojedinačno za module. Modul postaje pretraživ tako
  * što se registruje u tom configu; ovdje se ništa ne mijenja.
  *
- * Graceful: sa 0 registrovanih modula vraća praznu kolekciju, ne baca grešku.
+ * Uz njih uvijek idu i provideri SAME PLATFORME (npr. članovi domaćinstva) —
+ * to nisu moduli, ne mogu se isključiti i ne pripadaju registryju.
+ *
+ * Graceful: sa 0 registrovanih modula vraća samo platformske rezultate.
  */
 class SearchService
 {
+    /**
+     * Provideri koje nosi sama platforma (nisu moduli iz registryja).
+     *
+     * @var array<int, class-string<SearchProviderContract>>
+     */
+    private const CORE_PROVIDERS = [
+        MemberSearchProvider::class,
+    ];
+
     /**
      * @return Collection<int, SearchResult>
      */
@@ -28,6 +40,7 @@ class SearchService
         return collect(config('homeos-apps', []))
             ->filter(fn (array $app) => ($app['enabled'] ?? true) && ! empty($app['search_provider']))
             ->map(fn (array $app) => app($app['search_provider']))
+            ->merge(collect(self::CORE_PROVIDERS)->map(fn (string $provider) => app($provider)))
             ->filter(fn ($provider) => $provider instanceof SearchProviderContract)
             ->flatMap(fn (SearchProviderContract $provider) => $provider->search($query, $household))
             ->values();

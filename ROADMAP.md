@@ -487,6 +487,32 @@ Vlasnički pregled cijele aplikacije nakon Faze 6. Ispravljeno:
   (Cancel/Reset/Save/Width/Height/Rotation…) — kroz `lang/vendor/*` override, pa
   su spremni i za `en`/`de` iz Faze 9 (tačka 6).
 
+**Četvrti krug QA-a — navigacija i mobilni prikaz:**
+
+- **500 na kreiranju domaćinstva (produkcija)** — stavka „Moj profil“ u
+  korisničkom meniju gradi URL s `{tenant}` parametrom, a Filament taj URL računa
+  PRIJE provjere vidljivosti; na stranicama bez domaćinstva (kreiranje prvog
+  domaćinstva) to je rušilo cijelu stranicu. URL se sada gradi samo kad tenant
+  postoji. Pokriveno testom koji renderuje tu stranicu.
+- **Kreiranje domaćinstva više nije stalna opcija** u padajućem meniju:
+  `RegisterHousehold::canView()` je istinit samo dok korisnik nije ni u jednom
+  domaćinstvu — time nestaje i stavka iz menija i direktan pristup URL-om, a
+  Filamentovo preusmjeravanje nakon prijave i dalje pokriva slučaj „registrovao
+  se pa zatvorio browser prije nego je dovršio kreiranje“. Namjerno „nije ni u
+  jednom domaćinstvu“, a ne „nije vlasnik nijednog“: pozvani član nema svoje
+  domaćinstvo, ali ima gdje raditi i ne smije biti tjeran da kreira vlastito.
+- **Obavještenja** izbačena iz menija — zvonce u topbaru vodi na istu stranicu.
+- **Redoslijed grupe „Organizacija“**: Zadaci, Podsjetnici, Bilješke, Kanban,
+  Kalendar (eksplicitni `navigationSort`).
+- **Univerzalna pretraga** sada nalazi i **članove domaćinstva** (samo trenutno
+  odabranog). `MemberSearchProvider` je provider same platforme — registry u
+  `config/homeos-apps.php` ostaje isključivo za module.
+- **Mobilni**: bočni meni je koristio `h-screen` (100vh = viewport BEZ donje URL
+  trake browsera), pa se do zadnjih stavki nije moglo doskrolovati — sada
+  `100dvh`. Hamburger je prvi s lijeva, pa univerzalna pretraga (flex `order`,
+  jer hook iza hamburgera ne postoji). Meni se zatvara na klik bilo kojeg linka,
+  ne samo stavke menija (npr. „Postavke domaćinstva“ iz padajućeg menija).
+
 **Nije propust, nego obim Faze 7:** uključivanje/isključivanje modula po
 domaćinstvu. Ključ `enabled` u `config/homeos-apps.php` postoji i **svi** registri
 ga već poštuju (dashboard, pretraga, kalendar, digest, brzo dodavanje, kategorije
@@ -511,6 +537,40 @@ Ovo formalizuje ono što je već implicitno urađeno kroz Faze 1-6.
 4. Access/permission scoping po modulu (household odlučuje šta modul smije
    vidjeti) — uz to i UI kojim vlasnik domaćinstva pali/gasi module po sebi
    (`enabled` prelazi iz globalne konfiguracije u postavku po domaćinstvu).
+
+   **Gdje ide taj UI:** na **postojeću stranicu „Postavke domaćinstva“**
+   (`EditHouseholdProfile`), kao treća cjelina uz naziv domaćinstva i članove —
+   ne kao nova stavka menija. Isti princip kao kod profila korisnika: sve što je
+   „postavka domaćinstva“ živi na jednom mjestu. Lista modula se i tada čita iz
+   `config/homeos-apps.php` (naziv + ikonica po modulu), a per-domaćinstvo stanje
+   se čuva uz domaćinstvo; uključivanje/isključivanje je radnja vlasnika, član je
+   samo vidi.
+
+5. **Pozivnica putem linka** (dodano na zahtjev vlasnika, prije izrade faze).
+   Danas vlasnik može pozvati samo **već registrovanog** korisnika, pa osoba
+   koju treba pozvati mora prvo sama da se registruje — a registracija je
+   obavezno vodi na kreiranje vlastitog domaćinstva (aplikacija je household-
+   scoped, bez domaćinstva nema nijednog ekrana). Rezultat: pozvani član završi
+   s jednim praznim domaćinstvom koje mu ne treba.
+
+   Traženo ponašanje:
+   - Vlasnik unese email, bez obzira je li osoba registrovana. Ako **jest** —
+     dodaje se odmah (kao danas). Ako **nije** — šalje se pozivnica.
+   - Pozivnica ide kroz Notification sistem (`CLAUDE.md` §10), nikad direktnim
+     `Mail::send`; sadrži potpisan link s jednokratnim tokenom i rokom (7 dana).
+   - Link vodi na registraciju s popunjenim emailom; nakon registracije korisnik
+     **odmah ulazi u to domaćinstvo** s ulogom iz pozivnice i **ne prolazi** kroz
+     formu kreiranja domaćinstva. Za već prijavljenog korisnika link samo
+     prihvata pozivnicu.
+   - Nova tabela `household_invitations` (household_id, email, role, token,
+     expires_at, accepted_at, invited_by) — šema se upisuje u `DATA_MODEL.md`
+     prije implementacije, po obrascu iz tačke 4 tog dokumenta.
+   - Sigurnost: token jednokratan i istekne; poruka ne otkriva postoji li nalog
+     s tim emailom; pozivnicu šalje i povlači samo vlasnik; prihvatanje provjerava
+     da email pozivnice odgovara nalogu koji je prihvata.
+   - Forma kreiranja domaćinstva time ostaje forsirana **samo** onome ko se
+     registrovao sam od sebe, bez pozivnice — što je i bila namjera pravila iz
+     QA prolaza prije ove faze.
 
 **Definition of done:** Nova probna "dummy" app se doda prateći checklist i
 pojavi se na dashboardu/search-u/navigaciji bez izmjene postojećeg koda.

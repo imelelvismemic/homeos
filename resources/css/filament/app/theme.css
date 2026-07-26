@@ -16,15 +16,40 @@
     }
 
     /*
-     * Mobilni browseri (Safari/Chrome s URL trakom na DNU ekrana) prekrivaju
-     * posljednjih ~5rem viewporta, pa su zadnje stavke bočnog menija bile
-     * nedostupne — nije se moglo skrolovati ispod trake. Dodajemo rezervu na dnu
-     * menija (uz safe-area za uređaje s "notch"-om) samo na uskim ekranima, gdje
-     * je meni ionako preklopni panel preko cijele visine.
+     * Mobilni browseri s URL trakom na DNU ekrana: Filamentov bočni meni koristi
+     * `h-screen` (100vh), a to je VELIKI viewport — visina bez te trake. Zato je
+     * dno menija (npr. zadnja stavka "Kupovina") završavalo ispod trake i nije se
+     * moglo doskrolovati. `100dvh` je dinamička visina, ona koja je stvarno
+     * vidljiva; uz nju ide i rezerva na dnu liste (safe-area za uređaje s
+     * "notch"-om). Samo na uskim ekranima — na desktopu je meni statičan.
      */
     @media (max-width: 1023px) {
+        .fi-sidebar {
+            height: 100dvh;
+            max-height: 100dvh;
+        }
+
         .fi-sidebar-nav {
-            padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+            padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+        }
+
+        /*
+         * Redoslijed u topbaru na mobilnom: prvo hamburger, pa univerzalna
+         * pretraga. Filament renderuje TOPBAR_START hook (našu pretragu) PRIJE
+         * dugmeta menija, a hook poslije njega ne postoji — pa redoslijed
+         * postavljamo kroz flex `order` (ostalo ostaje kako jest).
+         */
+        .fi-topbar > nav > * {
+            order: 3;
+        }
+
+        .fi-topbar-open-sidebar-btn,
+        .fi-topbar-close-sidebar-btn {
+            order: 1;
+        }
+
+        .homeos-command-palette {
+            order: 2;
         }
     }
 

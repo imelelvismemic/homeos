@@ -2,8 +2,9 @@
      otvaranje/fokus/zatvaranje je client-side, a live rezultati se dohvaćaju
      običnim GET fetch-om ka /pretraga (SearchController). Bez Livewire komponente
      → nema /livewire/update ni 419. Dostupno na svim širinama; u TOPBAR_START,
-     ispred hamburgera na tabletu/mobilnom. --}}
+     a na mobilnom CSS-om (`homeos-command-palette`) pomjereno iza hamburgera. --}}
 <div
+    class="homeos-command-palette"
     x-data="{
         isOpen: false,
         q: '',

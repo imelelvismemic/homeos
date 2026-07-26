@@ -15,6 +15,22 @@ class RegisterHousehold extends RegisterTenant
         return __('platform.household.register_heading');
     }
 
+    /**
+     * Kreiranje domaćinstva nije stalna opcija: stranicu vidi samo korisnik koji
+     * još nije ni u jednom domaćinstvu. Time nestaje i stavka iz padajućeg menija
+     * domaćinstva (Filament je krije po `canView`), a Filamentovo preusmjeravanje
+     * nakon prijave i dalje radi — korisnik koji se registrovao pa zatvorio browser
+     * prije nego je dovršio kreiranje, dobije formu odmah po prijavi.
+     *
+     * Namjerno "nije ni u jednom domaćinstvu", ne "nije vlasnik nijednog": pozvani
+     * član nema svoje domaćinstvo, ali ima gdje raditi — ne smijemo ga svaki put
+     * tjerati da kreira vlastito.
+     */
+    public static function canView(): bool
+    {
+        return auth()->user()?->households()->doesntExist() ?? false;
+    }
+
     public function form(Form $form): Form
     {
         return $form

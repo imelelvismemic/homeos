@@ -23,6 +23,9 @@ class NoteResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
+    // Redoslijed u grupi Organizacija: Zadaci, Podsjetnici, Bilješke, Kanban, Kalendar.
+    protected static ?int $navigationSort = 3;
+
     protected static ?string $tenantOwnershipRelationshipName = 'household';
 
     public static function getModelLabel(): string
