@@ -3,10 +3,12 @@
 use App\Modules\Reminders\Models\Reminder;
 use App\Modules\Reminders\Notifications\ReminderDue;
 use App\Platform\Filament\Pages\Dashboard;
+use App\Platform\Http\LocaleController;
 use App\Platform\Localization\Locales;
 use App\Platform\Modules\ModuleRegistry;
 use App\Platform\QuickCapture\QuickCaptureRegistry;
 use Filament\Facades\Filament;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 
@@ -224,4 +226,54 @@ it('sends the email in the language of the person receiving it', function () {
 
     expect($subjects)->toContain(__('reminders.notifications.due.subject', [], 'de'));
     expect(app()->getLocale())->toBe('bs'); // jezik procesa se vraća nakon slanja
+});
+
+it('keeps the chosen language on the sign-in page after logging out', function () {
+    // Prijavljeni korisnik promijeni jezik, pa se odjavi. Odjava uništi sesiju,
+    // pa je bez kolačića stranica prijave padala na podrazumijevani jezik —
+    // korisnik koji je radio na njemačkom dobijao je bosanski.
+    [$household, $owner] = makeHousehold();
+
+    $response = test()->actingAs($owner->user)->post(route('locale', ['locale' => 'de']));
+
+    $response->assertRedirect();
+    $response->assertCookie(LocaleController::COOKIE, 'de');
+
+    test()->post(route('filament.app.auth.logout'));
+
+    // Gost s tim kolačićem: middleware ga uzima jer sesije više nema.
+    test()->withCookie(LocaleController::COOKIE, 'de')
+        ->get(route('filament.app.auth.login'))
+        ->assertOk()
+        ->assertSee('Anmelden', escape: false);
+});
+
+it('adopts the language chosen on the sign-in page onto the account', function () {
+    [$household, $owner] = makeHousehold();
+    expect($owner->user->locale)->toBe('bs');
+
+    // Gost klikne zastavicu na prijavi…
+    test()->post(route('locale', ['locale' => 'de']))->assertRedirect();
+
+    expect(session('locale_chosen'))->toBeTrue();
+
+    // …pa se prijavi: izbor mora ostati zapisan na nalogu, inače se vrati stari
+    // jezik i izgleda kao da prekidač "ne pamti".
+    event(new Login('web', $owner->user, false));
+
+    expect($owner->user->fresh()->locale)->toBe('de');
+    expect(session('locale_chosen'))->toBeNull();
+});
+
+it('never lets a stale cookie rewrite the language of the account signing in', function () {
+    [$household, $owner] = makeHousehold();
+    $owner->user->update(['locale' => 'en']);
+
+    // Kolačić s tuđeg rada na zajedničkom računaru, BEZ klika na zastavicu:
+    // smije odrediti jezik prikaza gostu, ali ne i prepisati tuđi nalog.
+    test()->withCookie(LocaleController::COOKIE, 'de');
+
+    event(new Login('web', $owner->user, false));
+
+    expect($owner->user->fresh()->locale)->toBe('en');
 });

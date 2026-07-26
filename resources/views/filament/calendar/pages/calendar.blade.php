@@ -42,6 +42,10 @@
     <script>
         (function () {
             const eventsUrl = @json($this->eventsUrl());
+            // Jezik i tekst dugmadi idu iz PHP-a (CalendarPage::calendarOptions):
+            // FullCalendar sam formatira nazive mjeseci i dana za dati jezik, a
+            // terminologiju držimo u prijevodima.
+            const calendarOptions = @json($this->calendarOptions());
 
             function bootHomeosCalendar() {
                 const el = document.getElementById('homeos-calendar');
@@ -52,7 +56,7 @@
                     return;
                 }
                 el.dataset.booted = '1';
-                window.initHomeosCalendar(el, eventsUrl);
+                window.initHomeosCalendar(el, eventsUrl, calendarOptions);
             }
 
             document.addEventListener('DOMContentLoaded', bootHomeosCalendar);

@@ -2,6 +2,7 @@
 
 namespace App\Platform\Http\Middleware;
 
+use App\Platform\Http\LocaleController;
 use App\Platform\Localization\Locales;
 use Carbon\CarbonImmutable;
 use Closure;
@@ -13,10 +14,13 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Postavlja jezik zahtjeva (ROADMAP Faza 9b).
  *
- * Redoslijed izvora je namjeran: prijavljeni korisnik nosi svoj izbor sa
- * sobom (users.locale, bilo koji uređaj), a gost ima samo sesiju — zato
- * prijava ne smije "pregaziti" korisnikov trajni izbor jezikom koji je na
- * login stranici bio postavljen slučajno.
+ * Redoslijed izvora je namjeran:
+ *  1. **prijavljeni korisnik** (`users.locale`) — nosi izbor sa sobom na svaki
+ *     uređaj i u email obavještenja,
+ *  2. **sesija** — izbor gosta u tekućem pregledu,
+ *  3. **kolačić** — isti izbor nakon što odjava uništi sesiju. Bez ovog koraka
+ *     je korisnik koji je radio na njemačkom pa se odjavio dobijao stranicu
+ *     prijave na bosanskom (prijavljeno kao greška nakon Faze 9c).
  */
 class SetLocale
 {
@@ -25,7 +29,9 @@ class SetLocale
         $user = $request->user();
 
         $locale = Locales::sanitize(
-            $user?->locale ?? $request->session()->get('locale')
+            $user?->locale
+                ?? $request->session()->get('locale')
+                ?? $request->cookie(LocaleController::COOKIE)
         );
 
         App::setLocale($locale);

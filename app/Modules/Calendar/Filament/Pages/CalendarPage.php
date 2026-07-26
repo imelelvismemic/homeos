@@ -56,4 +56,33 @@ class CalendarPage extends Page
 
         return route('filament.app.calendar-events', ['h' => $household->getKey()]);
     }
+
+    /**
+     * Podešavanja koja Blade predaje FullCalendaru.
+     *
+     * Jezik ide odavde jer FullCalendar sam formatira nazive mjeseci i dana za
+     * dati jezik — ranije su bili fiksni bosanski nizovi u JS-u, pa je kalendar
+     * bio jedini ekran koji nije pratio izbor jezika.
+     *
+     * Tekst dugmadi NE dolazi iz FullCalendar bundlea nego iz prijevoda: bundle
+     * za bosanski nudi „Raspored" umjesto našeg „Lista" (RULES.md §3 — isti
+     * termin za istu radnju svuda).
+     *
+     * @return array<string, mixed>
+     */
+    public function calendarOptions(): array
+    {
+        return [
+            'locale' => app()->getLocale(),
+            'labels' => [
+                'today' => __('calendar.buttons.today'),
+                'month' => __('calendar.buttons.month'),
+                'week' => __('calendar.buttons.week'),
+                'day' => __('calendar.buttons.day'),
+                'list' => __('calendar.buttons.list'),
+                'allDay' => __('calendar.all_day'),
+                'noEvents' => __('calendar.no_events'),
+            ],
+        ];
+    }
 }
