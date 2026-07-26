@@ -652,8 +652,7 @@ i sadrži prave podatke.
 na produkciju, dnevni backup radi, i probni rollback je uspješno testiran
 bez gubitka podataka.
 
-**Status: GOTOVO** (osim rollback testa, koji se izvodi odmah nakon ovog deploya
-— vidi niže).
+**Status: GOTOVO, uključujući rollback test.**
 
 - **Backup** (tačka 1): artisan komanda `homeos:backup` u repou, pokreće je
   centralni scheduler svaki dan u 03:15. Radi dump baze (`mysqldump` prema
@@ -687,6 +686,17 @@ bez gubitka podataka.
 - **Izolacija** (tačka 5): zahtijeva shell na serveru, pa je ostavljena kao
   kontrolna lista za vlasnika (vidi `SUBMISSION.md`) — Docker stack i dalje
   izlaže samo `127.0.0.1:8091`, a novi volumen ne dira ništa izvan projekta.
+- **Rollback provjera** (tačka 3): izvedena **na produkciji**, ne simulirana.
+  Verzija je podignuta na `1.0.1` i deployana (`/zdravlje` to potvrdio), pa je
+  na toj verziji **dodan novi zadatak i novi ljubimac**, pa je izmjena vraćena
+  `git revert`-om i ponovo deployana. Rezultat: `/zdravlje` javlja `1.0.0`, a
+  brojevi su ostali identični (`zadaci=12 podsjetnici=22 ljubimci=3 racuni=6
+  clanovi=8`) — dakle revert vraća **kod**, a ne dira podatke, ni one nastale u
+  međuvremenu.
+  - Usput otkriveno i ispravljeno: verzija je stajala u `.env`, pa se morala
+    ručno mijenjati na serveru i već je bila odstupila. Prebačena je u kod
+    (`config/homeos.php`), gdje joj je i mjesto — inače bi footer iz Faze 9
+    prikazivao pogrešan broj.
 
 ---
 
@@ -741,12 +751,13 @@ smisla tek nakon njih:**
    „Powered by @elvismemic" + verzija. Footer ide kroz Filament render hook
    (`PanelsRenderHook::FOOTER`), diskretno, u skladu s temom i u light/dark
    varijanti.
-   - **Verzija se NE piše u layout.** Već postoji od Faze 8: `HOMEOS_VERSION` u
-     `.env` → `config('homeos.version')`. Footer čita tu istu vrijednost koju
-     prikazuje i health endpoint `/zdravlje`, pa su uvijek u skladu i verzija se
-     mijenja na jednom mjestu (usput je i dokaz koje je izdanje na produkciji).
-   - Podizanje verzije ide uz izmjenu `.env.example` i `.env.prod.example`, da
-     nova instalacija ne krene s pogrešnim brojem.
+   - **Verzija se NE piše u layout.** Postoji od Faze 8 u `config('homeos.version')`.
+     Footer čita tu istu vrijednost koju prikazuje i health endpoint, pa su uvijek
+     u skladu (usput je i dokaz koje je izdanje na produkciji).
+   - **Nije u `.env`** (ispravljeno tokom rollback testa Faze 8): dok je bila env
+     varijabla, morala se ručno mijenjati na serveru pri svakom izdanju i već je
+     odstupila — kod je govorio 1.0.1, serverski `.env` 1.0.0, i `.env` je
+     pobjeđivao. Verzija je svojstvo koda, pa se podiže u commitu.
 
 8. **Zvonce se osvježava samo od sebe.** Brojač nepročitanih je server-renderovan
    u topbaru, pa nova obavijest stigne tek na sljedeće učitavanje stranice —

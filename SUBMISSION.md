@@ -600,6 +600,18 @@ proširivosti" iznad; ukratko:
   email na neuspjeh, fallback adresa, sigurnost `mysqldump` poziva (lozinka nikad
   u argumentima, jer su vidljivi u `ps`), i tri za health endpoint.
 
+**Rollback je testiran na produkciji, ne simuliran.** Verzija je podignuta na
+`1.0.1` i deployana, na njoj su **dodani novi zadatak i novi ljubimac**, pa je
+izmjena vraćena `git revert`-om i ponovo deployana. Nakon reverta `/zdravlje`
+javlja `1.0.0`, a brojevi zapisa su nepromijenjeni (`12 / 22 / 3 / 6 / 8`) —
+uključujući ono što je nastalo dok je live bila verzija koja se povlači. Dakle
+revert vraća kod, a ne dira podatke.
+
+Test je usput otkrio stvarnu manu: verzija je stajala u `.env`, pa se morala
+ručno mijenjati na serveru pri svakom izdanju — i već je bila odstupila (kod
+1.0.1, serverski `.env` 1.0.0, `.env` pobjeđuje). Prebačena je u kod
+(`config/homeos.php`); inače bi footer iz Faze 9 mirno prikazivao pogrešan broj.
+
 **Kontrolna lista za vlasnika** (traži shell na serveru, ne može iz koda):
 
 ```bash
