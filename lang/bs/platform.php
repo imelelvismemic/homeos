@@ -85,17 +85,21 @@ return [
         'mail' => [
             'subject' => 'Poziv u domaćinstvo :household',
             'greeting' => 'Zdravo,',
-            'line' => ':inviter vas poziva u domaćinstvo „:household“ na Home OS-u.',
+            'line' => ':inviter vas poziva u domaćinstvo „:household“ na :app.',
             'action' => 'Pridruži se domaćinstvu',
             'expires' => 'Link vrijedi još :days dana. Ako niste očekivali ovaj poziv, slobodno ga ignorišite.',
-            'salutation' => 'Home OS',
+            'salutation' => ':app',
         ],
     ],
 
     'backup' => [
-        'failed_subject' => 'Home OS: noćni backup nije uspio',
+        'failed_subject' => ':app: noćni backup nije uspio',
         'failed_line' => 'Automatski backup baze i priloga nije uspio. Razlog:',
         'failed_hint' => 'Provjerite prostor na disku i log aplikacije. Backup se ponovo pokušava sutra u isto vrijeme.',
+    ],
+
+    'footer' => [
+        'powered_by' => 'Pokreće',
     ],
 
     'modules' => [
@@ -200,13 +204,13 @@ return [
             'daily' => 'Dnevno',
             'weekly' => 'Sedmično',
         ],
-        'subject_daily' => 'Vaš dnevni sažetak — Home OS',
-        'subject_weekly' => 'Vaš sedmični sažetak — Home OS',
+        'subject_daily' => 'Vaš dnevni sažetak — :app',
+        'subject_weekly' => 'Vaš sedmični sažetak — :app',
         'greeting' => 'Zdravo, :name',
         'intro_daily' => 'Evo šta vas čeka danas i narednih dana:',
         'intro_weekly' => 'Evo šta vas čeka naredne sedmice:',
         'nothing' => 'Nema ništa hitno u ovom periodu — uživajte u miru.',
-        'outro' => 'Ugodan dan želi vam Home OS.',
+        'outro' => 'Ugodan dan želi vam :app.',
     ],
 
 ];

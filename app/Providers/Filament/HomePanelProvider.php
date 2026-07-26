@@ -3,7 +3,6 @@
 namespace App\Providers\Filament;
 
 use App\Platform\Filament\Pages\Dashboard;
-use App\Platform\Filament\Pages\NotificationsInbox;
 use App\Platform\Filament\Pages\RegisterHousehold;
 use App\Platform\Filament\Pages\RegisterUser;
 use App\Platform\Filament\Pages\UserProfile;
@@ -31,6 +30,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Livewire\Livewire;
 
 class HomePanelProvider extends PanelProvider
 {
@@ -40,6 +40,12 @@ class HomePanelProvider extends PanelProvider
             ->default()
             ->id('app')
             ->path('')
+            // Rebrend (Faza 9): naziv i znak dolaze iz koda, ne iz .env — isti
+            // razlog kao kod verzije (server .env se ne mijenja deployem).
+            ->brandName(fn (): string => config('homeos.name'))
+            ->brandLogo(fn () => view('filament.platform.brand'))
+            ->brandLogoHeight('2rem')
+            ->favicon(asset('favicon.svg'))
             ->login()
             // Registracija zna za pozivnicu: email je popunjen i zaključan, a po
             // kreiranju naloga korisnik odmah ulazi u domaćinstvo (Faza 7c).
@@ -163,13 +169,13 @@ class HomePanelProvider extends PanelProvider
                         return '';
                     }
 
-                    $member = $tenant->members()->where('user_id', auth()->id())->first();
-
-                    return view('filament.platform.notification-bell', [
-                        'inboxUrl' => NotificationsInbox::getUrl(tenant: $tenant),
-                        'unreadCount' => $member?->unreadNotifications()->count() ?? 0,
-                    ])->render();
+                    return Livewire::mount('platform.notification-bell');
                 },
+            )
+            // Footer (Faza 9): "Powered by @elvismemic" + verzija iz config/homeos.php.
+            ->renderHook(
+                PanelsRenderHook::FOOTER,
+                fn (): string => view('filament.platform.footer')->render(),
             )
             // Na mobilnom: zatvori bočni meni kad korisnik klikne bilo koji link
             // (Filament to radi samo za stavke menija, pa je npr. "Postavke

@@ -26,7 +26,7 @@ class BackupFailed extends Notification
     {
         return (new MailMessage)
             ->error()
-            ->subject(__('platform.backup.failed_subject'))
+            ->subject(__('platform.backup.failed_subject', ['app' => config('homeos.name')]))
             ->line(__('platform.backup.failed_line'))
             ->line($this->reason)
             ->line(__('platform.backup.failed_hint'));

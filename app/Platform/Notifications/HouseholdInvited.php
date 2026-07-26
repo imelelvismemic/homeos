@@ -39,11 +39,12 @@ class HouseholdInvited extends Notification
             ->line(__('platform.invitations.mail.line', [
                 'inviter' => $this->inviterName,
                 'household' => $this->householdName,
+                'app' => config('homeos.name'),
             ]))
             ->action(__('platform.invitations.mail.action'), route('household-invitation', ['token' => $this->token]))
             ->line(__('platform.invitations.mail.expires', [
                 'days' => $this->invitation->expires_at->diffInDays(now()) + 1,
             ]))
-            ->salutation(__('platform.invitations.mail.salutation'));
+            ->salutation(__('platform.invitations.mail.salutation', ['app' => config('homeos.name')]));
     }
 }

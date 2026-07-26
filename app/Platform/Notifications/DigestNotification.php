@@ -41,7 +41,7 @@ class DigestNotification extends HouseholdNotification
         $isWeekly = $this->frequency === DigestFrequency::Weekly;
 
         $mail = (new MailMessage)
-            ->subject(__($isWeekly ? 'platform.digest.subject_weekly' : 'platform.digest.subject_daily'))
+            ->subject(__($isWeekly ? 'platform.digest.subject_weekly' : 'platform.digest.subject_daily', ['app' => config('homeos.name')]))
             ->greeting(__('platform.digest.greeting', ['name' => $notifiable->user?->name ?? '']))
             ->line(__($isWeekly ? 'platform.digest.intro_weekly' : 'platform.digest.intro_daily'));
 
@@ -53,7 +53,7 @@ class DigestNotification extends HouseholdNotification
             }
         }
 
-        return $mail->line(__('platform.digest.outro'));
+        return $mail->line(__('platform.digest.outro', ['app' => config('homeos.name')]));
     }
 
     /**

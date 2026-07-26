@@ -15,4 +15,6 @@ Route::get('/pozivnica/{token}', HouseholdInvitationController::class)
 
 // Health endpoint (Faza 8) — koristi ga deploy da potvrdi da nova verzija radi,
 // i eventualni vanjski uptime monitor. Javan, ali bez detalja o infrastrukturi.
-Route::get('/zdravlje', HealthController::class)->name('health');
+// Putanja je ENGLESKI, za razliku od korisničkih ruta: ovo je tehnički endpoint
+// koji zovu skripte i monitori, i tako ga prepoznaje svako ko preuzme sistem.
+Route::get('/health', HealthController::class)->name('health');

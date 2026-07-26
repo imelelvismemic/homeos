@@ -624,3 +624,20 @@ mysql -e "SHOW GRANTS FOR 'homeos'@'localhost';"   # očekivano: GRANT ... ON `h
 # 3. Backup stvarno nastaje
 docker compose -f docker-compose.prod.yml exec scheduler ls -lh storage/backups
 ```
+
+**Faza 9a — rebrend i završni detalji** (dio 1 od 3):
+
+- **„Home OS plus"** s vlastitim znakom: inline SVG monogram (krov s plusom u
+  terakoti teme) u bočnom meniju, na prijavi i kao favicon — bez vanjskih asseta.
+- Naziv i verzija **žive u kodu** (`config/homeos.php`), ne u `.env`. Rollback
+  test Faze 8 je pokazao zašto: env varijabla se mora ručno mijenjati na serveru i
+  već je bila odstupila. Footer i health endpoint čitaju istu vrijednost, pa ne
+  mogu prikazati različite brojeve.
+- **Footer**: „Pokreće @elvismemic · v1.0.0", diskretan, u light i dark varijanti.
+- **`/zdravlje` → `/health`**: korisničke rute ostaju bosanske, ali tehnički
+  endpoint koji zovu deploy skripta i monitori piše se engleski.
+- **Zvonce se osvježava samo od sebe**: Livewire komponenta s `wire:poll` na 30s,
+  plus trenutna reakcija na „označi pročitanim". Ranije je nova obavijest stizala
+  tek na sljedeće učitavanje stranice — npr. kad se podsjetnik okine s liste.
+  (Reverb bi bio trenutan, ali traži novi kontejner i izmjenu Apache vhosta;
+  odluka vlasnika je bila polling.)

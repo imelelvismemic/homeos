@@ -4,6 +4,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Naziv proizvoda
+    |--------------------------------------------------------------------------
+    | Ime koje korisnik vidi (bočni meni, prijava, naslov kartice, potpis emaila).
+    | Kao i verzija, NIJE `env()`: naziv proizvoda je svojstvo koda, ne pojedine
+    | instalacije — inače se mora ručno mijenjati na svakom serveru.
+    |
+    | `APP_NAME` u `.env` ostaje Laravelov interni naziv i koristi se za ime
+    | pošiljaoca emaila (`MAIL_FROM_NAME`), pa ga pri rebrendu treba uskladiti i
+    | tamo (vidi ROADMAP Faza 9).
+    */
+
+    'name' => 'Home OS plus',
+
+    /*
+    |--------------------------------------------------------------------------
     | Verzija aplikacije
     |--------------------------------------------------------------------------
     | Jedno mjesto istine — koristi je health endpoint (i footer u Fazi 9), da se

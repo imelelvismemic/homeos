@@ -702,6 +702,14 @@ bez gubitka podataka.
 
 ## Faza 9 — Polish i dokumentacija
 
+**Status: u toku, u tri koraka.**
+- **9a — GOTOVO:** rebrend u „Home OS plus" (naziv i znak iz koda, ne iz `.env`),
+  SVG monogram kao logo i favicon, footer s verzijom, `/zdravlje` → `/health`,
+  zvonce kao Livewire komponenta koja se osvježava sama.
+- **9b** — jezici bs/en/de (sve što korisnik vidi, uključujući email na jeziku
+  primaoca), izbor zastavicama na prijavi i u topbaru.
+- **9c** — finalni UX prolaz na tri širine, sigurnosni pregled, README/CLAUDE.
+
 1. Testno pokrivanje ključnih tokova (feature testovi po modulu).
 2. Ažuriranje `README.md` i `CLAUDE.md` sa svim naučenim tokom razvoja.
 3. Finalni UX prolaz — sistematska provjera svih ekrana protiv `CLAUDE.md`

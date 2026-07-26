@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Platform\Backup\DatabaseDumper;
 use App\Platform\Backup\MysqlDumper;
+use App\Platform\Filament\Livewire\NotificationBell;
 use App\Platform\Modules\ModuleRegistry;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Zvonce obavještenja (Faza 9) živi u app/Platform, izvan Livewire
+        // auto-discovery foldera, pa se registruje eksplicitno pod kratkim imenom
+        // koje topbar render hook koristi.
+        Livewire::component('platform.notification-bell', NotificationBell::class);
     }
 }
