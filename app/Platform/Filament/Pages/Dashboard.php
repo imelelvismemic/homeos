@@ -3,6 +3,8 @@
 namespace App\Platform\Filament\Pages;
 
 use App\Platform\Dashboard\DashboardWidgetRegistry;
+use App\Platform\Models\Household;
+use App\Platform\Modules\ModuleRegistry;
 use Filament\Facades\Filament;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Carbon;
@@ -35,6 +37,19 @@ class Dashboard extends BaseDashboard
         return $household
             ? app(DashboardWidgetRegistry::class)->widgetClassesFor($household)
             : [];
+    }
+
+    /**
+     * Da li domaćinstvo uopšte ima uključenih aplikacija. Razlikuje dvije prazne
+     * situacije koje su ranije dijelile istu (pogrešnu) poruku: "nema instaliranih
+     * aplikacija" i "aplikacije rade, ali danas nemaju šta pokazati".
+     */
+    public function hasEnabledApps(): bool
+    {
+        $household = Filament::getTenant();
+
+        return $household instanceof Household
+            && app(ModuleRegistry::class)->enabled($household)->isNotEmpty();
     }
 
     /** Pozdrav ovisno o dobu dana. */

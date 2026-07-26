@@ -151,12 +151,41 @@ iznova otkriva:
 
 ## Dokaz proširivosti (extensibility)
 
-[POPUNITI nakon Faze 7 — ROADMAP.md]
+Dokaz je izveden u Fazi 7b modulom **Kućni ljubimci** (`app/Modules/Pets`) —
+dodan je NAKON što je platforma bila gotova, prateći checklist iz `CLAUDE.md`
+§14. Namjerno nije "dummy" nego modul koji se stvarno koristi: ljubimac +
+termini njege (vakcina, veterinarski pregled, terapija) s datumom.
 
-Plan dokaza: dodati probnu "dummy" aplikaciju prateći checklist iz
-`CLAUDE.md` (tačka 14) i pokazati da se pojavi na dashboardu, u pretrazi i
-navigaciji bez izmjene postojećeg koda. Ovdje će biti opisan konkretan
-primjer i (ako je moguće) kratak snimak/screenshot postupka.
+**Šta je bilo potrebno dodati:** samo folder `app/Modules/Pets`, dvije migracije
+(`pets_pets`, `pets_care_records`), prijevode `lang/bs/pets.php` i **jedan unos u
+`config/homeos-apps.php`**.
+
+**Šta je dobio besplatno, bez ijedne linije koda van modula:**
+
+| Mogućnost | Kako | Šta je trebalo u core-u |
+|---|---|---|
+| Stavka u navigaciji | Filament auto-discovery po folderu | ništa |
+| Sažetak na početnoj | `DashboardWidgetContract` | ništa |
+| Univerzalna pretraga | `SearchProviderContract` | ništa |
+| Termini u kalendaru | `CalendarSourceContract` | ništa |
+| Sedmični/dnevni sažetak | `DigestSourceContract` | ništa |
+| „Brzo dodaj“ | `QuickCreateContract` | ništa |
+| Privatnost i dijeljenje | `Shareable` + Policy | ništa |
+| Prekidač u postavkama domaćinstva | `ModuleRegistry` čita registry | ništa |
+| **Podsjetnik + email pred termin** | modul emituje platformski `ReminderRequested`; Podsjetnici ga uhvate | ništa |
+
+Zadnji red je suština brief-a („sve je povezano"): modul Ljubimci **ne importuje
+nijednu klasu iz Podsjetnika**, a korisnik ipak dobije podsjetnik i email tri
+dana prije vakcinacije. Isti mehanizam kojim račun i dokument otvaraju podsjetnik.
+
+Provjereno testovima (`tests/Feature/Pets`), uključujući i suprotan smjer —
+modul radi i kad su **svi ostali moduli isključeni**, i uredno nestaje sa svih
+ekrana kad domaćinstvo isključi njega, bez gubitka podataka.
+
+Jedina svjesna odluka radi čistoće dokaza: modul koristi **postojeću** navigacionu
+grupu „Administracija“. Nova grupa bi tražila dopunu `->navigationGroups([...])`
+u core provideru — što je uredno dokumentovano u checklisti, ali bi značilo
+izmjenu jednog core fajla.
 
 ---
 
@@ -494,3 +523,21 @@ domaćinstva“ su svedene na dvije stranice umjesto četiri stavke menija.
 - Uz to dvije QA sitnice: redoslijed grupa u meniju (Organizacija, Finansije,
   Administracija) i redoslijed u topbaru na mobilnom (hamburger pa pretraga) —
   prvi pokušaj nije radio zbog specifičnosti CSS selektora.
+
+**Faza 7b završena** — probna app **Kućni ljubimci** kao dokaz proširivosti
+(dio 2 od 3; 7c: pozivnica putem linka). Detalji su u sekciji „Dokaz
+proširivosti" iznad; ukratko:
+
+- Modul `app/Modules/Pets`: **Ljubimac** (ime, vrsta, datum rođenja, bilješka) i
+  **Njega** (vakcina / pregled / terapija / njega dlake, s terminom i brojem dana
+  za podsjetnik). Njega se vodi uz ljubimca (RelationManager), bez zasebne stavke
+  u meniju.
+- Uklopljen jednim unosom u `config/homeos-apps.php` — dashboard, pretraga,
+  kalendar, sažetak, „Brzo dodaj", dijeljenje i prekidač modula dolaze sami.
+- **Termin njege otvara podsjetnik** kroz platformski `ReminderRequested`, bez
+  importa modula Podsjetnici — isti mehanizam kao računi i dokumenti.
+- 14 testova, uključujući rad s isključenim ostalim modulima i nestajanje sa
+  svih ekrana kad se modul isključi (uz očuvane podatke).
+- Uz to: „Pozovi člana" premješteno uz samu listu članova, i razdvojene dvije
+  prazne poruke na početnoj („nema uključenih aplikacija" vs. „danas nema šta
+  prikazati") — ranije je i drugi slučaj tvrdio da aplikacije nisu instalirane.

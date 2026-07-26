@@ -325,6 +325,51 @@ Napomene:
 
 ---
 
+## 4d. `Pets` (Faza 7b, `app/Modules/Pets`) — dokaz proširivosti
+
+Modul dodan NAKON što je platforma bila gotova, strogo po checklisti iz
+`CLAUDE.md` §14, bez ijedne izmjene u core-u ili drugim modulima.
+
+```
+pets_pets
+  id
+  household_id      FK → households
+  created_by        FK → users
+  name
+  species           PetSpecies enum (dog/cat/bird/fish/other)
+  birth_date        nullable date
+  notes             nullable text
+  timestamps
+
+pets_care_records
+  id
+  household_id      FK → households
+  created_by        FK → users
+  pet_id            FK → pets_pets (cascade)
+  type              CareType enum (vaccination/vet_visit/treatment/grooming/other)
+  due_date          datetime (ime polja po §3)
+  remind_days_before  default 3
+  completed_at      nullable datetime
+  notes             nullable text
+  timestamps
+```
+
+Napomene:
+- Oba entiteta koriste `Shareable` (ljubimac može biti privatan).
+- **Datum njege pokreće cijeli lanac platforme, bez cross-module importa:**
+  `CareRecord::created` → `CareScheduled` → modul-vlastiti listener dispatch-uje
+  platformski `ReminderRequested` (X dana ranije) → Podsjetnici kreiraju
+  podsjetnik → scheduler ga okine → obavještenje + email. Isti mehanizam kao
+  računi (§4b) i dokumenti (§4c).
+- Njega se vodi kao RelationManager uz ljubimca — nema zasebne stavke u meniju.
+- Modul **nema vlastitu notifikacijsku kategoriju** (§5): koristi postojeći
+  `reminder_fired`, jer je obavještenje zapravo podsjetnik.
+- Grupa u navigaciji je postojeća „Administracija“ — nova grupa bi tražila izmjenu
+  `->navigationGroups([...])` u core provideru, pa je namjerno izbjegnuta da dokaz
+  proširivosti ostane čist.
+
+---
+
 ## 5. Lista notifikacijskih kategorija (raste kroz faze, popuniti pri dodavanju)
 
 Faza 1 definiše mehanizam; svaki modul pri dodavanju upisuje ovdje svoju

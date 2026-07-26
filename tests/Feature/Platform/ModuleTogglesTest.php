@@ -98,7 +98,7 @@ it('renders the dashboard with every module turned off', function () {
 
     Livewire::test(Dashboard::class)
         ->assertOk()
-        ->assertSee('Još nema instaliranih aplikacija');
+        ->assertSee('Nema uključenih aplikacija');
 });
 
 it('lets the owner toggle modules from the household settings page', function () {

@@ -35,5 +35,20 @@ it('renders the Today dashboard with zero modules installed', function () {
         ->assertOk()
         ->assertSee($owner->user->name)                 // pozdrav sadrži ime
         ->assertSee('Danas nema ništa hitno')           // prazan sažetak
-        ->assertSee('Još nema instaliranih aplikacija'); // prazno stanje widgeta
+        ->assertSee('Nema uključenih aplikacija'); // prazno stanje widgeta
+});
+
+it('separates "no apps enabled" from "apps on, nothing to show today"', function () {
+    config()->set('homeos-apps', require base_path('config/homeos-apps.php'));
+
+    [$household, $owner] = makeHousehold();
+    test()->actingAs($owner->user);
+    Filament::setTenant($household);
+
+    // Moduli su uključeni, ali domaćinstvo još nema nijedan podatak — poruka
+    // ne smije tvrditi da aplikacije nisu instalirane.
+    Livewire::test(Dashboard::class)
+        ->assertOk()
+        ->assertSee('Danas nema šta prikazati')
+        ->assertDontSee('Nema uključenih aplikacija');
 });

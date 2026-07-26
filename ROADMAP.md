@@ -538,9 +538,18 @@ Ovo formalizuje ono što je već implicitno urađeno kroz Faze 1-6.
   pokriven testom sa **svim** modulima isključenim. Uz to: redoslijed grupa u
   meniju (Organizacija, Finansije, Administracija) i ispravka redoslijeda u
   topbaru na mobilnom (tačka 6 niže).
-- **7b** — probna app **Kućni ljubimci** kao dokaz proširivosti (odluka vlasnika:
-  ljubimac + vakcine/pregledi s datumom → podsjetnik, kalendar, dashboard,
-  pretraga, dijeljenje; ne preklapa se ni s jednim postojećim modulom).
+- **7b — GOTOVO:** probna app **Kućni ljubimci** (`app/Modules/Pets`) kao dokaz
+  proširivosti. Ljubimac + termini njege (vakcina/pregled/terapija) s datumom;
+  njega je RelationManager uz ljubimca, bez zasebne stavke u meniju. Uklopljen
+  jednim unosom u `config/homeos-apps.php` — navigacija, dashboard, pretraga,
+  kalendar, digest, „Brzo dodaj", dijeljenje i prekidač modula dolaze sami.
+  Termin njege emituje platformski `ReminderRequested` → Podsjetnici kreiraju
+  podsjetnik → email, bez importa tog modula. Namjerno koristi POSTOJEĆU grupu
+  „Administracija“: nova grupa bi tražila dopunu `->navigationGroups([...])` u
+  core provideru, pa bi dokaz „bez izmjene postojećeg koda“ bio slabiji.
+  14 testova, uključujući rad kad su svi ostali moduli isključeni. Uz to:
+  „Pozovi člana" premješteno uz listu članova i razdvojene dvije prazne poruke
+  na početnoj strani.
 - **7c** — pozivnica putem linka (tačka 5 niže).
 
 1. App registry — mehanizam kojim se modul "registruje" u sistem (naziv,

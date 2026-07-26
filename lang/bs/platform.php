@@ -89,7 +89,12 @@ return [
         ],
         'summary_prefix' => 'Danas:',
         'empty_summary' => 'Danas nema ništa hitno — uživajte u mirnom danu kod kuće.',
-        'no_widgets' => 'Još nema instaliranih aplikacija. Kako dodajete module (zadaci, kalendar, računi...), njihovi sažeci se pojavljuju ovdje.',
+        // Dvije prazne situacije, dvije poruke: nema uključenih aplikacija vs.
+        // aplikacije rade ali danas nemaju šta pokazati.
+        'no_apps_heading' => 'Nema uključenih aplikacija',
+        'no_apps' => 'U postavkama domaćinstva uključite aplikacije koje želite koristiti — njihovi sažeci se pojavljuju ovdje.',
+        'nothing_yet_heading' => 'Danas nema šta prikazati',
+        'nothing_yet' => 'Dodajte zadatak, podsjetnik ili račun — sažetak onoga što vas čeka pojaviće se ovdje.',
     ],
 
     'quick_capture' => [

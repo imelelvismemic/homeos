@@ -35,11 +35,11 @@ it('lets the owner invite an existing registered user by email', function () {
     Filament::setTenant($household);
 
     householdProfile($household)
-        ->callAction('invite', data: [
+        ->callTableAction('invite', data: [
             'email' => 'invitee@example.com',
             'role' => 'member',
         ])
-        ->assertHasNoActionErrors();
+        ->assertHasNoTableActionErrors();
 
     expect($household->members()->where('user_id', $invitee->id)->exists())->toBeTrue();
 });
@@ -51,11 +51,11 @@ it('rejects inviting an email with no registered user', function () {
     Filament::setTenant($household);
 
     householdProfile($household)
-        ->callAction('invite', data: [
+        ->callTableAction('invite', data: [
             'email' => 'nobody@example.com',
             'role' => 'member',
         ])
-        ->assertHasActionErrors(['email']);
+        ->assertHasTableActionErrors(['email']);
 });
 
 it('rejects inviting a user who is already a member', function () {
@@ -65,11 +65,11 @@ it('rejects inviting a user who is already a member', function () {
     Filament::setTenant($household);
 
     householdProfile($household)
-        ->callAction('invite', data: [
+        ->callTableAction('invite', data: [
             'email' => $owner->email,
             'role' => 'member',
         ])
-        ->assertHasActionErrors(['email']);
+        ->assertHasTableActionErrors(['email']);
 });
 
 it('hides the invite action from a member who is not the household owner', function () {
@@ -79,10 +79,10 @@ it('hides the invite action from a member who is not the household owner', funct
 
     test()->actingAs($owner);
     Filament::setTenant($household);
-    householdProfile($household)->assertActionVisible('invite');
+    householdProfile($household)->assertTableActionVisible('invite');
 
     test()->actingAs($member);
-    householdProfile($household)->assertActionHidden('invite');
+    householdProfile($household)->assertTableActionHidden('invite');
 });
 
 it('shows every member of the household to a plain member too', function () {

@@ -31,12 +31,20 @@
             :widgets="$this->getVisibleWidgets()"
         />
     @else
+        {{-- Dvije različite situacije, dvije različite poruke: nema uključenih
+             aplikacija vs. aplikacije rade ali danas nemaju šta pokazati. --}}
         <div
             class="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 p-10 text-center dark:border-gray-700"
         >
-            <x-filament::icon icon="heroicon-o-squares-2x2" class="h-8 w-8 text-gray-400" />
-            <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">
-                {{ __('platform.dashboard.no_widgets') }}
+            <x-filament::icon
+                :icon="$this->hasEnabledApps() ? 'heroicon-o-sparkles' : 'heroicon-o-squares-2x2'"
+                class="h-8 w-8 text-gray-400"
+            />
+            <p class="mt-3 text-sm font-medium text-gray-950 dark:text-white">
+                {{ $this->hasEnabledApps() ? __('platform.dashboard.nothing_yet_heading') : __('platform.dashboard.no_apps_heading') }}
+            </p>
+            <p class="mt-1 max-w-prose text-sm text-gray-500 dark:text-gray-400">
+                {{ $this->hasEnabledApps() ? __('platform.dashboard.nothing_yet') : __('platform.dashboard.no_apps') }}
             </p>
         </div>
     @endif

@@ -142,58 +142,58 @@ class EditHouseholdProfile extends EditTenantProfile implements HasTable
     }
 
     /**
-     * @return array<PageAction>
+     * "Pozovi člana" stoji uz samu listu članova (zaglavlje tabele), ne na vrhu
+     * stranice — tamo je djelovalo kao radnja nad postavkama domaćinstva uopšte.
      */
-    protected function getHeaderActions(): array
+    private function inviteAction(): Action
     {
-        return [
-            PageAction::make('invite')
-                ->label(__('platform.members.invite_action'))
-                ->icon('heroicon-m-user-plus')
-                ->modalHeading(__('platform.members.invite_modal_heading'))
-                ->modalSubmitActionLabel(__('platform.members.invite_modal_submit'))
-                // Član ne dovodi ljude u tuđe domaćinstvo (CLAUDE.md §1).
-                ->visible(fn (): bool => static::currentUserIsOwner())
-                ->form([
-                    TextInput::make('email')
-                        ->label(__('platform.members.user'))
-                        ->helperText(__('platform.members.user_helper'))
-                        ->email()
-                        ->required()
-                        ->exists(table: 'users', column: 'email')
-                        ->validationMessages(['exists' => __('platform.members.user_not_found')])
-                        ->rule(fn () => function (string $attribute, $value, \Closure $fail): void {
-                            $user = User::where('email', $value)->first();
+        return Action::make('invite')
+            ->label(__('platform.members.invite_action'))
+            ->icon('heroicon-m-user-plus')
+            ->modalHeading(__('platform.members.invite_modal_heading'))
+            ->modalSubmitActionLabel(__('platform.members.invite_modal_submit'))
+            // Član ne dovodi ljude u tuđe domaćinstvo (CLAUDE.md §1).
+            ->visible(fn (): bool => static::currentUserIsOwner())
+            ->form([
+                TextInput::make('email')
+                    ->label(__('platform.members.user'))
+                    ->helperText(__('platform.members.user_helper'))
+                    ->email()
+                    ->required()
+                    ->exists(table: 'users', column: 'email')
+                    ->validationMessages(['exists' => __('platform.members.user_not_found')])
+                    ->rule(fn () => function (string $attribute, $value, \Closure $fail): void {
+                        $user = User::where('email', $value)->first();
 
-                            if ($user && $this->tenant->users()->whereKey($user->id)->exists()) {
-                                $fail(__('platform.members.already_member'));
-                            }
-                        }),
-                    Select::make('role')
-                        ->label(__('platform.members.role'))
-                        ->options([
-                            'member' => __('platform.members.role_member'),
-                            'owner' => __('platform.members.role_owner'),
-                        ])
-                        ->default('member')
-                        ->required(),
-                ])
-                ->action(function (array $data): void {
-                    $user = User::where('email', $data['email'])->firstOrFail();
+                        if ($user && $this->tenant->users()->whereKey($user->id)->exists()) {
+                            $fail(__('platform.members.already_member'));
+                        }
+                    }),
+                Select::make('role')
+                    ->label(__('platform.members.role'))
+                    ->options([
+                        'member' => __('platform.members.role_member'),
+                        'owner' => __('platform.members.role_owner'),
+                    ])
+                    ->default('member')
+                    ->required(),
+            ])
+            ->action(function (array $data): void {
+                $user = User::where('email', $data['email'])->firstOrFail();
 
-                    $this->tenant->members()->create([
-                        'user_id' => $user->id,
-                        'role' => $data['role'],
-                        'joined_at' => now(),
-                    ]);
-                }),
-        ];
+                $this->tenant->members()->create([
+                    'user_id' => $user->id,
+                    'role' => $data['role'],
+                    'joined_at' => now(),
+                ]);
+            });
     }
 
     public function table(Table $table): Table
     {
         return $table
             ->heading(__('platform.members.plural_label'))
+            ->headerActions([$this->inviteAction()])
             ->query(fn (): Builder => HouseholdMember::query()->where('household_id', $this->tenant->getKey()))
             ->columns([
                 TextColumn::make('user.name')

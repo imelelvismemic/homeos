@@ -22,6 +22,7 @@ return [
         'document' => 'Dokumenti',
         'contact' => 'Kontakti',
         'shopping_list' => 'Liste za kupovinu',
+        'pet' => 'Ljubimci',
         'member' => 'Članovi domaćinstva',
     ],
 

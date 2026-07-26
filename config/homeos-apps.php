@@ -14,6 +14,11 @@ use App\Modules\Notes\Calendar\JournalCalendarSource;
 use App\Modules\Notes\Dashboard\NoteDashboardWidget;
 use App\Modules\Notes\QuickCapture\NoteQuickCreate;
 use App\Modules\Notes\Search\NoteSearchProvider;
+use App\Modules\Pets\Calendar\CareCalendarSource;
+use App\Modules\Pets\Dashboard\PetsDashboardWidget;
+use App\Modules\Pets\Digest\CareDigestSource;
+use App\Modules\Pets\QuickCapture\PetQuickCreate;
+use App\Modules\Pets\Search\PetSearchProvider;
 use App\Modules\Reminders\Calendar\ReminderCalendarSource;
 use App\Modules\Reminders\Dashboard\ReminderDashboardWidget;
 use App\Modules\Reminders\Digest\ReminderDigestSource;
@@ -133,6 +138,27 @@ return [
                     ['name' => 'amount', 'label' => 'Iznos (KM)', 'type' => 'number', 'required' => true],
                     ['name' => 'due_date', 'label' => 'Rok plaćanja', 'type' => 'date', 'required' => true],
                 ],
+            ],
+        ],
+    ],
+
+    // Kućni ljubimci — dodano u Fazi 7b kao DOKAZ PROŠIRIVOSTI: cijeli modul se
+    // uklopio samo ovom registracijom, bez ijedne izmjene u core-u ili drugim
+    // modulima (vidi ROADMAP Faza 7b i SUBMISSION.md).
+    'pets' => [
+        'name' => 'Ljubimci',
+        'icon' => 'heroicon-o-heart',
+        'enabled' => true,
+        'dashboard_widget' => PetsDashboardWidget::class,
+        'search_provider' => PetSearchProvider::class,
+        'calendar_source' => CareCalendarSource::class,
+        'digest_source' => CareDigestSource::class,
+        'quick_capture' => [
+            'label' => 'Novi ljubimac',
+            'icon' => 'heroicon-o-heart',
+            'handler' => PetQuickCreate::class,
+            'fields' => [
+                ['name' => 'name', 'label' => 'Ime', 'type' => 'text', 'required' => true],
             ],
         ],
     ],
