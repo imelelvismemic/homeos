@@ -4,6 +4,7 @@ use App\Platform\Backup\BackupFailedException;
 use App\Platform\Backup\BackupService;
 use App\Platform\Backup\DatabaseDumper;
 use App\Platform\Backup\MysqlDumper;
+use App\Platform\Console\BackupCommand;
 use App\Platform\Notifications\BackupFailed;
 use App\Platform\Support\AlertRecipient;
 use Illuminate\Support\Carbon;
@@ -125,6 +126,15 @@ it('builds a mysqldump command that is safe and consistent', function () {
     expect($command)->toContain('--host=host.docker.internal');
     // Lozinka NIKAD u argumentima — vidljiva bi bila u `ps` svima na serveru.
     expect(implode(' ', $command))->not->toContain('tajna');
+});
+
+it('resolves the real dumper from the container, without any test binding', function () {
+    // Regresija: interfejs je postojao, produkcijska implementacija nije bila
+    // vezana — komanda je pucala tek na serveru ("Target [DatabaseDumper] is not
+    // instantiable"), jer su testovi vezali svoju lažnu.
+    expect(app(DatabaseDumper::class))->toBeInstanceOf(MysqlDumper::class);
+    expect(app(BackupService::class))->toBeInstanceOf(BackupService::class);
+    expect(app(BackupCommand::class))->not->toBeNull();
 });
 
 it('runs the backup end to end through the artisan command', function () {

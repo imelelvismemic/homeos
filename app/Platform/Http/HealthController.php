@@ -5,6 +5,7 @@ namespace App\Platform\Http;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -25,9 +26,14 @@ class HealthController
         $checks = [
             'database' => $this->check(fn () => DB::connection()->getPdo() !== null),
             'cache' => $this->check(function (): bool {
-                Cache::put('homeos:health', 1, 10);
+                // Vrijednost je STRING, i to nasumičan. Redis store vraća brojeve
+                // kao string ("1" umjesto 1), pa je poređenje s brojem lažno
+                // padalo u produkciji dok je u testovima (array store) prolazilo.
+                $token = Str::random(16);
 
-                return Cache::get('homeos:health') === 1;
+                Cache::put('homeos:health', $token, 10);
+
+                return Cache::get('homeos:health') === $token;
             }),
             'storage' => $this->check(fn () => is_writable(storage_path('app'))),
         ];

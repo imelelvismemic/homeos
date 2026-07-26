@@ -754,6 +754,14 @@ smisla tek nakon njih:**
    - Šta god se izabere, brojač mora ostati tačan i nakon „označi pročitanim“
      (ne smije se vratiti na staru vrijednost pri sljedećem pollu).
 
+9. **Health ruta na engleski.** `/zdravlje` (Faza 8) preimenovati u `/health`.
+   Korisnički vidljive rute ostaju na bosanskom (`/pozivnica/{token}`), ali ovo
+   je tehnički endpoint koji zovu deploy skripta i uptime monitori — takvi se po
+   konvenciji pišu engleski i tako ih prepoznaje svako ko preuzme sistem.
+   Mijenja se zajedno: `routes/web.php`, URL u `.github/workflows/deploy.yml`
+   (health-check korak), i spomeni u `SUBMISSION.md`/`ROADMAP.md`. Ime rute je
+   već `health`, pa se `route('health')` ne mijenja.
+
 ---
 
 ## Napomena o redoslijedu
