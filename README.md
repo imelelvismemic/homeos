@@ -1,4 +1,4 @@
-# Home OS
+# HomeOS plus
 
 Lični "kućni operativni sistem" — jedna aplikacija koja objedinjuje
 svakodnevnu administraciju domaćinstva (zadaci, kalendar, podsjetnici,
@@ -6,15 +6,31 @@ finansije, bilješke...), dijeljena između članova domaćinstva i izgrađena
 kao platforma na koju se nove aplikacije mogu dodavati bez izmjene
 postojećeg koda.
 
-Puna specifikacija razvoja: [`CLAUDE.md`](CLAUDE.md) · redoslijed faza:
-[`ROADMAP.md`](ROADMAP.md) · šema podataka: [`DATA_MODEL.md`](DATA_MODEL.md)
-· izvorni brief: [`docs/ORIGINAL_SPEC.md`](docs/ORIGINAL_SPEC.md).
+Dostupan na bosanskom, engleskom i njemačkom — jezik se bira zastavicom u
+traci (i na stranici prijave), a emailovi stižu na jeziku primaoca.
+
+## Dokumentacija
+
+Sva dokumentacija živi u `docs/`:
+
+| Fajl | Sadržaj |
+|---|---|
+| [`docs/CLAUDE.md`](docs/CLAUDE.md) | Pravila razvoja i konkretni interfejsi — čita se prije svakog rada na projektu |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Redoslijed faza i stanje svake od njih |
+| [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) | Šema podataka i konvencije imenovanja polja |
+| [`docs/RULES.md`](docs/RULES.md) | Terminologija, pravopis i UX pravila korisničkog teksta |
+| [`docs/SUBMISSION.md`](docs/SUBMISSION.md) | Šta je izgrađeno, fazu po fazu, s obrazloženjima odluka |
+| [`docs/ORIGINAL_SPEC.md`](docs/ORIGINAL_SPEC.md) | Izvorni brief — namjera koju su ostali dokumenti razradili |
+
+U korijenu ostaje samo `CLAUDE.md` od nekoliko linija, koji uvozi
+`docs/CLAUDE.md`: Claude Code automatski čita `CLAUDE.md` iz korijena, pa bi
+bez njega pravila prestala da se učitavaju sama.
 
 ## Stack
 
 Laravel · Filament v3 · MySQL/MariaDB · Redis · Laravel Reverb · Resend
 (email) · Docker Compose · GitHub Actions. Potpuna lista i obrazloženje u
-`CLAUDE.md` tačka 2.
+`docs/CLAUDE.md` tačka 2.
 
 ## Pokretanje lokalno
 
@@ -37,7 +53,7 @@ Prvo pokretanje generiše `APP_KEY` i migrira bazu automatski
 http://localhost:8091
 ```
 
-(port se poklapa sa `APP_INTERNAL_PORT` iz `.env` — vidi `DATA_MODEL.md`
+(port se poklapa sa `APP_INTERNAL_PORT` iz `.env` — vidi `docs/DATA_MODEL.md`
 tačku 7).
 
 Mailpit (hvata testne emailove umjesto slanja na prave adrese) je dostupan
@@ -66,22 +82,22 @@ docker compose down                               # zaustavi sve servise
 
 1. Otvorite `http://localhost:8091` i registrujte se.
 2. Nakon registracije, kreirajte svoje domaćinstvo (postajete vlasnik).
-3. U sekciji "Članovi domaćinstva" možete pozvati drugog, već registrovanog
-   korisnika u domaćinstvo po email adresi.
+3. U postavkama domaćinstva, sekcija "Članovi", pozovite ostale po email
+   adresi — ako osoba još nema nalog, dobija pozivnicu s linkom.
 
 ## Produkcija
 
 Deployment lanac (Apache/Virtualmin reverse proxy, `docker-compose.prod.yml`,
-GitHub Actions `deploy.yml`) opisan je u `ROADMAP.md` (Faza 0.5) i
-`CLAUDE.md` (tačka 3a) — uspostavlja se nakon što je lokalni skeleton
-potvrđen.
+GitHub Actions `deploy.yml`) opisan je u `docs/ROADMAP.md` (Faza 0.5 i Faza 8)
+i `docs/CLAUDE.md` (tačka 3a). Stanje instalacije provjerava javni endpoint
+`/health` (baza, cache, storage i verzija).
 
 ## Struktura projekta
 
 Svaki modul (Zadaci, Kalendar, Finansije...) živi u `app/Modules/<Ime>` i
 komunicira s ostatkom sistema isključivo kroz `app/Platform` (eventi,
 dijeljenje, notifikacije) — nikad direktnim pristupom internom kodu drugog
-modula. Potpuna konvencija: `CLAUDE.md` tačka 4.
+modula. Potpuna konvencija: `docs/CLAUDE.md` tačka 4.
 
 ## Testiranje
 

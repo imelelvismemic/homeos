@@ -17,7 +17,7 @@ return [
 
     // Naslov padajućeg menija za prikaz/skrivanje kolona ("Columns"). Paketski bs
     // fajl nema ovaj ključ, pa je Laravel padao na engleski fallback na SVIM
-    // listama (ne samo zadacima) — vidi docs/PRAVILA.md §1.
+    // listama (ne samo zadacima) — vidi docs/RULES.md §1.
     'column_toggle' => [
         'heading' => 'Kolone',
     ],

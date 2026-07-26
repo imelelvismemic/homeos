@@ -8,7 +8,7 @@ use Filament\Facades\Filament;
 /**
  * Valuta domaćinstva (ROADMAP Faza 7c). Iznosi se NIGDJE ne ispisuju s
  * hardkodiranom valutom — format ide kroz ovaj helper, koji čita `households.currency`
- * (docs/PRAVILA.md §11).
+ * (docs/RULES.md §11).
  *
  * Prikaz je namjerno jednostavan i isti za sve valute — `1,234.56 €` — umjesto
  * Intl formata po lokalu ("BAM 700.00"), da tabele i widgeti ostanu poravnati i

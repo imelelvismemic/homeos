@@ -1,7 +1,7 @@
 <?php
 
 // Override paketskih bs prijevoda — dugme za zatvaranje modala (npr. potvrda
-// brisanja). Vidi docs/PRAVILA.md.
+// brisanja). Vidi docs/RULES.md.
 
 return [
 

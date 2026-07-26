@@ -6,7 +6,7 @@ use App\Platform\Support\Currency;
 
 /**
  * Jedinstven prikaz iznosa u Finansijama. Valuta NIJE hardkodirana — dolazi iz
- * postavki domaćinstva (App\Platform\Support\Currency, docs/PRAVILA.md §11).
+ * postavki domaćinstva (App\Platform\Support\Currency, docs/RULES.md §11).
  * Metoda je namjerno ostala tanka: modul ne pravi svoju logiku formatiranja.
  */
 class Money

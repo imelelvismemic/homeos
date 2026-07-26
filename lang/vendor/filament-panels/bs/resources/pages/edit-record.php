@@ -1,6 +1,6 @@
 <?php
 
-// Override paketskih bs prijevoda — vidi docs/PRAVILA.md.
+// Override paketskih bs prijevoda — vidi docs/RULES.md.
 
 return [
 

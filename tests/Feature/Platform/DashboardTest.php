@@ -10,7 +10,7 @@ beforeEach(function () {
     config()->set('homeos-apps', []); // 0 modula — DoD Faze 2
 });
 
-it('greets by local time of day, not by UTC (PRAVILA.md §7)', function () {
+it('greets by local time of day, not by UTC (RULES.md §7)', function () {
     [$household, $owner] = makeHousehold();
     test()->actingAs($owner->user);
     Filament::setTenant($household);

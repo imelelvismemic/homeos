@@ -4,6 +4,8 @@ use App\Modules\Reminders\Models\Reminder;
 use App\Modules\Reminders\Notifications\ReminderDue;
 use App\Platform\Filament\Pages\Dashboard;
 use App\Platform\Localization\Locales;
+use App\Platform\Modules\ModuleRegistry;
+use App\Platform\QuickCapture\QuickCaptureRegistry;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
@@ -78,6 +80,57 @@ it('has the same JSON translation keys in every language', function () {
 
     // Za engleski JSON fajl ne treba: ključ JE engleski tekst.
     expect($de)->toBe($bs);
+});
+
+it('resolves every user-visible string in the app registry in all languages', function () {
+    // `config/homeos-apps.php` nosi prijevodne ključeve, ne gotov tekst: config se
+    // u produkciji kešira, pa bi `__()` u configu zamrznuo jezik onoga ko je pravio
+    // keš. Posljedica pogrešnog ključa nije greška nego sirovi ključ na ekranu —
+    // zato se ovdje traži da se SVAKI ključ stvarno razriješi, u svim jezicima.
+    $texts = [];
+
+    foreach (config('homeos-apps') as $moduleKey => $app) {
+        $texts["{$moduleKey}.name"] = $app['name'];
+
+        $definitions = $app['quick_capture'] ?? null;
+
+        if (! is_array($definitions)) {
+            continue;
+        }
+
+        foreach (array_is_list($definitions) ? $definitions : [$definitions] as $i => $definition) {
+            $texts["{$moduleKey}.quick_capture.{$i}.label"] = $definition['label'];
+
+            foreach ($definition['fields'] ?? [] as $field) {
+                $texts["{$moduleKey}.quick_capture.{$i}.{$field['name']}"] = $field['label'];
+            }
+        }
+    }
+
+    expect($texts)->not->toBeEmpty();
+
+    foreach ($texts as $where => $key) {
+        foreach (['bs', 'en', 'de'] as $locale) {
+            expect(trans($key, [], $locale))
+                ->not->toBe($key, "Ključ se ne razrješava ({$locale}): {$where} → {$key}");
+        }
+    }
+});
+
+it('renders the app names and quick-add buttons in the chosen language', function () {
+    [$household, $owner] = makeHousehold();
+    $owner->user->update(['locale' => 'de']);
+
+    test()->actingAs($owner->user);
+    Filament::setTenant($household);
+    app()->setLocale('de');
+
+    expect(app(ModuleRegistry::class)->name('tasks'))->toBe('Aufgaben');
+
+    $labels = app(QuickCaptureRegistry::class)->items()->pluck('label')->all();
+
+    expect($labels)->toContain('Neue Aufgabe');
+    expect($labels)->not->toContain('Novi zadatak');
 });
 
 it('remembers the chosen language for a guest and for a signed-in user', function () {
@@ -158,7 +211,7 @@ it('sends the email in the language of the person receiving it', function () {
     ]);
 
     // NAMJERNO bez Notification::fake(): fake ne poziva toMail(), pa bi test
-    // prošao i da jezik primaoca uopšte ne radi (docs/PRAVILA.md).
+    // prošao i da jezik primaoca uopšte ne radi (docs/RULES.md).
     config()->set('mail.default', 'array');
     $transport = Mail::mailer('array')->getSymfonyTransport();
     $transport->flush();

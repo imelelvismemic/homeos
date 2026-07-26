@@ -6,7 +6,7 @@ plan rada za Claude Code — svaka faza treba biti završena, testirana i
 commitovana prije prelaska na sljedeću.
 
 Prateći dokumenti: `CLAUDE.md` (pravila razvoja), `DATA_MODEL.md` (šema
-podataka), `docs/ORIGINAL_SPEC.md` (izvorni brief — referenca za namjeru i
+podataka), `ORIGINAL_SPEC.md` (izvorni brief — referenca za namjeru i
 duh zadatka, ne operativni plan; kod nejasnoće koju ova tri dokumenta ne
 razrješavaju, provjeriti tamo prije donošenja odluke).
 
@@ -422,7 +422,7 @@ Vlasnički pregled cijele aplikacije nakon Faze 6. Ispravljeno:
   dashboard widgeta, obavještenje i kod ručnog okidanja.
 - **Kalendar** — klik na dan otvara „Brzo dodaj“ s postavljenim datumom (spec:
   „dodajte zadatak, bilješku ili podsjetnik odakle god“); 24-satni prikaz vremena
-  u sedmičnom/dnevnom/list prikazu (PRAVILA.md §6).
+  u sedmičnom/dnevnom/list prikazu (RULES.md §6).
 - **Bilješke** — dnevnik dobio stvarnu razradu: zasebna kartica „Dnevnik“ na
   listi, akcija „Dnevnik za danas“ (prefill datuma) i prikaz unosa dnevnika na
   kalendaru (`JournalCalendarSource`). Iz editora uklonjeno nefunkcionalno
@@ -440,9 +440,9 @@ Vlasnički pregled cijele aplikacije nakon Faze 6. Ispravljeno:
   brojač na zvoncetu koji se osvježi odmah po označavanju pročitanim.
 - **Članovi** — dugme „Pozovi“ vidi samo vlasnik domaćinstva.
 - **Prijevodi/terminologija** — „Columns“ → „Kolone“ na svim listama (tačan
-  paketski ključ, vidi PRAVILA.md §1); ujednačeno „lozinka“ umjesto „šifra“ u
+  paketski ključ, vidi RULES.md §1); ujednačeno „lozinka“ umjesto „šifra“ u
   cijelom sistemu; pretraga listi po odgovornoj osobi/oznakama fiksirana kao
-  pravilo (PRAVILA.md §8).
+  pravilo (RULES.md §8).
 
 **Drugi krug QA-a (isti prolaz, nakon provjere vlasnika):**
 
@@ -465,7 +465,7 @@ Vlasnički pregled cijele aplikacije nakon Faze 6. Ispravljeno:
   Finansije nude i trošak (`finance.expense`) i račun (`finance.bill`, s
   naslovom, iznosom i rokom). Dodan i tip polja `date`.
 - **„Nazad“ s forme uređivanja** vodi na listu, ne na prethodnu stranicu
-  (`CancelReturnsToList` na svim Edit stranicama) — `docs/PRAVILA.md` §9.
+  (`CancelReturnsToList` na svim Edit stranicama) — `RULES.md` §9.
 - **Mobilna navigacija** — meni je dobio rezervu na dnu (uz `safe-area`), jer je
   URL traka mobilnog browsera prekrivala posljednje stavke.
 
@@ -703,14 +703,14 @@ bez gubitka podataka.
 ## Faza 9 — Polish i dokumentacija
 
 **Status: u toku, u tri koraka.**
-- **9a — GOTOVO:** rebrend u „Home OS plus" (naziv i znak iz koda, ne iz `.env`),
+- **9a — GOTOVO:** rebrend u „HomeOS plus" (naziv i znak iz koda, ne iz `.env`),
   SVG monogram kao logo i favicon, footer s verzijom, `/zdravlje` → `/health`,
   zvonce kao Livewire komponenta koja se osvježava sama.
 - **9a dorada:** footer prepravljen u „© @elvismemic <tekuća godina> · v<verzija>";
   naziv ispravljen u „HomeOS plus" (razmak je falio u blade-u, pa se prikazivalo
   „Home OSplus"); **email obavještenja su bila u kvaru** — notifikacije su gradile
   tenant-scoped URL bez tenanta, pa je u scheduler kontekstu email padao dok je
-  in-app obavijest stizala. Zapisano u `docs/PRAVILA.md` §11.
+  in-app obavijest stizala. Zapisano u `RULES.md` §11.
 - **9b — GOTOVO:** jezici bs/en/de. Puni prijevodi svih 11 fajlova po jeziku
   (~700 ključeva) + `lang/de.json` za Laravelove mail stringove; prekidač sa
   zastavicama (SVG, ne emoji — Windows ne renderuje emoji zastave) u traci i na
@@ -724,7 +724,39 @@ bez gubitka podataka.
   Labele navigacionih grupa u `HomePanelProvider` su prebačene u closure:
   panel se gradi prije nego middleware postavi jezik, pa je direktan `__()`
   zamrzavao bosanske nazive i redoslijed menija se raspadao na drugom jeziku.
-- **9c** — finalni UX prolaz na tri širine, sigurnosni pregled, README/CLAUDE.
+- **9c** — završni prolaz. Uz planirano (UX na tri širine, sigurnosni pregled,
+  README/CLAUDE) ušli su i zahtjevi vlasnika:
+  - **Dokumentacija u `docs/`** — u korijenu ostaju `README.md` i `CLAUDE.md` od
+    nekoliko linija koji uvozi `docs/CLAUDE.md` (Claude Code čita korijenski
+    `CLAUDE.md` sam; bez uvoza bi pravila prestala da se učitavaju).
+    `PRAVILA.md` → `RULES.md`; sve reference usklađene.
+  - **Gradient i stakleni efekat** — topla paleta (terakota → medena → krem):
+    podloga stranice, traka i meni, kartice, prijava, hero. Zamagljenost iza
+    panela je isti recept koji su već imali brzo dodavanje i pretraga, pa je
+    efekat kroz aplikaciju jedan; sami paneli ostaju puni radi čitljivosti.
+    Rezerve za `prefers-reduced-transparency` i za browser bez `backdrop-filter`.
+  - **Zvonce otvara panel s desne strane** na širokim ekranima (korisnik pročita
+    i potvrdi bez napuštanja stranice); na uskim i dalje vodi na punu stranicu.
+    Logika sandučeta je izdvojena u trait, pa panel i stranica ne mogu odstupiti.
+  - **Nazivi aplikacija i dugmad brzog dodavanja nisu pratili jezik** — dopuna
+    Faze 9b: `config/homeos-apps.php` je nosio gotov tekst, a config se u
+    produkciji kešira, pa je `__()` u njemu zamrzavao jezik. Sada nosi prijevodne
+    ključeve koje razrješavaju `ModuleRegistry::name()` i `QuickCaptureRegistry`.
+  - **„Sada" u brzom dodavanju podsjetnika** — ista radnja kao `suffixAction` na
+    klasičnoj formi; kalendar i format (`d.m.Y H:i`, 24h) su već bili isti.
+  - **Sinhronizacija jezika** localStorage ↔ nalog: prijavljenom je `users.locale`
+    istina (klijent se poravnava po njemu), gostu se zapamćeni jezik vraća serveru
+    jednom po otvaranju pretraživača.
+  - **Sve rute na engleskom** (`RULES.md` §12): `/invitation/{token}`,
+    `/language/{locale}`, `/search`, `/quick-add/{key}`, `/calendar/events`,
+    `/profile/avatar/{user}`, slug `finance-overview`. Imena ruta nepromijenjena,
+    pa nijedan `route()` poziv nije diran.
+  - **Emailovi u stilu aplikacije** — vlastita markdown tema (`homeos.css`), znak
+    i naziv u zaglavlju, potpis `©elvismemic v<verzija>` iz istog izvora kao
+    aplikacija. Znak je složen HTML-om, ne SVG-om: Gmail izbacuje `<svg>`, a
+    vanjske slike su blokirane dok korisnik ne dopusti prikaz.
+  - **Sigurnosni pregled** — svaka javna ruta i endpoint koji upisuje podatke
+    imaju `throttle`, i to provjerava test (`SecurityTest`), ne komentar.
 
 1. Testno pokrivanje ključnih tokova (feature testovi po modulu).
 2. Ažuriranje `README.md` i `CLAUDE.md` sa svim naučenim tokom razvoja.
@@ -739,12 +771,12 @@ bez gubitka podataka.
 višejezičnost diraju svaki string u sistemu, pa finalni UX prolaz (tačka 3) ima
 smisla tek nakon njih:**
 
-5. **Rebrend „Home OS" → „Home OS plus"** kroz cijeli sistem, a ne samo naslov:
+5. **Rebrend „Home OS" → „HomeOS plus"** kroz cijeli sistem, a ne samo naslov:
    - `APP_NAME` (`.env.example`, `.env.prod.example`, CI/deploy okruženje),
      naslov panela i `<title>`, login/registracija, prazna stanja koja spominju
      naziv, email šabloni i potpis digesta, `README.md`/`SUBMISSION.md`.
    - Provjeriti da nigdje nije hardkodovan naziv u Blade/PHP-u — ide kroz
-     `config('app.name')` odnosno prijevod (`docs/PRAVILA.md` §1).
+     `config('app.name')` odnosno prijevod (`RULES.md` §1).
    - Domena, ime repozitorija, Docker/DB imena i `homeos.imel.cloud` se **NE**
      mijenjaju (infrastruktura ostaje ista) — mijenja se samo ono što korisnik
      vidi. To eksplicitno navesti u commit poruci da se kasnije ne "ispravlja".
@@ -766,7 +798,7 @@ smisla tek nakon njih:**
      izvora, ne iz `Accept-Language`.
    - Email obavještenja i digest se šalju na jeziku **primaoca** (član, ne
      pošiljalac) — Notification klase moraju postaviti locale prije renderovanja.
-   - Datumi/valuta ostaju po `docs/PRAVILA.md` §6 (24h, `d.m.Y`, KM) na svim
+   - Datumi/valuta ostaju po `RULES.md` §6 (24h, `d.m.Y`, KM) na svim
      jezicima — ne prevoditi format u lokalne konvencije.
    - Testovi: za svaki jezik jedan smoke test da se ključne stranice renderuju i
      da nema nedostajućih ključeva (usporedba skupa ključeva `bs` vs `en`/`de`).
@@ -797,9 +829,7 @@ smisla tek nakon njih:**
      (ne smije se vratiti na staru vrijednost pri sljedećem pollu).
 
 9. **Health ruta na engleski.** `/zdravlje` (Faza 8) preimenovati u `/health`.
-   Korisnički vidljive rute ostaju na bosanskom (`/pozivnica/{token}`), ali ovo
-   je tehnički endpoint koji zovu deploy skripta i uptime monitori — takvi se po
-   konvenciji pišu engleski i tako ih prepoznaje svako ko preuzme sistem.
+   Korisnički vidljive rute su na također na engleskom (`/invitation/{token}`).
    Mijenja se zajedno: `routes/web.php`, URL u `.github/workflows/deploy.yml`
    (health-check korak), i spomeni u `SUBMISSION.md`/`ROADMAP.md`. Ime rute je
    već `health`, pa se `route('health')` ne mijenja.

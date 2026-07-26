@@ -12,7 +12,7 @@ use Illuminate\Support\Collection;
 
 /**
  * Ljubimci u univerzalnoj pretrazi — po vlastitom tekstu zapisa (ime + bilješka),
- * kako nalaže docs/PRAVILA.md §8.
+ * kako nalaže docs/RULES.md §8.
  */
 class PetSearchProvider implements SearchProviderContract
 {

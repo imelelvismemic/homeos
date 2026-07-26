@@ -58,7 +58,7 @@ window.initHomeosCalendar = function (el, eventsUrl) {
         },
         allDayText: 'Cijeli dan',
         noEventsText: 'Nema događaja za prikaz',
-        // 24-satni format bez AM/PM (docs/PRAVILA.md §6) — FullCalendar po
+        // 24-satni format bez AM/PM (docs/RULES.md §6) — FullCalendar po
         // defaultu koristi engleski 12-satni prikaz u sedmici/danu/listi.
         eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
         slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },

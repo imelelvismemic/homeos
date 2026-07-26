@@ -115,4 +115,23 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Markdown Mail Settings
+    |--------------------------------------------------------------------------
+    |
+    | Tema emailova (Faza 9c) prati vizuelni identitet aplikacije, umjesto
+    | Laravelovog default izgleda — `resources/views/vendor/mail/html/themes/
+    | homeos.css`. Šabloni su objavljeni u `resources/views/vendor/mail`.
+    |
+    */
+
+    'markdown' => [
+        'theme' => 'homeos',
+
+        'paths' => [
+            resource_path('views/vendor/mail'),
+        ],
+    ],
+
 ];

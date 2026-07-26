@@ -3,6 +3,54 @@
 
 @config './tailwind.config.js';
 
+/*
+ * ============================================================================
+ * Tokeni: topli gradient + staklo (ROADMAP Faza 9c)
+ * ============================================================================
+ * Gradient ostaje u paleti "Topli dom": terakota → medena → krem. Definisan je
+ * JEDNOM ovdje i koristi se preko `var(...)` — da se ne razilazi po ekranima
+ * (isti razlog zbog kojeg naziv i verzija žive u config/homeos.php).
+ *
+ * Staklo se svuda gradi od dvije stvari: poluprozirna podloga + `backdrop-filter`.
+ * Zato podloga aplikacije NIJE ravna boja — bez nečega ispod, staklo nema šta
+ * zamutiti i efekat se ne vidi.
+ */
+:root {
+    --homeos-gradient-warm: linear-gradient(
+        135deg,
+        #a9502c 0%,
+        #bf6a44 38%,
+        #d99a3c 78%,
+        #e8c79a 100%
+    );
+
+    /* Podloga stranice: dvije mekane tople "aure" na kremastoj osnovi. */
+    --homeos-page-wash:
+        radial-gradient(70rem 40rem at 12% -10%, rgba(191, 106, 68, 0.16), transparent 65%),
+        radial-gradient(60rem 36rem at 100% 0%, rgba(217, 154, 60, 0.14), transparent 60%),
+        radial-gradient(50rem 40rem at 50% 120%, rgba(62, 124, 140, 0.08), transparent 60%);
+
+    --homeos-glass-bg: rgba(255, 255, 255, 0.72);
+    --homeos-glass-bg-strong: rgba(255, 255, 255, 0.85);
+    --homeos-glass-border: rgba(255, 255, 255, 0.6);
+    --homeos-glass-ring: rgba(87, 51, 33, 0.08);
+    --homeos-glass-blur: 8px;
+}
+
+.dark {
+    /* U tamnoj temi ista logika, samo hladnije i tiše — inače gradient "svijetli"
+       kroz staklo i tekst gubi kontrast. */
+    --homeos-page-wash:
+        radial-gradient(70rem 40rem at 12% -10%, rgba(191, 106, 68, 0.2), transparent 65%),
+        radial-gradient(60rem 36rem at 100% 0%, rgba(217, 154, 60, 0.12), transparent 60%),
+        radial-gradient(50rem 40rem at 50% 120%, rgba(62, 124, 140, 0.1), transparent 60%);
+
+    --homeos-glass-bg: rgba(28, 25, 23, 0.66);
+    --homeos-glass-bg-strong: rgba(28, 25, 23, 0.86);
+    --homeos-glass-border: rgba(255, 255, 255, 0.08);
+    --homeos-glass-ring: rgba(0, 0, 0, 0.4);
+}
+
 @layer base {
     /*
      * Display font (Fraunces) — suzdržano, samo glavni naslovi i hero
@@ -13,6 +61,17 @@
         font-family: 'Fraunces', ui-serif, Georgia, serif;
         font-weight: 600;
         letter-spacing: -0.01em;
+    }
+
+    /*
+     * Podloga cijele aplikacije. `fixed` attachment: aure ostaju na mjestu pri
+     * skrolu, pa staklene površine prelaze preko njih i efekat je vidljiv u
+     * pokretu, a ne samo na vrhu stranice.
+     */
+    .fi-body {
+        background-image: var(--homeos-page-wash);
+        background-attachment: fixed;
+        background-repeat: no-repeat;
     }
 
     /*
@@ -64,6 +123,152 @@
         *::after {
             animation-duration: 0.01ms !important;
             transition-duration: 0.01ms !important;
+        }
+    }
+}
+
+@layer components {
+    /*
+     * Staklena površina — jedna klasa, jedno ponašanje. Sve što treba staklo
+     * dobija je kroz `@apply`-slobodan `composes` obrazac: selektori niže samo
+     * pozivaju iste varijable, da se efekat ne raspadne na jednom mjestu.
+     */
+    .homeos-glass {
+        background-color: var(--homeos-glass-bg);
+        backdrop-filter: blur(var(--homeos-glass-blur)) saturate(140%);
+        -webkit-backdrop-filter: blur(var(--homeos-glass-blur)) saturate(140%);
+        border-color: var(--homeos-glass-border);
+    }
+
+    /*
+     * Traka i bočni meni: staklo preko podloge stranice. `!important` je nužan
+     * jer Filament nosi `bg-white dark:bg-gray-900` kao utility klasu direktno
+     * na elementu — specifičnost je ista, a utility dolazi kasnije u ispisu.
+     */
+    .fi-topbar,
+    .fi-topbar > nav,
+    .fi-sidebar,
+    .fi-sidebar-header {
+        background-color: var(--homeos-glass-bg) !important;
+        backdrop-filter: blur(var(--homeos-glass-blur)) saturate(140%);
+        -webkit-backdrop-filter: blur(var(--homeos-glass-blur)) saturate(140%);
+    }
+
+    /* Sadržajne površine: kartice widgeta, sekcije formi, tabele. */
+    .fi-wi-stats-overview-stat,
+    .fi-section,
+    .fi-ta-ctn {
+        background-color: var(--homeos-glass-bg) !important;
+        backdrop-filter: blur(6px) saturate(125%);
+        -webkit-backdrop-filter: blur(6px) saturate(125%);
+    }
+
+    /*
+     * Modali: zamagljenost pripada PODLOZI, ne panelu — isti recept koji već
+     * imaju brzo dodavanje i univerzalna pretraga (`bg-gray-950/50
+     * backdrop-blur-sm` na sloju preko sadržaja, pun panel iznad njega).
+     * Filamentovi modali po defaultu samo potamne pozadinu, pa im se blur
+     * dodaje ovdje — tako je efekat kroz cijelu aplikaciju jedan i isti, a
+     * tekst u panelu ostaje na punoj podlozi i čitljiv.
+     */
+    .fi-modal-close-overlay {
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* Stranice prijave/registracije: topla gradient podloga ispod staklene kartice. */
+    .fi-simple-layout {
+        background-image: var(--homeos-page-wash);
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+    }
+
+    .fi-simple-main {
+        background-color: var(--homeos-glass-bg-strong) !important;
+        backdrop-filter: blur(12px) saturate(140%);
+        -webkit-backdrop-filter: blur(12px) saturate(140%);
+        border: 1px solid var(--homeos-glass-border);
+    }
+
+    /*
+     * Hero na početnoj (signature element). Gradient ide 135deg, pa je najsvjetliji
+     * ton u DONJEM DESNOM uglu — dalje od teksta. Preko njega ide topla sjena u
+     * gornjem lijevom uglu, tako da bijeli tekst tamo ima kontrast po WCAG AA
+     * bez obzira na širinu ekrana (na uskom ekranu bi inače medena/krem zona
+     * došla pod naslov i tekst bi se izgubio).
+     */
+    .homeos-hero {
+        background-image: var(--homeos-gradient-warm);
+    }
+
+    .homeos-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+            120% 110% at 0% 0%,
+            rgba(74, 28, 10, 0.5) 0%,
+            rgba(74, 28, 10, 0.2) 45%,
+            transparent 72%
+        );
+        pointer-events: none;
+    }
+
+    /* Staklena "kugla" u hero uglu — jedini ukrasni element, bez animacije. */
+    .homeos-hero::after {
+        content: '';
+        position: absolute;
+        right: -3rem;
+        bottom: -5rem;
+        height: 16rem;
+        width: 16rem;
+        border-radius: 9999px;
+        background-color: rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        pointer-events: none;
+    }
+
+    .homeos-hero > * {
+        position: relative;
+    }
+
+    /*
+     * Rezerve. Staklo je ukras, ne nosilac informacije — gdje ga browser ili
+     * korisnička postavka ne podržava, površine moraju ostati pune i čitljive,
+     * ne poluprozirne mrlje.
+     */
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+        :root {
+            --homeos-glass-bg: #ffffff;
+            --homeos-glass-bg-strong: #ffffff;
+        }
+
+        .dark {
+            --homeos-glass-bg: #1c1917;
+            --homeos-glass-bg-strong: #1c1917;
+        }
+    }
+
+    /* Korisnik je u sistemu tražio manje prozirnosti — poštuje se. */
+    @media (prefers-reduced-transparency: reduce) {
+        :root {
+            --homeos-glass-bg: #ffffff;
+            --homeos-glass-bg-strong: #ffffff;
+        }
+
+        .dark {
+            --homeos-glass-bg: #1c1917;
+            --homeos-glass-bg-strong: #1c1917;
+        }
+
+        .fi-body,
+        .fi-simple-layout {
+            background-image: none;
+        }
+
+        .homeos-hero::after {
+            display: none;
         }
     }
 }

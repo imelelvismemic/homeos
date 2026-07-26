@@ -27,7 +27,7 @@ class MonthlyOverview extends Page
 
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static ?string $slug = 'finansije-pregled';
+    protected static ?string $slug = 'finance-overview';
 
     protected static string $view = 'filament.finance.pages.overview';
 

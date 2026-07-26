@@ -78,16 +78,24 @@ class HomePanelProvider extends PanelProvider
             // tenant ruta, pa ima puni kontekst domaćinstva.
             ->tenantProfile(EditHouseholdProfile::class)
             // Endpointi koje topbar modali (pretraga, brzo dodavanje) zovu fetch-om.
+            // Putanje su ENGLESKI (RULES.md §12) — korisnički tekst je na jeziku
+            // korisnika, ali URL je dio koda i ne prevodi se.
             // Rute panela → SetUpPanel middleware (Filament kontekst); auth/tenant
             // provjera je u kontrolerima (kao SearchController).
             ->routes(function (): void {
-                Route::get('/pretraga', SearchController::class)->name('search');
-                Route::post('/brzo/{key}', QuickCreateController::class)->name('quick-create');
+                Route::get('/search', SearchController::class)->name('search');
+                // Brzo dodavanje upisuje podatke, a modal ga zove fetch-om — granica
+                // je zaštita od nenamjernog "zaglavljenog" klika i od zloupotrebe
+                // tuđim nalogom (sigurnosni pregled, Faza 9c). 60/min je daleko
+                // iznad ljudskog tempa unosa.
+                Route::post('/quick-add/{key}', QuickCreateController::class)
+                    ->middleware('throttle:60,1')
+                    ->name('quick-create');
                 // Kalendar dohvata događaje po prikazanom rasponu (FullCalendar feed),
                 // pa se nakon brzog dodavanja osvježi bez promjene mjeseca.
-                Route::get('/kalendar/dogadjaji', CalendarEventsController::class)->name('calendar-events');
+                Route::get('/calendar/events', CalendarEventsController::class)->name('calendar-events');
                 // Profilna slika s privatnog diska (autentikovano).
-                Route::get('/profil/slika/{user}', AvatarController::class)->name('avatar');
+                Route::get('/profile/avatar/{user}', AvatarController::class)->name('avatar');
             })
             // Custom tema "Topli dom" (CLAUDE.md §6). Paleta kroz ->colors()
             // (Filament generiše CSS varijable); Fraunces/Inter i signature
@@ -128,7 +136,7 @@ class HomePanelProvider extends PanelProvider
             ->widgets([])
             // Univerzalna pretraga (command palette, Ctrl/Cmd+K) na početku topbara,
             // ispred hamburgera na tabletu/mobilnom. Čisti Alpine modal + fetch ka
-            // /pretraga (bez Livewire → nema /livewire/update ni 419).
+            // /search (bez Livewire → nema /livewire/update ni 419).
             ->renderHook(
                 PanelsRenderHook::TOPBAR_START,
                 function (): string {
@@ -160,7 +168,7 @@ class HomePanelProvider extends PanelProvider
             )
             // "Brzo dodaj" — Alpine modal nad trenutnom stranicom (zamagljena
             // pozadina, kao command palette): korisnik doda minimalne podatke,
-            // snimi šalje fetch POST na /brzo/{key}, modal se zatvori i korisnik
+            // snimi šalje fetch POST na /quick-add/{key}, modal se zatvori i korisnik
             // ostaje gdje je bio (bez navigacije, bez Livewire → bez 419).
             // GLOBAL_SEARCH_AFTER (a ne TOPBAR_END) jer se TOPBAR_END renderuje
             // NAKON korisničkog menija — a redoslijed s desna nalijevo treba biti:

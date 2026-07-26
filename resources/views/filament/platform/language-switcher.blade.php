@@ -9,7 +9,42 @@
 @endphp
 
 <div
-    x-data="{ open: false }"
+    x-data="{
+        open: false,
+        current: @js($current),
+        authenticated: @js(auth()->check()),
+        supported: @js(array_keys($locales)),
+
+        remember(code) {
+            try { localStorage.setItem('homeos_locale', code); } catch (e) { /* privatni prozor */ }
+        },
+
+        /*
+         * Sinhronizacija izbora jezika između pretraživača i naloga.
+         *
+         * Prijavljen korisnik: `users.locale` je istina — nosi ga na svaki uređaj
+         * i u email obavještenja, pa se klijent poravnava po njemu. Obrnuto bi
+         * značilo da tuđi izbor na zajedničkom računaru prepiše jezik naloga.
+         *
+         * Gost: sesija istekne, localStorage ostaje — pa se zapamćeni jezik vrati
+         * serveru jednom po otvaranju pretraživača (sessionStorage je zaštita da
+         * ne pravimo petlju ako server izbor ne prihvati).
+         */
+        sync() {
+            let stored = null;
+
+            try { stored = localStorage.getItem('homeos_locale'); } catch (e) { return; }
+
+            if (this.authenticated) { this.remember(this.current); return; }
+
+            if (! stored || stored === this.current || ! this.supported.includes(stored)) return;
+            if (sessionStorage.getItem('homeos_locale_synced')) return;
+
+            sessionStorage.setItem('homeos_locale_synced', '1');
+            this.$refs['form-' + stored]?.submit();
+        },
+    }"
+    x-init="sync()"
     @keydown.escape="open = false"
     @click.outside="open = false"
     class="homeos-language-switcher relative"
@@ -38,10 +73,11 @@
         class="absolute end-0 z-50 mt-1 w-44 overflow-hidden rounded-lg bg-white py-1 shadow-lg ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10"
     >
         @foreach ($locales as $code => $label)
-            <form method="POST" action="{{ route('locale', ['locale' => $code]) }}">
+            <form method="POST" action="{{ route('locale', ['locale' => $code]) }}" x-ref="form-{{ $code }}">
                 @csrf
                 <button
                     type="submit"
+                    x-on:click="remember(@js($code))"
                     @class([
                         'flex w-full items-center gap-2 px-3 py-2 text-sm outline-none transition hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-white/5 dark:focus-visible:bg-white/5',
                         'font-semibold text-primary-600 dark:text-primary-400' => $code === $current,

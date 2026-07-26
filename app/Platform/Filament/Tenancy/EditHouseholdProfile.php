@@ -130,13 +130,18 @@ class EditHouseholdProfile extends EditTenantProfile implements HasTable
      * Prekidač po modulu — lista i nazivi dolaze iz registryja
      * (config/homeos-apps.php), pa nova app dobija svoj prekidač sama od sebe.
      *
+     * Naziv ide kroz `ModuleRegistry::name()`, koji razrješava prijevodni ključ iz
+     * configa (Faza 9c) — sam config nosi ključ, jer se u produkciji kešira.
+     *
      * @return array<int, Toggle>
      */
     private function moduleToggles(): array
     {
-        return app(ModuleRegistry::class)->all()
+        $registry = app(ModuleRegistry::class);
+
+        return $registry->all()
             ->map(fn (array $app, string $key) => Toggle::make("module_{$key}")
-                ->label($app['name'] ?? $key)
+                ->label(fn (): string => $registry->name($key))
                 ->inline(false)
                 ->disabled(! static::currentUserIsOwner()))
             ->values()

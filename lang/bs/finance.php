@@ -23,6 +23,7 @@ return [
     'transactions' => [
         'label' => 'Transakcija',
         'plural_label' => 'Transakcije',
+        'quick_capture' => 'Novi trošak',
         'navigation_label' => 'Transakcije',
         'fields' => [
             'type' => 'Vrsta',
@@ -50,6 +51,7 @@ return [
     'bills' => [
         'label' => 'Račun',
         'plural_label' => 'Računi',
+        'quick_capture' => 'Novi račun',
         'navigation_label' => 'Računi i pretplate',
         'fields' => [
             'title' => 'Naziv',

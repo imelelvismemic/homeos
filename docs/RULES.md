@@ -204,3 +204,36 @@ expect((new ReminderDue($r))->toMail($member)->actionUrl)->toContain((string) $r
 Isti obrazac vrijedi za svaku zamjenu produkcijskog sloja u testu (vidi i vezu
 `DatabaseDumper` iz Faze 8): ako test veže lažnu implementaciju, mora postojati i
 test koji provjerava **pravu**.
+
+## 12. Rute su na engleskom
+
+URL je dio koda, ne korisnički tekst. Korisnički vidljiv tekst ide kroz
+`lang/<jezik>/*` (§1) i mijenja se s izborom jezika; putanja ne — jedna adresa
+mora voditi na isto mjesto bez obzira na kojem jeziku korisnik radi. Bosanske
+putanje su i praktično problem: dijeljen link nosi dijakritike ili njihovu
+transliteraciju, a ko preuzme projekat čita URL bez konteksta.
+
+- **Sve putanje su na engleskom**, u `kebab-case`: `/invitation/{token}`,
+  `/language/{locale}`, `/search`, `/quick-add/{key}`, `/calendar/events`,
+  `/profile/avatar/{user}`, `/health`.
+- Filament Resource putanje dolaze iz slug-a resursa; ako se slug postavlja
+  ručno (`protected static ?string $slug`), i on je engleski
+  (`finance-overview`, ne `finansije-pregled`).
+- **Ime rute se ne mijenja kad se putanja mijenja** — sav kod zove
+  `route('household-invitation', …)`, pa preimenovanje putanje ne dira ni jedan
+  poziv. Ako se ime ipak mora mijenjati, mijenja se svuda odjednom.
+- **Putanja koja je već otišla korisnicima ne smije prestati raditi.** Kad se
+  preimenuje ruta iz emaila (pozivnica, obnova lozinke), stara ostaje kao
+  redirect na novu — takvi linkovi žive u sandučetima danima. Pri preimenovanju
+  u Fazi 9c redirect nije zadržan, jer je vlasnik potvrdio da nijedna pozivnica
+  nije poslana van razvoja; da nije tako, redirect bi bio obavezan.
+- **Svaka javna ruta ima `throttle`.** Prijava, registracija i obnova lozinke to
+  dobijaju od Filamenta (`rateLimit(5)`); naše javne rute i endpointi koji
+  upisuju podatke ograničenje nose eksplicitno, a test to provjerava
+  (`tests/Feature/Platform/SecurityTest.php`) — granica koja postoji samo u
+  komentaru pada prvom izmjenom koja je ne primijeti.
+- **Izuzetak: `/health` ostaje bez `throttle`.** Rate limiter čuva brojače u
+  cacheu, pa bi na pokvarenom cacheu middleware pukao prije kontrolera i endpoint
+  bi vratio 500 — a upravo tada mora odgovoriti i prijaviti `cache: false`.
+  Zdravstveni endpoint ne smije padati s infrastrukturom koju provjerava. Izuzetak
+  je zapisan i u testu, da se ne "popravi" u tišini.

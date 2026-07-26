@@ -2,7 +2,7 @@
 
 // Dopuna nedostajućih ključeva iz vendor/filament/forms/resources/lang/bs/components.php.
 // Paketski bs prijevod nema `file_upload` sekciju, pa je uređivač slike (profilna
-// slika) ostajao na engleskom — docs/PRAVILA.md §1.
+// slika) ostajao na engleskom — docs/RULES.md §1.
 return [
 
     'text_input' => [

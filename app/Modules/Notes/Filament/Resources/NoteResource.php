@@ -92,7 +92,7 @@ class NoteResource extends ModuleResource
                     ->label(__('notes.fields.title'))
                     ->getStateUsing(fn (Note $r) => $r->displayTitle())
                     // Bilješka bez naslova se prikazuje kao izvod iz sadržaja, pa
-                    // pretraga mora obuhvatiti i sadržaj (PRAVILA.md §8).
+                    // pretraga mora obuhvatiti i sadržaj (RULES.md §8).
                     ->searchable(query: fn (Builder $query, string $search): Builder => $query
                         ->orWhere('title', 'like', "%{$search}%")
                         ->orWhere('body', 'like', "%{$search}%"))
@@ -111,7 +111,7 @@ class NoteResource extends ModuleResource
                     ->badge()
                     ->separator(',')
                     ->toggleable()
-                    // Pretraga tabele po nazivima oznaka (PRAVILA.md §8).
+                    // Pretraga tabele po nazivima oznaka (RULES.md §8).
                     ->searchable(query: fn (Builder $query, string $search): Builder => $query->orWhereHas(
                         'tags',
                         fn (Builder $q) => $q->where('name', 'like', "%{$search}%"),
@@ -125,7 +125,7 @@ class NoteResource extends ModuleResource
             ])
             ->defaultSort('updated_at', 'desc')
             // Dnevnik je zasebna kartica na listi (ListNotes::getTabs), pa isti
-            // izbor nema i kao filter — jedan pojam, jedno mjesto (PRAVILA.md §5).
+            // izbor nema i kao filter — jedan pojam, jedno mjesto (RULES.md §5).
             ->filters([])
             ->actions([
                 EditAction::make(),

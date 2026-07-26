@@ -3,7 +3,7 @@
      šalje fetch POST na /brzo/{key}, modal se zatvori i korisnik ostaje gdje je
      bio (bez navigacije, bez Livewire → bez 419). Tipovi/polja iz
      QuickCaptureRegistry; ikone su native Filament ikone (renderovane server-side).
-     Datum koristi flatpickr (d.m.Y H:i, 24h) radi PRAVILA.md §6. --}}
+     Datum koristi flatpickr (d.m.Y H:i, 24h) radi RULES.md §6. --}}
 @vite('resources/js/quick-capture.js')
 
 <div
@@ -18,9 +18,24 @@
         saving: false,
         saved: false,
         prefillDate: null,
+        // flatpickr instance po imenu polja — treba nam da dugme „Sada\" može
+        // postaviti vrijeme i u kalendaru, ne samo u modelu (inače korisnik
+        // vidi prazno polje a šalje se vrijednost).
+        pickers: {},
         get activeItem() { return this.items.find((i) => i.key === this.activeKey) || null; },
         openModal(date = null) { this.open = true; this.reset(); this.prefillDate = this.normalizeDate(date); },
-        reset() { this.activeKey = null; this.form = {}; this.errors = {}; this.saved = false; this.prefillDate = null; },
+        reset() { this.activeKey = null; this.form = {}; this.errors = {}; this.saved = false; this.prefillDate = null; this.pickers = {}; },
+        // Isto ponašanje kao „Sada\" na klasičnoj formi podsjetnika
+        // (ReminderResource: suffixAction → set(due_date, now())).
+        setNow(name) {
+            const picker = this.pickers[name];
+            if (picker) { picker.setDate(new Date(), true); return; }
+            // Bez flatpickra (npr. blokiran asset) polje ostaje obično tekstualno,
+            // pa vrijednost upisujemo u formatu koji server očekuje.
+            const d = new Date();
+            const p = (n) => String(n).padStart(2, '0');
+            this.form[name] = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+        },
         // Kalendar javlja dan (ili tačan termin) klikom — pretvori u 'Y-m-d H:i'
         // koji očekuje flatpickr; za cijeli dan uzmi 09:00 kao razuman početak.
         normalizeDate(raw) {
@@ -53,6 +68,8 @@
                         altFormat: withTime ? 'd.m.Y H:i' : 'd.m.Y',
                         onChange: (dates, str) => { this.form[name] = str; },
                     });
+
+                    this.pickers[name] = picker;
 
                     // Dan izabran u kalendaru → već upisan u polje datuma/vremena.
                     if (this.prefillDate) {
@@ -157,14 +174,27 @@
                                             class="block w-full rounded-lg border-none bg-white text-sm text-gray-950 shadow-sm ring-1 ring-gray-950/10 focus:ring-2 focus:ring-primary-500 dark:bg-white/5 dark:text-white dark:ring-white/20"
                                         ></textarea>
                                     </template>
+                                    {{-- Datum i vrijeme: isti kalendar i isti format kao klasična
+                                         forma (d.m.Y H:i, 24h), plus dugme „Sada" — ista radnja
+                                         koju tamo nosi suffixAction na DateTimePickeru. --}}
                                     <template x-if="field.type === 'datetime'">
-                                        <input
-                                            type="text"
-                                            data-qc-field
-                                            x-bind:data-qc-datetime="field.name"
-                                            placeholder="dd.mm.gggg ss:mm"
-                                            class="block w-full rounded-lg border-none bg-white text-sm text-gray-950 shadow-sm ring-1 ring-gray-950/10 focus:ring-2 focus:ring-primary-500 dark:bg-white/5 dark:text-white dark:ring-white/20"
-                                        />
+                                        <div class="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                data-qc-field
+                                                x-bind:data-qc-datetime="field.name"
+                                                placeholder="dd.mm.gggg ss:mm"
+                                                class="block w-full rounded-lg border-none bg-white text-sm text-gray-950 shadow-sm ring-1 ring-gray-950/10 focus:ring-2 focus:ring-primary-500 dark:bg-white/5 dark:text-white dark:ring-white/20"
+                                            />
+                                            <button
+                                                type="button"
+                                                x-on:click="setNow(field.name)"
+                                                class="flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-primary-600 transition hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-500/10"
+                                            >
+                                                <x-filament::icon icon="heroicon-m-clock" class="h-4 w-4" />
+                                                {{ __('platform.quick_capture.now') }}
+                                            </button>
+                                        </div>
                                     </template>
                                     <template x-if="field.type === 'date'">
                                         <input

@@ -133,7 +133,7 @@ class ReminderResource extends ModuleResource
                     ->label(__('reminders.fields.assigned_to'))
                     ->placeholder('—')
                     ->toggleable()
-                    // Pretraga tabele po imenu odgovorne osobe (PRAVILA.md §8).
+                    // Pretraga tabele po imenu odgovorne osobe (RULES.md §8).
                     ->searchable(query: fn (Builder $query, string $search): Builder => $query->orWhereHas(
                         'assignee.user',
                         fn (Builder $q) => $q->where('name', 'like', "%{$search}%"),

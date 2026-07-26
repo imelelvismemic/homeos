@@ -23,6 +23,7 @@ return [
     'transactions' => [
         'label' => 'Buchung',
         'plural_label' => 'Buchungen',
+        'quick_capture' => 'Neue Ausgabe',
         'navigation_label' => 'Buchungen',
         'fields' => [
             'type' => 'Art',
@@ -50,6 +51,7 @@ return [
     'bills' => [
         'label' => 'Rechnung',
         'plural_label' => 'Rechnungen',
+        'quick_capture' => 'Neue Rechnung',
         'navigation_label' => 'Rechnungen und Abos',
         'fields' => [
             'title' => 'Bezeichnung',

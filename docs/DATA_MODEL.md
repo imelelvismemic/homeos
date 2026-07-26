@@ -430,7 +430,7 @@ return [
 `EUR`; postojeća domaćinstva su migracijom prebačena na `BAM` jer su iznosi
 unošeni kao marke). Iznosi u tabelama ostaju `decimal(12,2)` bez valute — valuta
 je svojstvo domaćinstva, ne pojedinačnog zapisa. Ispis ide isključivo kroz
-`App\Platform\Support\Currency` (`docs/PRAVILA.md` §10); modul koji prikazuje
+`App\Platform\Support\Currency` (`RULES.md` §10); modul koji prikazuje
 iznose deklariše `'uses_currency' => true` u registryju, čime se izbor valute
 pojavi u postavkama domaćinstva.
 
@@ -470,7 +470,7 @@ Pravila:
 Popuniti odmah u Fazi 0, prije prve migracije:
 
 ```
-APP_NAME="Home OS"
+APP_NAME="HomeOS plus"
 APP_ENV=local
 APP_KEY=
 APP_DEBUG=true

@@ -47,7 +47,10 @@ class QuickCaptureRegistry
                 ->filter(fn (array $definition) => ! empty($definition['handler']))
                 ->map(fn (array $definition) => [
                     'key' => $this->keyFor($moduleKey, $app, $definition),
-                    'label' => $definition['label'] ?? ($app['name'] ?? $moduleKey),
+                    // Config nosi prijevodni ključ (kešira se u produkciji), pa se
+                    // prijevod razrješava ovdje — inače su dugmad brzog dodavanja
+                    // na jeziku onoga ko je pravio keš (Faza 9c).
+                    'label' => __($definition['label'] ?? ($app['name'] ?? $moduleKey)),
                     'icon' => $definition['icon'] ?? $app['icon'] ?? null,
                     'fields' => $this->fields($definition),
                 ])
@@ -103,6 +106,11 @@ class QuickCaptureRegistry
         return collect($definition['fields'] ?? [])
             ->map(function (array $field): array {
                 $options = $field['options'] ?? null;
+
+                // Labela polja je prijevodni ključ iz configa (Faza 9c).
+                if (isset($field['label'])) {
+                    $field['label'] = __($field['label']);
+                }
 
                 if (is_callable($options)) {
                     $options = $options();

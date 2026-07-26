@@ -68,7 +68,7 @@ it('stores the avatar on the private disk and removes it when cleared', function
     $owner->user->update(['avatar_path' => 'avatars/slika.png']);
     Storage::disk('documents')->put('avatars/slika.png', 'fake');
 
-    expect($owner->user->fresh()->getFilamentAvatarUrl())->toContain('/profil/slika/');
+    expect($owner->user->fresh()->getFilamentAvatarUrl())->toContain('/profile/avatar/');
 
     Livewire::test(UserProfile::class)
         ->fillForm([

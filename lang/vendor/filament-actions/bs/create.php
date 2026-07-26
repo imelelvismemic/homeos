@@ -1,7 +1,7 @@
 <?php
 
 // Override paketskih bs prijevoda za "create" akciju (koristi je i relation
-// manager, npr. dodavanje podzadatka). Vidi docs/PRAVILA.md.
+// manager, npr. dodavanje podzadatka). Vidi docs/RULES.md.
 
 return [
 

@@ -12,7 +12,7 @@ class ListShoppingLists extends ListRecords
 
     // Naslov više ne treba override — rečeničnu kapitalizaciju nosi zajednička
     // osnova ModuleResource ($hasTitleCaseModelLabel = false), pa vrijedi za sve
-    // module odjednom (docs/PRAVILA.md §2).
+    // module odjednom (docs/RULES.md §2).
     protected function getHeaderActions(): array
     {
         return [CreateAction::make()->label(__('lifeadmin.lists.headings.create'))];

@@ -163,7 +163,7 @@ it('universal search matches task text (title/description) but not assignee or t
     expect(app(SearchService::class)->search('paprika', $household))->toHaveCount(1);
 
     // Po oznaci i imenu odgovorne osobe ZADATAK se ne nalazi — to je u pretrazi
-    // liste zadataka (PRAVILA.md §8). Ime člana ipak daje rezultat, ali tipa
+    // liste zadataka (RULES.md §8). Ime člana ipak daje rezultat, ali tipa
     // 'member' (pretraga članova domaćinstva), ne 'task'.
     expect(app(SearchService::class)->search('vikend', $household))->toBeEmpty();
 

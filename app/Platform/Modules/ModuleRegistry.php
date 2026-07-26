@@ -36,6 +36,22 @@ class ModuleRegistry
     }
 
     /**
+     * Naziv modula za prikaz, na trenutnom jeziku (Faza 9c).
+     *
+     * `config/homeos-apps.php` nosi PRIJEVODNI KLJUČ, ne gotov tekst: config se u
+     * produkciji kešira, pa bi `__()` pozvan u configu zamrznuo jezik onoga ko je
+     * pravio keš — nazivi aplikacija u postavkama domaćinstva su zbog toga bili
+     * na bosanskom bez obzira na izbor korisnika. Prijevod se zato razrješava
+     * ovdje, pri prikazu.
+     */
+    public function name(string $key): string
+    {
+        $app = config("homeos-apps.{$key}");
+
+        return __($app['name'] ?? $key);
+    }
+
+    /**
      * Moduli dostupni datom domaćinstvu (bez domaćinstva: samo default iz configa).
      *
      * @return Collection<string, array<string, mixed>>

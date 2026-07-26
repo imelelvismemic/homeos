@@ -13,7 +13,7 @@ use Filament\Resources\Resource;
  *
  * 1. **Rečenična kapitalizacija.** Filament po defaultu title-case-uje naslove
  *    izvedene iz labela ("Kućni Ljubimci", "Liste Za Kupovinu"). Bosanski piše
- *    veliko slovo samo na prvoj riječi (docs/PRAVILA.md §2), pa gasimo
+ *    veliko slovo samo na prvoj riječi (docs/RULES.md §2), pa gasimo
  *    `$hasTitleCaseModelLabel`. Ranije se to krpilo `getTitle()` override-om po
  *    stranici, pa se greška vraćala sa svakim novim modulom.
  * 2. **Pripadnost modulu** (`BelongsToModule`): isključen modul nestaje iz

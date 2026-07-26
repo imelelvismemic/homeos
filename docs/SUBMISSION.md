@@ -1,7 +1,7 @@
 <!--
 Ovaj dokument je namijenjen ljudima koji ocjenjuju rješenje, ne Claude Code
 agentu. Za operativni rad na projektu vrijede ROADMAP.md, CLAUDE.md,
-DATA_MODEL.md i docs/ORIGINAL_SPEC.md.
+DATA_MODEL.md i ORIGINAL_SPEC.md.
 
 Dijelovi označeni [POPUNITI ...] se dopunjuju kako projekat napreduje kroz
 faze iz ROADMAP.md — ovaj dokument se ažurira usput, ne piše se tek na
@@ -24,7 +24,7 @@ kao **platforma** na koju se mogu dodavati nove aplikacije bez izmjene
 postojećeg koda. Zadatak je dobijen kao PDF na engleskom, bez definisane
 tehnologije i bez smjernica za deployment.
 
-Puni izvorni tekst: `docs/ORIGINAL_SPEC.md` (prijevod).
+Puni izvorni tekst: `ORIGINAL_SPEC.md` (prijevod).
 
 ---
 
@@ -100,7 +100,7 @@ dokumenta koja Claude Code prati kroz cijeli razvoj:
   jednostavno uklopiv.
 - **`DATA_MODEL.md`** — šema podataka zaključana unaprijed, da moduli ne
   izmišljaju paralelne konvencije za iste koncepte.
-- **`docs/ORIGINAL_SPEC.md`** — izvorni brief, referenca za namjeru kad
+- **`ORIGINAL_SPEC.md`** — izvorni brief, referenca za namjeru kad
   operativni dokumenti ne daju jasan odgovor.
 
 Namjera ovog pristupa: da se apstraktne/arhitekturne odluke donesu
@@ -117,7 +117,7 @@ iznova otkriva:
   Resource, DashboardWidget/SearchProvider/CalendarSource, notifikacije,
   scheduler, testovi, registracija) + naučene Filament zamke. Svaki modul od
   Faze 4 kreće od njega, ne od praznog fajla.
-- **`docs/PRAVILA.md`** — pravila terminologije i pravopisa za sav
+- **`RULES.md`** — pravila terminologije i pravopisa za sav
   korisnički tekst (veliko/malo slovo, dosljedni termini dugmadi
   "Sačuvaj"/"Zatvori", formati datuma, prazna stanja). Nastalo iz QA prolaza
   nakon Faze 3; povezano iz `CLAUDE.md` §13, poštuje ga svaki modul.
@@ -339,7 +339,7 @@ model/DoD/ponavljanje/saldo/oba Resource-a/integracija); Pint čist.
   → `700.00 KM` (umjesto Filament defaulta `BAM 700.00`) — liste, kalendar,
   mjesečni pregled, widget, podsjetnik.
 - **Naslovi formi** (dodaj/uredi) za kategorije/budžete/račune/transakcije usklađeni
-  s `docs/PRAVILA.md` (malo slovo u drugoj riječi); **brisanje budžeta** prikazuje
+  s `RULES.md` (malo slovo u drugoj riječi); **brisanje budžeta** prikazuje
   naziv zapisa u modalu kao ostali moduli.
 - **Odabir mjeseca budžeta** je sada `Select` (mjesec+godina), bez biranja dana.
 - **Račun**: inline "brzo dodaj kategoriju" na formi + filter po kategoriji na listi.
@@ -445,7 +445,7 @@ ispravke koje su dotakle više modula odjednom:
   osvježava odmah; **„Pozovi“** vidi samo vlasnik domaćinstva.
 - **Jezik** — „Columns“ → „Kolone“ na svim listama (tačan paketski ključ) i
   ujednačen termin „lozinka“ umjesto „šifra“ kroz cijeli sistem. Naučeno pravilo
-  zapisano u `docs/PRAVILA.md` (§1, §3, §7, §8) da se ne ponovi u novim modulima.
+  zapisano u `RULES.md` (§1, §3, §7, §8) da se ne ponovi u novim modulima.
 
 **Drugi krug QA-a** (nakon iste provjere vlasnika):
 
@@ -461,7 +461,7 @@ ispravke koje su dotakle više modula odjednom:
 - **Brzo dodavanje** je prošireno: modul može registrovati više tipova unosa
   (`quick_capture` kao lista), pa Finansije nude i trošak i **račun**.
 - **„Nazad“ s forme uređivanja** vodi na listu (`CancelReturnsToList`), a ne na
-  formu dodavanja s koje je korisnik došao — pravilo u `docs/PRAVILA.md` §9 i u
+  formu dodavanja s koje je korisnik došao — pravilo u `RULES.md` §9 i u
   checklisti novog modula.
 - **Mobilna navigacija** — meni više ne završava ispod URL trake browsera.
 
@@ -551,12 +551,12 @@ proširivosti" iznad; ukratko:
   s iznosima, i to preko registry ključa `uses_currency` — platforma ne poznaje
   modul „finance" po imenu. Postojeća domaćinstva su migracijom prebačena na BAM
   (njihovi iznosi su unošeni kao marke; tihi prelazak na EUR bi promijenio
-  značenje podataka). Pravilo: `docs/PRAVILA.md` §10.
+  značenje podataka). Pravilo: `RULES.md` §10.
 - **Kapitalizacija naslova riješena na izvoru:** Filament title-case-uje naslove
   izvedene iz labela („Kućni Ljubimci"), što se dotad krpilo po stranici i vraćalo
   sa svakim novim modulom. Sada svi Resource-i modula nasljeđuju
   `App\Platform\Filament\Resources\ModuleResource`, koja gasi taj Filament
-  prekidač (i nosi pripadnost modulu iz 7a). Pravilo: `docs/PRAVILA.md` §2.
+  prekidač (i nosi pripadnost modulu iz 7a). Pravilo: `RULES.md` §2.
 - Brzo dodavanje je dobilo tip polja `select` (opcije se razrješavaju u zahtjevu,
   radi prijevoda), pa je vrsta ljubimca obavezna i tamo, kao i na punoj formi.
 
@@ -668,4 +668,109 @@ docker compose -f docker-compose.prod.yml exec scheduler ls -lh storage/backups
   onim što moduli vraćaju i redoslijed menija se raspadao.
 - Email obavještenja se testiraju kroz **stvarni mailer** (`array` transport), ne
   kroz `Notification::fake()` — fake ne poziva `toMail()`, pa bi test prošao i da
-  jezik primaoca uopšte ne radi (`docs/PRAVILA.md` §11).
+  jezik primaoca uopšte ne radi (`RULES.md` §11).
+
+**Faza 9c — završni prolaz** (dio 3 od 3, zatvara Fazu 9):
+
+- **Dokumentacija je u `docs/`.** U korijenu ostaju `README.md` i `CLAUDE.md` od
+  nekoliko linija koji uvozi `docs/CLAUDE.md` — Claude Code automatski čita
+  korijenski `CLAUDE.md`, pa bi puno premještanje značilo da se pravila razvoja
+  više ne učitavaju sama, tj. tiho zaobilaženje koje niko ne bi primijetio.
+  `PRAVILA.md` je preimenovan u `RULES.md`; sve reference u dokumentima i kodu su
+  usklađene.
+- **Gradient i stakleni efekat**, u paleti „Topli dom" (terakota → medena → krem):
+  topla podloga stranice, staklena traka i meni, kartice, staklena kartica na
+  prijavi, hero s gradijentom. Zamagljenost iza panela koristi **isti recept koji
+  su već imali brzo dodavanje i univerzalna pretraga**, pa je efekat kroz
+  aplikaciju jedan i prepoznatljiv; paneli su puni, jer tekst u njima ne smije
+  zavisiti od toga šta je slučajno ispod. Hero gradient ide tako da je najsvjetliji
+  ton u donjem desnom uglu, dalje od teksta, plus topla sjena preko zone naslova —
+  bijeli tekst tako drži WCAG AA na svim širinama. Rezerve postoje za
+  `prefers-reduced-transparency` i za browser bez `backdrop-filter`: površine
+  postaju pune, jer staklo je ukras, ne nosilac informacije.
+- **Zvonce otvara panel s desne strane** na širokim ekranima — korisnik pročita i
+  potvrdi obavijest bez napuštanja onoga što radi. Na uskim ekranima panel te
+  širine nije praktičan, pa zvonce vodi na punu stranicu; zato dva okidača
+  razdvojena CSS-om, a ne grananje u JavaScriptu. Logika sandučeta je izdvojena u
+  trait koji dijele panel i stranica — inače bi dva prikaza istog sandučeta
+  vremenom počela pokazivati različit broj nepročitanih.
+- **Dopuna Faze 9b koju je vlasnik uhvatio u testiranju:** nazivi aplikacija u
+  postavkama domaćinstva i dugmad brzog dodavanja ostajali su na bosanskom.
+  Uzrok: `config/homeos-apps.php` je nosio gotov tekst, a config se u produkciji
+  kešira — `__()` u configu bi zamrznuo jezik onoga ko je pravio keš. Sada config
+  nosi **prijevodne ključeve**, koje razrješavaju `ModuleRegistry::name()` i
+  `QuickCaptureRegistry` pri prikazu. Test traži da se svaki ključ iz registryja
+  stvarno razriješi u svim jezicima — pogrešan ključ se inače ne vidi kao greška
+  nego kao sirovi tekst na ekranu.
+- **„Sada" u brzom dodavanju podsjetnika** — ista radnja koju na klasičnoj formi
+  nosi `suffixAction` na `DateTimePicker`-u. Kalendar i format (`d.m.Y H:i`, 24h)
+  su već bili isti; jedina prava razlika ostaje sam widget (flatpickr vs Filamentov
+  picker), jer bi Filamentov zahtijevao da modal postane Livewire komponenta — a
+  on je namjerno bez Livewire-a (iza proxyja je `/livewire/update` obarao 419).
+- **Jezik je sinhronizovan između pretraživača i naloga.** Prijavljenom korisniku
+  je `users.locale` istina i klijent se poravnava po njemu — obrnuto bi značilo da
+  tuđi izbor na zajedničkom računaru prepiše jezik naloga. Gostu se zapamćeni jezik
+  vraća serveru jednom po otvaranju pretraživača, pa izbor preživi istek sesije.
+- **Sve rute su na engleskom** (`RULES.md` §12): `/invitation/{token}`,
+  `/language/{locale}`, `/search`, `/quick-add/{key}`, `/calendar/events`,
+  `/profile/avatar/{user}`, slug `finance-overview`. URL je dio koda, ne korisnički
+  tekst — jedna adresa mora voditi na isto mjesto na svim jezicima. Imena ruta su
+  nepromijenjena, pa nijedan `route()` poziv nije diran.
+- **Emailovi prate stil aplikacije** — vlastita markdown tema (`homeos.css`) s
+  paletom i serifnim naslovom, znak i naziv u zaglavlju, potpis
+  `©elvismemic v<verzija>` iz istog izvora kao u aplikaciji. Znak je složen HTML
+  tabelom i bojama, **ne** SVG-om: Gmail izbacuje `<svg>` iz emaila, Outlook ga ne
+  renderuje, a vanjske slike većina klijenata blokira dok korisnik ne dopusti
+  prikaz — pa bi na mjestu logotipa stajao prazan okvir.
+- **Sigurnosni pregled kao testovi, ne kao spisak namjera:** svaka javna ruta i
+  endpoint koji upisuje podatke imaju `throttle` (prijava/registracija/obnova
+  lozinke to već imaju od Filamenta), član jednog domaćinstva ne može ni ručno
+  izmijenjenim linkom doći do tuđeg (`?h=`, tuđi tenant → 404, ne 403, da se ne
+  potvrdi ni postojanje). Granica koja živi samo u komentaru pada prvom izmjenom
+  koja je ne primijeti.
+- **`README.md` prepisan** — naziv usklađen s rebrendom („HomeOS plus", ne
+  „Home OS"), tabela cijele dokumentacije s putanjama u `docs/`, napomena o tri
+  jezika i emailovima na jeziku primaoca, `/health` kao način da se provjeri
+  stanje instalacije, i objašnjenje zašto korijenski `CLAUDE.md` ostaje.
+- **`CLAUDE.md` (pravila razvoja) dopunjen onim što je faza naučila:** §13
+  Lokalizacija sada nosi tri jezika, `Locales` kao jedini izvor istine, pravilo da
+  novi ključ ide u sva tri jezika, pravilo da `__()` u kodu koji se izvršava pri
+  registraciji providera zamrzne prijevod, i pravilo da email ide na jeziku
+  primaoca. Struktura `lang/` u §4 pokazuje `en/` i `de/`; checklista za novi modul
+  (§14) traži prijevode u sva tri jezika; §18 zabranjuje ključ dodan u samo jedan
+  jezik. Preostala spominjanja starog naziva su ispravljena.
+- **`RULES.md` §12 — nova sekcija „Rute su na engleskom"**: URL je dio koda, ne
+  korisnički tekst; slug postavljen ručno je isto engleski; ime rute se ne mijenja
+  kad se putanja mijenja (zato nijedan `route()` poziv nije diran); putanja koja je
+  već otišla korisnicima ne smije prestati raditi; svaka javna ruta ima `throttle`.
+- **Redirect sa stare bosanske putanje pozivnice je namjerno izostavljen** — prvo
+  je bio dodan, jer pozivnice vrijede 7 dana i mogu čekati u sandučetima; vlasnik je
+  potvrdio da nijedna nije poslana van razvoja, pa je uklonjen. Pravilo je ipak
+  zapisano u `RULES.md`, uz napomenu zašto ovdje nije primijenjeno.
+- **Prijevodi dopunjeni u sva tri jezika** za novi tekst ove faze: brzo dodavanje
+  troška i računa (`finance.transactions.quick_capture`, `finance.bills.quick_capture`),
+  panel obavještenja (`platform.inbox.close`, `platform.inbox.open_all`) i dugme
+  „Sada" (`platform.quick_capture.now`). Test parnosti iz Faze 9b čuva da nijedan
+  ne ostane samo u jednom jeziku.
+- **Emailovi: šabloni objavljeni i tema uvezana** — `resources/views/vendor/mail`
+  (HTML i plain-text varijanta), tema `homeos` registrovana u `config/mail.php`.
+  Plain-text verzija nosi isti potpis, jer je to ono što vide klijenti koji ne
+  prikazuju HTML.
+- **Novi testovi u ovoj fazi:** `SecurityTest` (granice na svim javnim rutama i na
+  endpointu koji upisuje podatke, izolacija domaćinstava kroz `?h=` i kroz tuđi
+  tenant, obavezna prijava za stranice panela), `MailStyleTest` (znak, naziv,
+  potpis, paleta i plain-text alternativa — kroz **stvarni** mailer, jer
+  `Notification::fake()` nikad ne pozove `toMail()`), dva testa za panel zvonca
+  (zatvoreno zvonce ne vuče listu; potvrda iz panela ne zatvara panel i javlja novi
+  broj nepročitanih), i dva jezična (razrješavanje ključeva iz registryja u svim
+  jezicima; nazivi aplikacija i dugmad brzog dodavanja na izabranom jeziku).
+- **Build je provjeren, ne pretpostavljen** — `npm run build` prolazi s novom temom
+  i sve nove klase (uključujući responzivne varijante `lg:flex` / `lg:hidden` za
+  dvostruki okidač zvonca) su u kompajliranom CSS-u. Bez te provjere greška u temi
+  bi pukla tek u deploy koraku.
+
+**Šta u 9c ostaje na vlasniku:** vizuelna provjera na tri širine (375 / 768 /
+1280 px) i u svijetloj i tamnoj temi. Agent nema pristup pretraživaču, pa je
+gradient/staklo, panel zvonca i izgled emaila u stvarnom klijentu (Gmail, Outlook)
+nešto što potvrđuje vlasnik — `CLAUDE.md` §6 to i traži kao dio „definition of
+done", i zato se ovdje ne tvrdi da je već potvrđeno.

@@ -23,6 +23,7 @@ return [
     'transactions' => [
         'label' => 'Transaction',
         'plural_label' => 'Transactions',
+        'quick_capture' => 'New expense',
         'navigation_label' => 'Transactions',
         'fields' => [
             'type' => 'Type',
@@ -50,6 +51,7 @@ return [
     'bills' => [
         'label' => 'Bill',
         'plural_label' => 'Bills',
+        'quick_capture' => 'New bill',
         'navigation_label' => 'Bills and subscriptions',
         'fields' => [
             'title' => 'Title',
