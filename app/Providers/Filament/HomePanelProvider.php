@@ -91,6 +91,15 @@ class HomePanelProvider extends PanelProvider
                 'danger' => Color::hex('#B23B2E'),
                 'info' => Color::hex('#3E7C8C'),
             ])
+            // Redoslijed grupa u meniju je fiksiran ovdje; bez ovoga ih Filament
+            // slaže onim redom kojim ih zatekne kroz auto-discovery modula.
+            // Nazivi moraju biti isti stringovi koje moduli vraćaju iz
+            // getNavigationGroup() (lang/bs/<modul>.php → navigation_group).
+            ->navigationGroups([
+                __('tasks.navigation_group'),
+                __('finance.navigation_group'),
+                __('lifeadmin.navigation_group'),
+            ])
             ->discoverResources(in: app_path('Platform/Filament/Resources'), for: 'App\\Platform\\Filament\\Resources')
             ->discoverPages(in: app_path('Platform/Filament/Pages'), for: 'App\\Platform\\Filament\\Pages')
             ->pages([

@@ -75,6 +75,15 @@ return [
         ],
     ],
 
+    // Kalendar je "potrošač", ne izvor: nema svoj entitet niti providere, nego
+    // prikazuje ono što drugi moduli prijave kroz calendar_source. U registryju je
+    // zato što je za korisnika ravnopravna app u meniju — i može se isključiti.
+    'calendar' => [
+        'name' => 'Kalendar',
+        'icon' => 'heroicon-o-calendar-days',
+        'enabled' => true,
+    ],
+
     'notes' => [
         'name' => 'Bilješke',
         'icon' => 'heroicon-o-document-text',

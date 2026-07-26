@@ -526,6 +526,23 @@ a stavka u meniju ostane. Faza 7 to zaokružuje (tačke 1, 3 i 4 niže).
 
 Ovo formalizuje ono što je već implicitno urađeno kroz Faze 1-6.
 
+**Status: isporučuje se u tri koraka** (odluka vlasnika, isti ritam kao Faze 5 i 6).
+
+- **7a — GOTOVO:** app registry s uključenošću **po domaćinstvu**
+  (`ModuleRegistry` + tabela `household_modules`, prekidači na stranici Postavke
+  domaćinstva, vlasnik-only). Nijedan dio sistema više ne čita `enabled` iz
+  configa direktno — dashboard, pretraga, kalendar, digest, brzo dodavanje i
+  kategorije obavještenja idu kroz registry, a Filament Resource/Page kroz
+  `BelongsToModule` nestaju i iz **menija** i s **rute**. Kalendar je dodan u
+  registry (potrošač bez providera) da bi i on bio ugasiv. Graceful degradation
+  pokriven testom sa **svim** modulima isključenim. Uz to: redoslijed grupa u
+  meniju (Organizacija, Finansije, Administracija) i ispravka redoslijeda u
+  topbaru na mobilnom (tačka 6 niže).
+- **7b** — probna app **Kućni ljubimci** kao dokaz proširivosti (odluka vlasnika:
+  ljubimac + vakcine/pregledi s datumom → podsjetnik, kalendar, dashboard,
+  pretraga, dijeljenje; ne preklapa se ni s jednim postojećim modulom).
+- **7c** — pozivnica putem linka (tačka 5 niže).
+
 1. App registry — mehanizam kojim se modul "registruje" u sistem (naziv,
    ikonica, dashboard widget, search provider, meni stavka) kroz
    konfiguraciju, ne hardkodovanjem u core-u.
@@ -571,6 +588,22 @@ Ovo formalizuje ono što je već implicitno urađeno kroz Faze 1-6.
    - Forma kreiranja domaćinstva time ostaje forsirana **samo** onome ko se
      registrovao sam od sebe, bez pozivnice — što je i bila namjera pravila iz
      QA prolaza prije ove faze.
+
+6. **Dvije preostale sitnice iz QA-a** (vlasnik ih je svjesno odgodio za ovu
+   fazu, jer su kozmetičke):
+   - **Redoslijed u topbaru na mobilnom**: hamburger prvi s lijeva, pa
+     univerzalna pretraga, pa ostalo redom. Prvi pokušaj (flex `order` u temi)
+     nije proradio zbog **specifičnosti CSS-a**: pravilo `.fi-topbar > nav > *`
+     (0,1,1) nadjačava `.homeos-command-palette` (0,1,0), pa su svi elementi
+     ostali u istoj grupi. Ispravka je da selektori za hamburger i pretragu budu
+     jednako specifični (`.fi-topbar > nav > .…`). Provjeriti na stvarnom
+     uređaju, ne samo u emulaciji širine.
+   - **Redoslijed grupa u meniju**: Organizacija, Finansije, Administracija.
+     Filament grupe trenutno slaže redom kojim ih zatekne kroz auto-discovery
+     modula; fiksira se s `->navigationGroups([...])` u `HomePanelProvider`,
+     s istim prevedenim nazivima koje moduli vraćaju iz `getNavigationGroup()`
+     (`lang/bs/<modul>.php` → `navigation_group`). Nova app dodaje svoju grupu
+     u tu listu — spomenuti u checklisti iz `CLAUDE.md` §14.
 
 **Definition of done:** Nova probna "dummy" app se doda prateći checklist i
 pojavi se na dashboardu/search-u/navigaciji bez izmjene postojećeg koda.

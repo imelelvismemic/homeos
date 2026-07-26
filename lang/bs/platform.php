@@ -66,6 +66,11 @@ return [
         'saved' => 'Profil je sačuvan.',
     ],
 
+    'modules' => [
+        'section' => 'Aplikacije',
+        'description' => 'Isključena aplikacija nestaje iz menija, s početne strane, iz pretrage, kalendara i brzog dodavanja. Podaci ostaju sačuvani i vraćaju se čim je ponovo uključite.',
+    ],
+
     'sharing' => [
         'action' => 'Podijeli',
         'modal_heading' => 'Privatnost i dijeljenje',

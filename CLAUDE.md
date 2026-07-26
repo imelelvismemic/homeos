@@ -339,13 +339,19 @@ return [
         'icon' => 'heroicon-o-check-circle',
         'dashboard_widget' => \App\Modules\Tasks\DashboardWidget::class, // implementira DashboardWidgetContract
         'search_provider' => \App\Modules\Tasks\Search\TaskSearchProvider::class, // implementira SearchProviderContract
-        'enabled' => true, // household može ovo ugasiti po sebi (Faza 7)
+        'enabled' => true, // PODRAZUMIJEVANO stanje; domaćinstvo ga mijenja (Faza 7)
     ],
 ];
 ```
 
 Core (dashboard, search, navigacija) čita isključivo iz ovog fajla — nikad
 hardkodovana lista modula u Blade/Filament kodu.
+
+**Uključenost po domaćinstvu (Faza 7):** `enabled` je samo default. Pitanje
+"da li je modul dostupan OVOM domaćinstvu" ima tačno jedan odgovor —
+`App\Platform\Modules\ModuleRegistry` (tabela `household_modules` nosi
+odstupanja, vidi `DATA_MODEL.md` §6). Nigdje se ne čita `$app['enabled']`
+direktno; svaki novi agregator (widget, pretraga, digest…) pita registry.
 
 ---
 
@@ -385,6 +391,11 @@ Prije nego što se modul smatra gotovim, mora ispuniti sve tačke:
       minimalan/prazan widget, ali mora postojati
 - [ ] Implementira `SearchProviderContract` (tačka 8)
 - [ ] Filament Resource prati konvenciju auto-discovery iz tačke 5
+- [ ] Svaki Resource i svaka Page modula koriste
+      `App\Platform\Filament\Concerns\BelongsToModule` — isključen modul nestaje
+      i iz menija i s rute (tačka 12)
+- [ ] Ako modul uvodi novu navigacionu grupu, grupa se dodaje u
+      `->navigationGroups([...])` u `HomePanelProvider` (redoslijed menija)
 - [ ] Prati custom Filament temu i responzivnost/pristupačnost pravila iz
       tačke 6 — testiran na mobile/tablet/desktop, prazna stanja i greške
       imaju smislen tekst

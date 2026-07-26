@@ -352,11 +352,40 @@ return [
         'route' => 'tasks.index',
         'dashboard_widget' => \App\Modules\Tasks\Widgets\TodayTasksWidget::class,
         'search_provider' => \App\Modules\Tasks\Search\TaskSearchProvider::class,
-        'enabled' => true, // household može ovo ugasiti po sebi (Faza 7)
+        'enabled' => true, // podrazumijevano stanje; domaćinstvo ga može promijeniti
     ],
     // ...
 ];
 ```
+
+**Uključenost po domaćinstvu (Faza 7).** `enabled` u configu je samo
+PODRAZUMIJEVANA vrijednost. Stvarni odgovor daje
+`App\Platform\Modules\ModuleRegistry`, koji na config nakalemi izbor domaćinstva:
+
+```
+household_modules
+  id
+  household_id      FK → households
+  module_key        ključ iz config/homeos-apps.php
+  enabled           bool
+  timestamps
+  unique(household_id, module_key)  → index `household_modules_unique`
+```
+
+Čuvaju se samo **odstupanja** od defaulta — domaćinstvo koje ništa nije diralo
+nema nijedan red, pa novi modul odmah radi svima bez popunjavanja tabele unazad.
+
+Pravila:
+- Nijedan dio sistema ne čita više `$app['enabled']` direktno; sve ide kroz
+  `ModuleRegistry` (dashboard, pretraga, kalendar, digest, brzo dodavanje,
+  kategorije obavještenja, navigacija i rute).
+- Filament Resource/Page modula koristi
+  `App\Platform\Filament\Concerns\BelongsToModule` — ključ modula se izvodi iz
+  namespace-a (`App\Modules\Tasks\…` → `tasks`), pa isključen modul nestaje i iz
+  menija i s rute, ne samo s agregiranih ekrana.
+- Isključenje **ne briše podatke**: zapisi ostaju i vraćaju se čim se modul
+  ponovo uključi.
+- Prekidači su na stranici „Postavke domaćinstva“, radnja vlasnika.
 
 ---
 

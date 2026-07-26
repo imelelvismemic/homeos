@@ -6,6 +6,7 @@ use App\Modules\Finance\Filament\Resources\BudgetResource\Pages;
 use App\Modules\Finance\Models\Budget;
 use App\Modules\Finance\Models\Category;
 use App\Modules\Finance\Support\Money;
+use App\Platform\Filament\Concerns\BelongsToModule;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -19,6 +20,8 @@ use Illuminate\Support\Str;
 
 class BudgetResource extends Resource
 {
+    use BelongsToModule;
+
     protected static ?string $model = Budget::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chart-pie';

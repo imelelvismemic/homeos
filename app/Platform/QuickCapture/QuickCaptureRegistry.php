@@ -2,6 +2,7 @@
 
 namespace App\Platform\QuickCapture;
 
+use App\Platform\Modules\ModuleRegistry;
 use Illuminate\Support\Collection;
 
 /**
@@ -41,8 +42,7 @@ class QuickCaptureRegistry
      */
     public function items(): Collection
     {
-        return collect(config('homeos-apps', []))
-            ->filter(fn (array $app) => $app['enabled'] ?? true)
+        return app(ModuleRegistry::class)->enabled()
             ->flatMap(fn (array $app, string $moduleKey) => collect($this->definitions($app))
                 ->filter(fn (array $definition) => ! empty($definition['handler']))
                 ->map(fn (array $definition) => [
@@ -62,7 +62,7 @@ class QuickCaptureRegistry
 
         $app = config("homeos-apps.{$moduleKey}");
 
-        if (! is_array($app) || ! ($app['enabled'] ?? true)) {
+        if (! is_array($app) || ! app(ModuleRegistry::class)->isEnabled($moduleKey)) {
             return null;
         }
 

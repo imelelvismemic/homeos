@@ -5,6 +5,7 @@ namespace App\Modules\Tasks\Filament\Pages;
 use App\Modules\Tasks\Enums\TaskStatus;
 use App\Modules\Tasks\Models\Board;
 use App\Modules\Tasks\Models\Task;
+use App\Platform\Filament\Concerns\BelongsToModule;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
@@ -22,6 +23,8 @@ use Illuminate\Support\Collection;
  */
 class KanbanBoard extends Page
 {
+    use BelongsToModule;
+
     protected static ?string $navigationIcon = 'heroicon-o-view-columns';
 
     protected static string $view = 'filament.tasks.pages.kanban-board';

@@ -2,6 +2,8 @@
 
 namespace App\Platform\Notifications;
 
+use App\Platform\Modules\ModuleRegistry;
+
 /**
  * Jedinstveni izvor liste email-kategorija (DATA_MODEL.md §5) za postavke
  * obavještenja. Platform nosi generičku kategoriju `shared_with_you`; svaki modul
@@ -16,8 +18,8 @@ class NotificationCategoryRegistry
     {
         $keys = ['shared_with_you']; // platform-generička
 
-        foreach (config('homeos-apps', []) as $module) {
-            if (($module['enabled'] ?? true) && ! empty($module['notification_categories'])) {
+        foreach (app(ModuleRegistry::class)->enabled() as $module) {
+            if (! empty($module['notification_categories'])) {
                 $keys = array_merge($keys, $module['notification_categories']);
             }
         }

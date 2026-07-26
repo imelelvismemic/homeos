@@ -5,6 +5,7 @@ namespace App\Modules\LifeAdmin\Filament\Resources;
 use App\Modules\LifeAdmin\Enums\DocumentType;
 use App\Modules\LifeAdmin\Filament\Resources\DocumentResource\Pages;
 use App\Modules\LifeAdmin\Models\Document;
+use App\Platform\Filament\Concerns\BelongsToModule;
 use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -25,6 +26,8 @@ use Illuminate\Support\Facades\Storage;
 
 class DocumentResource extends Resource
 {
+    use BelongsToModule;
+
     protected static ?string $model = Document::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-folder';

@@ -8,6 +8,7 @@ use App\Modules\Finance\Models\Category;
 use App\Modules\Finance\Models\Transaction;
 use App\Modules\Finance\Services\BalanceService;
 use App\Modules\Finance\Support\Money;
+use App\Platform\Filament\Concerns\BelongsToModule;
 use App\Platform\Models\Household;
 use App\Platform\Models\HouseholdMember;
 use Filament\Facades\Filament;
@@ -22,6 +23,8 @@ use Illuminate\Support\Str;
  */
 class MonthlyOverview extends Page
 {
+    use BelongsToModule;
+
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $slug = 'finansije-pregled';

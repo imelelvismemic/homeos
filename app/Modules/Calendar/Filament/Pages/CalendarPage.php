@@ -2,6 +2,7 @@
 
 namespace App\Modules\Calendar\Filament\Pages;
 
+use App\Platform\Filament\Concerns\BelongsToModule;
 use App\Platform\Models\Household;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
@@ -17,6 +18,8 @@ use Filament\Pages\Page;
  */
 class CalendarPage extends Page
 {
+    use BelongsToModule;
+
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
     protected static string $view = 'filament.calendar.pages.calendar';

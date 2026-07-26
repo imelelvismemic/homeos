@@ -7,6 +7,7 @@ use App\Platform\Contracts\DigestSourceContract;
 use App\Platform\Enums\DigestFrequency;
 use App\Platform\Models\Household;
 use App\Platform\Models\HouseholdMember;
+use App\Platform\Modules\ModuleRegistry;
 use App\Platform\Notifications\DigestNotification;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Notification;
@@ -27,8 +28,8 @@ class DigestService
     {
         $sections = [];
 
-        foreach (config('homeos-apps', []) as $module) {
-            if (! ($module['enabled'] ?? true) || empty($module['digest_source'])) {
+        foreach (app(ModuleRegistry::class)->enabled($household) as $module) {
+            if (empty($module['digest_source'])) {
                 continue;
             }
 

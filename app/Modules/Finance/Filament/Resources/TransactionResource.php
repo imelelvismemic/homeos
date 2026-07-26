@@ -7,6 +7,7 @@ use App\Modules\Finance\Filament\Resources\TransactionResource\Pages;
 use App\Modules\Finance\Models\Category;
 use App\Modules\Finance\Models\Transaction;
 use App\Modules\Finance\Support\Money;
+use App\Platform\Filament\Concerns\BelongsToModule;
 use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Models\HouseholdMember;
 use Filament\Facades\Filament;
@@ -25,6 +26,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class TransactionResource extends Resource
 {
+    use BelongsToModule;
+
     protected static ?string $model = Transaction::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';

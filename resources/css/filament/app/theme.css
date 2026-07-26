@@ -35,20 +35,24 @@
 
         /*
          * Redoslijed u topbaru na mobilnom: prvo hamburger, pa univerzalna
-         * pretraga. Filament renderuje TOPBAR_START hook (našu pretragu) PRIJE
-         * dugmeta menija, a hook poslije njega ne postoji — pa redoslijed
-         * postavljamo kroz flex `order` (ostalo ostaje kako jest).
+         * pretraga, pa ostalo redom. Filament renderuje TOPBAR_START hook (našu
+         * pretragu) PRIJE dugmeta menija, a hook poslije njega ne postoji — pa
+         * redoslijed postavljamo kroz flex `order`.
+         *
+         * Svi selektori MORAJU biti jednako specifični: prvi pokušaj je koristio
+         * `.homeos-command-palette` (0,1,0) protiv `.fi-topbar > nav > *` (0,1,1),
+         * pa je pravilo za pretragu gubilo i ništa se nije promijenilo.
          */
         .fi-topbar > nav > * {
             order: 3;
         }
 
-        .fi-topbar-open-sidebar-btn,
-        .fi-topbar-close-sidebar-btn {
+        .fi-topbar > nav > .fi-topbar-open-sidebar-btn,
+        .fi-topbar > nav > .fi-topbar-close-sidebar-btn {
             order: 1;
         }
 
-        .homeos-command-palette {
+        .fi-topbar > nav > .homeos-command-palette {
             order: 2;
         }
     }

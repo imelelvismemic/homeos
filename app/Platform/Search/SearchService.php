@@ -4,6 +4,7 @@ namespace App\Platform\Search;
 
 use App\Platform\Contracts\SearchProviderContract;
 use App\Platform\Models\Household;
+use App\Platform\Modules\ModuleRegistry;
 use Illuminate\Support\Collection;
 
 /**
@@ -37,8 +38,8 @@ class SearchService
             return collect();
         }
 
-        return collect(config('homeos-apps', []))
-            ->filter(fn (array $app) => ($app['enabled'] ?? true) && ! empty($app['search_provider']))
+        return app(ModuleRegistry::class)->enabled($household)
+            ->filter(fn (array $app) => ! empty($app['search_provider']))
             ->map(fn (array $app) => app($app['search_provider']))
             ->merge(collect(self::CORE_PROVIDERS)->map(fn (string $provider) => app($provider)))
             ->filter(fn ($provider) => $provider instanceof SearchProviderContract)

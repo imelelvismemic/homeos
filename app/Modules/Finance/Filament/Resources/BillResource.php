@@ -6,6 +6,7 @@ use App\Modules\Finance\Filament\Resources\BillResource\Pages;
 use App\Modules\Finance\Models\Bill;
 use App\Modules\Finance\Models\Category;
 use App\Modules\Finance\Support\Money;
+use App\Platform\Filament\Concerns\BelongsToModule;
 use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
@@ -25,6 +26,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class BillResource extends Resource
 {
+    use BelongsToModule;
+
     protected static ?string $model = Bill::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-currency-euro';

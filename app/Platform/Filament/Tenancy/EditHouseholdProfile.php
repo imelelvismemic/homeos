@@ -4,11 +4,14 @@ namespace App\Platform\Filament\Tenancy;
 
 use App\Models\User;
 use App\Platform\Models\HouseholdMember;
+use App\Platform\Modules\ModuleRegistry;
 use App\Platform\Services\HouseholdMemberService;
 use Filament\Actions\Action as PageAction;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Tenancy\EditTenantProfile;
@@ -58,7 +61,76 @@ class EditHouseholdProfile extends EditTenantProfile implements HasTable
                 ->required()
                 ->maxLength(255)
                 ->disabled(fn (): bool => ! static::currentUserIsOwner()),
+
+            Section::make(__('platform.modules.section'))
+                ->description(__('platform.modules.description'))
+                ->schema($this->moduleToggles())
+                ->columns(2),
         ]);
+    }
+
+    /**
+     * Prekidač po modulu — lista i nazivi dolaze iz registryja
+     * (config/homeos-apps.php), pa nova app dobija svoj prekidač sama od sebe.
+     *
+     * @return array<int, Toggle>
+     */
+    private function moduleToggles(): array
+    {
+        return app(ModuleRegistry::class)->all()
+            ->map(fn (array $app, string $key) => Toggle::make("module_{$key}")
+                ->label($app['name'] ?? $key)
+                ->inline(false)
+                ->disabled(! static::currentUserIsOwner()))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $registry = app(ModuleRegistry::class);
+
+        foreach ($registry->all()->keys() as $key) {
+            $data["module_{$key}"] = $registry->isEnabled($key, $this->tenant);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Prekidači modula ne pripadaju tabeli domaćinstva — skidamo ih iz podataka
+     * forme i upisujemo kroz registry (tabela `household_modules`).
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $registry = app(ModuleRegistry::class);
+
+        foreach ($registry->all()->keys() as $key) {
+            $field = "module_{$key}";
+
+            if (array_key_exists($field, $data)) {
+                $registry->setEnabled($this->tenant, $key, (bool) $data[$field]);
+                unset($data[$field]);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Puno osvježavanje nakon snimanja — meni i widgeti se renderuju u layoutu,
+     * pa se promjena uključenosti modula inače ne bi vidjela do sljedeće navigacije.
+     */
+    protected function getRedirectUrl(): ?string
+    {
+        return filament()->getTenantProfileUrl(['tenant' => $this->tenant]);
     }
 
     /**

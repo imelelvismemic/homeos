@@ -4,6 +4,7 @@ namespace App\Platform\Calendar;
 
 use App\Platform\Contracts\CalendarSourceContract;
 use App\Platform\Models\Household;
+use App\Platform\Modules\ModuleRegistry;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 
@@ -19,8 +20,8 @@ class CalendarService
      */
     public function eventsBetween(CarbonInterface $start, CarbonInterface $end, Household $household): Collection
     {
-        return collect(config('homeos-apps', []))
-            ->filter(fn (array $app) => ($app['enabled'] ?? true) && ! empty($app['calendar_source']))
+        return app(ModuleRegistry::class)->enabled($household)
+            ->filter(fn (array $app) => ! empty($app['calendar_source']))
             ->map(fn (array $app) => app($app['calendar_source']))
             ->filter(fn ($source) => $source instanceof CalendarSourceContract)
             ->flatMap(fn (CalendarSourceContract $source) => $source->eventsBetween($start, $end, $household))

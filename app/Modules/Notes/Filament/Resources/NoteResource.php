@@ -4,6 +4,7 @@ namespace App\Modules\Notes\Filament\Resources;
 
 use App\Modules\Notes\Filament\Resources\NoteResource\Pages;
 use App\Modules\Notes\Models\Note;
+use App\Platform\Filament\Concerns\BelongsToModule;
 use App\Platform\Filament\Sharing\SharingForm;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\RichEditor;
@@ -19,6 +20,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class NoteResource extends Resource
 {
+    use BelongsToModule;
+
     protected static ?string $model = Note::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';

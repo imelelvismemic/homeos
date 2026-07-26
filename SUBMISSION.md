@@ -465,3 +465,32 @@ domaćinstva“ su svedene na dvije stranice umjesto četiri stavke menija.
 - **Mobilni**: meni je koristio `100vh` (visina bez donje URL trake browsera) pa
   se do zadnjih stavki nije moglo doskrolovati — sada `100dvh`; hamburger je
   prvi s lijeva, pa pretraga; meni se zatvara na klik bilo kojeg linka.
+
+**Faza 7a završena** — App registry s uključenošću **po domaćinstvu** (dio 1 od 3;
+7b: probna app kao dokaz proširivosti, 7c: pozivnica putem linka):
+
+- `enabled` u `config/homeos-apps.php` je od sada samo **podrazumijevana**
+  vrijednost. Stvarni odgovor daje `App\Platform\Modules\ModuleRegistry`, koji na
+  config nakalemi izbor domaćinstva iz tabele `household_modules`. Tabela čuva
+  samo **odstupanja** — domaćinstvo koje ništa nije mijenjalo nema nijedan red,
+  pa novi modul odmah radi svima, bez popunjavanja tabele unazad.
+- Prepravljeni su **svi** agregatori da pitaju registry: dashboard, univerzalna
+  pretraga, kalendar, digest, brzo dodavanje i kategorije obavještenja. Ranije je
+  svaki čitao `enabled` samostalno, pa bi gašenje modula radilo samo dijelom.
+- **Navigacija i rute** su bile najveća rupa: modul bi nestao s dashboarda, ali
+  bi stavka u meniju ostala i URL bi i dalje radio. Novi trait
+  `App\Platform\Filament\Concerns\BelongsToModule` izvodi ključ modula iz
+  namespace-a (`App\Modules\Tasks\…` → `tasks`) — istom konvencijom foldera kojom
+  Filament već auto-discoveruje resurse, pa core i dalje ne drži listu klasa po
+  modulu. Isključen modul nestaje iz menija i vraća 403 na svojoj ruti.
+- Prekidači su na stranici **Postavke domaćinstva**, uz naziv i članove: vlasnik
+  ih mijenja, član ih vidi onemogućene. Isključenje **ne briše podatke**.
+- Kalendar je dodan u registry kao "potrošač" (nema svoj entitet ni providere,
+  prikazuje ono što drugi moduli prijave) — inače se, po odluci "svi moduli se
+  mogu isključiti", ne bi mogao ugasiti.
+- Testovi: default vs. izbor domaćinstva, nestanak modula sa svih agregiranih
+  ekrana uz očuvane podatke, skrivanje iz navigacije + 403 na ruti, **render
+  dashboarda sa svim modulima isključenim**, prekidači kao vlasnik i kao član.
+- Uz to dvije QA sitnice: redoslijed grupa u meniju (Organizacija, Finansije,
+  Administracija) i redoslijed u topbaru na mobilnom (hamburger pa pretraga) —
+  prvi pokušaj nije radio zbog specifičnosti CSS selektora.

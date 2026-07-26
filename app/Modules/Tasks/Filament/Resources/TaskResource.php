@@ -9,6 +9,7 @@ use App\Modules\Tasks\Models\Board;
 use App\Modules\Tasks\Models\Task;
 use App\Platform\Events\NoteRequested;
 use App\Platform\Events\ReminderRequested;
+use App\Platform\Filament\Concerns\BelongsToModule;
 use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Models\HouseholdMember;
 use Carbon\Carbon;
@@ -35,6 +36,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class TaskResource extends Resource
 {
+    use BelongsToModule;
+
     protected static ?string $model = Task::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-check-circle';

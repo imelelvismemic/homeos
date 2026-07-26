@@ -5,6 +5,7 @@ namespace App\Modules\Reminders\Filament\Resources;
 use App\Modules\Reminders\Filament\Resources\ReminderResource\Pages;
 use App\Modules\Reminders\Models\Reminder;
 use App\Modules\Reminders\Services\ReminderFirer;
+use App\Platform\Filament\Concerns\BelongsToModule;
 use App\Platform\Filament\Sharing\SharingForm;
 use App\Platform\Models\HouseholdMember;
 use Filament\Facades\Filament;
@@ -27,6 +28,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ReminderResource extends Resource
 {
+    use BelongsToModule;
+
     protected static ?string $model = Reminder::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bell';
