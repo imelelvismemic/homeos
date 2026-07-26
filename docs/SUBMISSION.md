@@ -3,15 +3,39 @@ Ovaj dokument je namijenjen ljudima koji ocjenjuju rješenje, ne Claude Code
 agentu. Za operativni rad na projektu vrijede ROADMAP.md, CLAUDE.md,
 DATA_MODEL.md i ORIGINAL_SPEC.md.
 
-Dijelovi označeni [POPUNITI ...] se dopunjuju kako projekat napreduje kroz
-faze iz ROADMAP.md — ovaj dokument se ažurira usput, ne piše se tek na
-kraju.
+Pisan je USPUT, fazu po fazu, ne na kraju projekta — zato nosi i odluke koje
+su se mijenjale i greške koje su usput otkrivene.
 -->
 
-# Home OS — Sažetak rješenja
+# HomeOS plus — Sažetak rješenja
 
 **Autor:** Elvis Memić
 **Alat:** Claude Code (kompletna izrada, od arhitekture do deploymenta)
+**Aplikacija:** https://homeos.imel.cloud
+
+---
+
+## Kako čitati ovaj dokument
+
+Dokument je dugačak jer je pisan usput, kroz sve faze. Ako imate pet minuta,
+dovoljne su prve tri stavke:
+
+| Ako vas zanima… | Idite na |
+|---|---|
+| **Šta je isporučeno i u kojem roku** | [Rekapitulacija realizacije po danima](#rekapitulacija-realizacije-po-danima) |
+| **Obim u brojevima** (testovi, moduli, kod) | [Brojevi na kraju](#brojevi-na-kraju) |
+| **Šta je dodano iznad zadatka i zašto** | [Zaključak](#zaključak-šta-je-ušlo-a-zadatak-to-nije-tražio) |
+| Kako je dokazana proširivost platforme | [Dokaz proširivosti](#dokaz-proširivosti-extensibility) |
+| Zašto su tehničke odluke takve kakve su | [Arhitektonske odluke i obrazloženje](#arhitektonske-odluke-i-obrazloženje) |
+| Kako je rješeno puštanje u rad | [Deployment](#deployment) |
+| Detaljan tok rada, fazu po fazu | [Status projekta](#status-projekta) |
+
+Prateći dokumenti, za onoga koga zanima kako se na sistemu radi dalje:
+[`CLAUDE.md`](CLAUDE.md) (pravila razvoja i interfejsi),
+[`ROADMAP.md`](ROADMAP.md) (faze i kriteriji završenosti),
+[`DATA_MODEL.md`](DATA_MODEL.md) (šema podataka),
+[`RULES.md`](RULES.md) (terminologija i UX pravila),
+[`ORIGINAL_SPEC.md`](ORIGINAL_SPEC.md) (izvorni zadatak).
 
 ---
 
