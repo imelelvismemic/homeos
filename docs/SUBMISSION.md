@@ -804,3 +804,168 @@ done", i zato se ovdje ne tvrdi da je već potvrđeno.
   sadržaja, pa je staklo značilo da se tekst menija čita preko teksta stranice.
   Na tim širinama je podloga puna (svijetla/tamna), dok na desktopu — gdje meni
   ima svoju kolonu — staklo ostaje.
+
+---
+
+# Rekapitulacija realizacije po danima
+
+Na početku dokumenta stoji plan; ovdje stoji šta je stvarno isporučeno i kada.
+Podaci su izvedeni iz git historije (69 commita), ne iz naknadnog sjećanja.
+
+**Okvir:** zadatak primljen u srijedu 22.07. u 16h, rok predaje ponedjeljak
+27.07. u 16h — pet radnih dana uključujući vikend. Zadnji commit je u nedjelju
+26.07. u 15:30: **puni obim je završen oko 24 sata prije roka, bez ijednog
+izostavljenog modula.**
+
+**Prije prvog commita** (srijeda 22.07. od 22h do 01h, pa četvrtak 23.07. od 9h
+do 11h — ukupno oko 5 sati) radilo se na onome što se u git historiji ne vidi kao
+kod, a odredilo je sve ostalo:
+
+- **Razrada zadatka u operativni plan** i pisanje svih pratećih dokumenata koji su
+  potom inicijalno pushani: `ROADMAP.md` (11 faza s kriterijima završenosti),
+  `CLAUDE.md` (pravila razvoja, zaključani interfejsi i tehnički stack),
+  `DATA_MODEL.md` (šema podataka i konvencije imenovanja polja) i
+  `ORIGINAL_SPEC.md` kao referenca za namjeru zadatka. Sve globalne odluke — UI
+  sloj, multi-tenancy, email provider, testing, autorizacija, lokalizacija —
+  zaključane su **prije** Faze 0, upravo da se ne improvizuju usput po modulima.
+- **Priprema okruženja i infrastrukture** (koraci koje radi čovjek, ne agent):
+  Docker Desktop s WSL2 backendom, Docker CE na serveru, Virtualmin virtual server
+  za `homeos.imel.cloud` sa SSL sertifikatom, provjera Apache proxy modula,
+  izolovan MySQL korisnik i baza, provjera slobodnog loopback porta (8091), GitHub
+  repozitorij i pristup, te Resend nalog s domenom i SPF/DKIM zapisima na
+  Hurricane Electric DNS-u — DNS prvi, zbog propagacije.
+
+Tih pet sati bez ijedne linije koda je razlog zašto kasnije nije bilo rušenja i
+prepravljanja: svaka faza je znala u šta se uklapa prije nego je počela, i zato je
+ostatak posla mogao ići dva dana ispred plana.
+
+| Dan | Plan iz `ROADMAP.md` | Stvarno isporučeno | Commita | Prvi–zadnji commit |
+|---|---|---|---|---|
+| **Sri 22.07 (22–01)** | — (rad počinje po prijemu zadatka) | Razrada plana, `ROADMAP`/`CLAUDE`/`DATA_MODEL`, priprema okruženja i DNS/Resend | 0 | prije prvog commita |
+| **Čet 23.07** | Faza 0 + 0.5, pa start Faze 1 | Dovršetak dokumentacije (09–11, pa prvi push), **Faza 0** (Laravel+Filament skeleton, Docker, CI), **Faza 0.5** (produkcijski stack, Apache reverse proxy, auto-deploy, Resend) | 14 | 11:03 – 23:13 |
+| **Pet 24.07** | Dovršiti Fazu 1, Faza 2 | **Faza 1** (platform jezgro), **Faza 2** (dashboard, tema, brzo dodavanje), **Faza 3** (Zadaci + Kanban + Kalendar) + QA, univerzalna pretraga, **Faza 4** (Podsjetnici + Bilješke), rekonstrukcija brzog dodavanja | 25 | 06:54 – 23:12 |
+| **Sub 25.07** | Faza 3 | **Faza 5a** (Finansije), **Faza 5b** (Life admin), **Faza 6a** (dijeljenje + članovi), **Faza 6b** (obavještenja po članu + digest), in-app sanduče, tri QA kruga kroz cijeli sistem | 13 | 07:11 – 21:33 |
+| **Ned 26.07** | Faza 4 + Faza 5 | Četvrti QA krug, **Faza 7a/7b/7c** (app registry, probna app, pozivnice), **Faza 8** (backup, health, *testiran rollback na produkciji*), **Faza 9a/9b/9c** (rebrend, tri jezika, završni prolaz) | 17 | 04:14 – 15:30 |
+| **Pon 27.07** | Faza 6, 7, minimalna 8, kratka 9, finalizacija | — *nije bio potreban* | 0 | — |
+
+**Odstupanja od plana i zašto:**
+
+- **Dva dana ispred plana kroz cijeli projekat.** Faza 3 je isporučena u petak
+  (planirano: subota), Faza 5 u subotu (planirano: nedjelja), a Faze 6–9 u
+  nedjelju (planirano: ponedjeljak). Zato je vrijeme predviđeno za „ako nešto
+  pukne" iskorišteno za kvalitet, ne za nadoknađivanje.
+- **Faza 9 je jedina faza koja je narasla, a ne skratila se.** Plan je izričito
+  govorio da se ona prva skraćuje ako dođe do kašnjenja; pošto kašnjenja nije
+  bilo, podijeljena je na 9a (rebrend), 9b (tri jezika) i 9c (završni prolaz), uz
+  zahtjeve vlasnika koji su u nju ušli usput.
+- **Velike faze su same tražile podjelu.** 5a/5b, 6a/6b, 7a/7b/7c i 9a/9b/9c nisu
+  bile u planu kao koraci — podijeljene su da bi vlasnik mogao provjeriti i
+  potvrditi svaki dio prije nastavka, što je dio grešaka uhvatilo ranije.
+- **Četiri QA kruga umjesto jednog finalnog prolaza.** Umjesto da se ispravke
+  gomilaju za kraj, prošli su kao zasebni krugovi (petak, subota ×3, nedjelja) —
+  terminologija, mobilni prikaz, 500 na kreiranju domaćinstva, konsolidacija
+  postavki. `RULES.md` je nastao upravo iz tih krugova.
+- **Najveći pojedinačni gubitak vremena:** univerzalna pretraga. Livewire
+  komponenta u Filament render hooku je iza proxyja obarala `/livewire/update` na
+  419 (snapshot/checksum), pa je rješenje prošlo kroz pet pokušaja dok nije
+  završilo kao čisti Alpine + `fetch` JSON, bez Livewire round-tripa. Isti
+  obrazac je onda primijenjen i na brzo dodavanje, i oba od tada rade bez 419.
+
+---
+
+# Brojevi na kraju
+
+| Mjera | Vrijednost |
+|---|---|
+| Testovi (Pest) | **224**, svi prolaze |
+| Tvrdnji (assertions) | **858** |
+| Trajanje punog seta | ~10 min (sqlite u memoriji) |
+| Test fajlova | 52 |
+| Commita | 69 (14 / 25 / 13 / 17 po danima) |
+| PHP fajlova u `app/` | 231 (~12.200 linija) |
+| Modula (`app/Modules/*`) | 7 (Tasks, Reminders, Notes, Finance, LifeAdmin, Pets, Calendar) |
+| Migracija | 30 |
+| Eventa / listenera | 17 / 15 |
+| Policy klasa | 12 |
+| Filament Resources / Pages | 12 / 8 |
+| Notifikacija | 9 |
+| Platformskih kontrakata | 4 (Dashboard, Search, Calendar, Digest) + QuickCreate |
+| Prijevodnih vrijednosti | ~1.960 u tri jezika (bs 613, en 670, de 680 — razlika je Laravelov puni set validacijskih pravila u en/de) |
+| Jezika | 3 (bs, en, de), s testom parnosti ključeva |
+
+---
+
+# Zaključak: šta je ušlo, a zadatak to nije tražio
+
+Zadatak (`ORIGINAL_SPEC.md`) opisuje **šta aplikacija treba raditi** — module,
+dijeljenje, email obavještenja i proširivost. Ne spominje hosting, isporuku,
+sigurnost, testove, jezike ni dokumentaciju. Sve niže je zato dodano kao dio
+onoga što ovakav sistem čini upotrebljivim u stvarnom domaćinstvu, a ne samo
+demonstracijom:
+
+**Isporuka i pouzdanost**
+
+- **Auto-deployment na svaki push u `main`** (GitHub Actions → SSH → Docker
+  Compose), s migracijama i backupom baze prije njih. `main` je uvijek u stanju
+  spremnom za produkciju, jer CI mora biti zelen prije mergea.
+- **Rollback je testiran na živoj produkciji, ne pretpostavljen.** Verzija je
+  podignuta na 1.0.1, deployana, pa `git revert`-om vraćena na 1.0.0 — uz
+  provjeru da su podaci ostali netaknuti (12 zadataka, 22 podsjetnika, 3
+  ljubimca, 6 računa, 8 članova prije i poslije). Taj test je i otkrio da naziv i
+  verzija ne smiju živjeti u `.env` na serveru, pa su premješteni u kod.
+- **Noćni backup** baze i priloga u 03:15, s automatskim brisanjem starijih od 14
+  dana i **email upozorenjem ako backup ne uspije** — jer backup o kojem niko ne
+  zna kad je pukao nije backup.
+- **`/health` endpoint** (baza, cache, storage, verzija), koji koristi i deploy da
+  potvrdi da je nova verzija živa. Namjerno **bez** rate limitera: brojači
+  limitera žive u cacheu, pa bi na pokvarenom cacheu endpoint vratio 500 upravo
+  kad mu je posao da prijavi `cache: false`.
+- **CI kao kapija:** Pint + puni Pest set na svaki push i pull request.
+
+**Sigurnost i izolacija**
+
+- Docker stack sluša **isključivo na loopbacku** (`127.0.0.1:8091`), a SSL
+  terminira Apache/Virtualmin — kontejner nema ni sertifikat ni javni port, i ne
+  dira desetine drugih domena na istom serveru.
+- **Izolovan MySQL korisnik i baza**, s pravima ograničenim samo na svoju bazu.
+- **Prilozi i profilne slike su na privatnom disku** i idu kroz autentikovanu
+  rutu — dokument domaćinstva nikad ne postaje javni URL.
+- **Throttle na javnim rutama** i na endpointu koji upisuje podatke, uz testove
+  koji provjeravaju i granice i izolaciju domaćinstava (tuđi `?h=` i tuđi tenant
+  → 404, ne 403, da se ne potvrdi ni postojanje).
+
+**Upotrebljivost koju zadatak nije tražio**
+
+- **Tri jezika** (bosanski, engleski, njemački) s prekidačem sa zastavicama,
+  **emailovima na jeziku primaoca** i testom parnosti ključeva koji nedostajući
+  prijevod čini greškom, a ne sirovim ključem na ekranu.
+- **Uključivanje/isključivanje aplikacija po domaćinstvu** — isključena app
+  nestaje iz menija, dashboarda, pretrage, kalendara i brzog dodavanja, a podaci
+  ostaju i vraćaju se kad se ponovo uključi.
+- **Pozivnica putem linka** za osobe koje još nemaju nalog (token s rokom od 7
+  dana, email zaključan na formi registracije).
+- **Valuta kao postavka domaćinstva** (29 valuta), primijenjena na svim formama i
+  pregledima.
+- **Tamna tema, pristupačnost** (vidljiv keyboard focus, `prefers-reduced-motion`,
+  `prefers-reduced-transparency`, kontrast po WCAG AA) i **mobile-first izgled
+  provjeren na tri širine**, uz vlastiti vizuelni identitet („Topli dom") umjesto
+  neizmijenjenog Filament admin izgleda.
+- **Vlastiti stil emailova** s logotipom aplikacije i istim potpisom i verzijom
+  kao u aplikaciji, umjesto Laravelovog default izgleda.
+
+**Način rada koji je ostao zapisan**
+
+- **Četiri živa dokumenta** (`CLAUDE.md`, `RULES.md`, `DATA_MODEL.md`,
+  `ROADMAP.md`) — ne opis onoga što je napravljeno, nego pravila po kojima se radi
+  dalje: checklista za novi modul, terminologija i pravopis korisničkog teksta,
+  konvencije imenovanja polja, pravilo da su rute engleske.
+- **Pravilo naučeno kroz greške:** ako test zamijeni produkcijski sloj (lažni
+  dumper, `Notification::fake()`, `array` cache), mora postojati i test koji
+  vježba **pravi** — jer `Notification::fake()` nikad ne pozove `toMail()`, pa su
+  emailovi jedno vrijeme tiho padali dok su testovi bili zeleni.
+
+**Šta zadatak spominje, a nije izgrađeno:** korisnički vidljiv graditelj
+automatizacija („kada se ovo desi, uradi ono"). Temelj za njega postoji i
+koristi se — 17 domenskih eventa i 15 listenera kroz koje moduli sarađuju bez
+međusobnog poznavanja — ali ekran na kojem član domaćinstva sam sastavlja pravilo
+nije bio u obimu 11 faza i nije improvizovan u zadnji čas.
