@@ -661,6 +661,13 @@ bez gubitka podataka.
   priloga — bez priloga bi vraćena baza pokazivala na nepostojeće fajlove.
   Rotacija briše starije od `BACKUP_KEEP_DAYS` (14). Deploy dodatno radi backup
   **prije migracija** (`CLAUDE.md` §17).
+  - **Zamka s volumenom (naučeno u produkciji):** Docker imenovani volumen
+    montiran na putanju koje **nema u image-u** kreira se kao `root:root`, a
+    kontejner radi kao `www` — backup je tiho padao na `Permission denied`, dok
+    je deploy prolazio jer korak nije fatalan. Rješenje je dvostruko: image od
+    sada nosi prazan `storage/backups` (novi volumen naslijedi `www:www`), a
+    deploy dodatno radi idempotentni `chown` za **već postojeći** volumen, jer
+    njega Docker ne re-seed-a.
   - Backupi idu u imenovani volumen `app-backups`, **ne** u bind mount na host:
     dump baze bi tada morao biti čitljiv kontejnerskom korisniku, a na serveru s
     desetinama tuđih vhostova to znači i čitljiv drugima. Volumen se seed-a kao

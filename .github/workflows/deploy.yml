@@ -58,6 +58,13 @@ jobs:
             rm -rf public/build
             docker compose -f docker-compose.prod.yml cp app:/var/www/html/public/build public/build
 
+            echo "==> vlasništvo foldera za backupe"
+            # Image od sada nosi storage/backups, pa NOVI volumen naslijedi
+            # www:www. Već postojeći volumen Docker ne re-seed-a — ostao bi
+            # root:root i backup bi tiho padao. Idempotentna zaštita:
+            docker compose -f docker-compose.prod.yml exec -T -u root app \
+              sh -c 'mkdir -p storage/backups && chown -R www:www storage/backups'
+
             echo "==> backup baze prije migracija (CLAUDE.md §17)"
             docker compose -f docker-compose.prod.yml exec -T app php artisan homeos:backup || echo "UPOZORENJE: backup nije uspio — provjeri log."
 

@@ -81,6 +81,11 @@ COPY docker/php.ini /usr/local/etc/php/conf.d/zz-homeos.ini
 
 RUN addgroup -g 1000 www \
     && adduser -G www -g www -s /bin/sh -D www \
+    # Folder za backupe MORA postojati u image-u: Docker imenovani volumen
+    # montiran na putanju koje u image-u nema kreira kao root:root, pa mu
+    # kontejnerski korisnik (www) ne može pisati. Ovako se volumen seed-a iz
+    # image-a i naslijedi ispravno vlasništvo (ROADMAP Faza 8).
+    && mkdir -p storage/backups \
     && chown -R www:www /var/www/html \
     && chmod -R 775 storage bootstrap/cache \
     && chmod +x /usr/local/bin/entrypoint.sh
