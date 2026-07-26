@@ -18,14 +18,14 @@
         saving: false,
         saved: false,
         prefillDate: null,
-        // flatpickr instance po imenu polja — treba nam da dugme „Sada\" može
-        // postaviti vrijeme i u kalendaru, ne samo u modelu (inače korisnik
+        // flatpickr instance po imenu polja — treba nam da dugme za trenutno
+        // vrijeme postavi vrijeme i u kalendaru, ne samo u modelu (inače korisnik
         // vidi prazno polje a šalje se vrijednost).
         pickers: {},
         get activeItem() { return this.items.find((i) => i.key === this.activeKey) || null; },
         openModal(date = null) { this.open = true; this.reset(); this.prefillDate = this.normalizeDate(date); },
         reset() { this.activeKey = null; this.form = {}; this.errors = {}; this.saved = false; this.prefillDate = null; this.pickers = {}; },
-        // Isto ponašanje kao „Sada\" na klasičnoj formi podsjetnika
+        // Isto ponašanje kao dugme za trenutno vrijeme na klasičnoj formi
         // (ReminderResource: suffixAction → set(due_date, now())).
         setNow(name) {
             const picker = this.pickers[name];

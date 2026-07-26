@@ -130,20 +130,6 @@ img {
     text-decoration: none;
 }
 
-/* Znak: terakota kvadrat s bijelim plusom — pandan monogramu u aplikaciji. */
-.brand-mark {
-    background-color: #bf6a44;
-    border-radius: 9px;
-    color: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    height: 36px;
-    line-height: 36px;
-    text-align: center;
-    width: 36px;
-}
-
 .brand-name {
     color: #1c1917;
     font-family: Georgia, 'Times New Roman', serif;
@@ -273,44 +259,14 @@ img {
     width: 100%;
 }
 
-.button {
-    -webkit-text-size-adjust: none;
-    border-radius: 10px;
-    color: #ffffff;
-    display: inline-block;
-    overflow: hidden;
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 600;
-    padding: 12px 22px;
-}
-
-.button-blue,
-.button-primary {
-    background-color: #bf6a44;
-    border-bottom: 8px solid #bf6a44;
-    border-left: 18px solid #bf6a44;
-    border-right: 18px solid #bf6a44;
-    border-top: 8px solid #bf6a44;
-}
-
-.button-green,
-.button-success {
-    background-color: #4e8d5b;
-    border-bottom: 8px solid #4e8d5b;
-    border-left: 18px solid #4e8d5b;
-    border-right: 18px solid #4e8d5b;
-    border-top: 8px solid #4e8d5b;
-}
-
-.button-red,
-.button-error {
-    background-color: #b23b2e;
-    border-bottom: 8px solid #b23b2e;
-    border-left: 18px solid #b23b2e;
-    border-right: 18px solid #b23b2e;
-    border-top: 8px solid #b23b2e;
-}
+/*
+ * Dugme NEMA CSS klasu: boje i dimenzije su inline u
+ * `resources/views/vendor/mail/html/button.blade.php`. Razlog je konkretan —
+ * `.inner-body a` je specifičniji od `.button`, pa je inliner tekstu dugmeta
+ * davao boju linka (terakota na terakoti), a `border`-trik iz default teme uz
+ * `padding` je davao dvostruki okvir. Inline stil je u emailu jedino što
+ * nijedan klijent ne može nadjačati.
+ */
 
 /* Panels */
 

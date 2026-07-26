@@ -31,17 +31,23 @@ function renderReminderMail(): string
 
     $owner->notify(new ReminderDue($reminder));
 
-    return collect($transport->messages())
-        ->map(fn ($message) => $message->getOriginalMessage()->toString())
-        ->implode("\n");
+    // Tijelo je quoted-printable kodirano (`alt=3D"..."`, `=` prelama redove), pa
+    // se dekodira — inače tvrdnje provjeravaju kodiranje, a ne sadržaj.
+    return quoted_printable_decode(
+        collect($transport->messages())
+            ->map(fn ($message) => $message->getOriginalMessage()->toString())
+            ->implode("\n")
+    );
 }
 
 it('brands every email with the app mark, name and signature', function () {
     $html = renderReminderMail();
 
-    // Znak: terakota kvadrat s plusom, složen HTML-om (Gmail izbacuje <svg>,
-    // a vanjske slike su blokirane dok korisnik ne dopusti prikaz).
-    expect($html)->toContain('brand-mark');
+    // Znak je ORIGINALNI logo aplikacije, rasterizovan iz istog SVG-a
+    // (Gmail izbacuje <svg> iz emaila, pa SVG kod većine primalaca ne bi bio
+    // vidljiv). Uz sliku ide i naziv kao tekst, za slučaj blokiranih slika.
+    expect($html)->toContain('email-logo.png');
+    expect($html)->toContain('alt="HomeOS plus"');
     expect($html)->toContain('HomeOS');
     expect($html)->toContain('#bf6a44');
 

@@ -154,6 +154,30 @@
         -webkit-backdrop-filter: blur(var(--homeos-glass-blur)) saturate(140%);
     }
 
+    /*
+     * Na uskim ekranima bočni meni je PUN, bez stakla. Tamo ne stoji uz sadržaj
+     * nego preko njega, pa poluprozirna podloga znači da tekst menija čita preko
+     * teksta stranice — a ovdje je meni glavna navigacija, ne ukras. Na desktopu
+     * meni ima svoju kolonu i staklo je bezopasno.
+     *
+     * Media query je odvojen od onog u `base` sloju namjerno: ovo je pravilo
+     * `components` sloja i mora doći POSLIJE staklenog pravila iznad, inače
+     * gubi po redoslijedu ispisa.
+     */
+    @media (max-width: 1023px) {
+        .fi-sidebar,
+        .fi-sidebar-header {
+            background-color: #ffffff !important;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        .dark .fi-sidebar,
+        .dark .fi-sidebar-header {
+            background-color: #1c1917 !important;
+        }
+    }
+
     /* Sadržajne površine: kartice widgeta, sekcije formi, tabele. */
     .fi-wi-stats-overview-stat,
     .fi-section,

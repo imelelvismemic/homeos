@@ -757,6 +757,12 @@ bez gubitka podataka.
     vanjske slike su blokirane dok korisnik ne dopusti prikaz.
   - **Sigurnosni pregled** — svaka javna ruta i endpoint koji upisuje podatke
     imaju `throttle`, i to provjerava test (`SecurityTest`), ne komentar.
+  - **Ispravke nakon vlasnikove provjere:** `\"` u Alpine atributu je lomio brzo
+    dodavanje na svakoj stranici (pokriveno `AlpineMarkupTest`-om); originalni
+    logo u emailu (SVG rasterizovan u PNG, jer Gmail izbacuje `<svg>`); dugme u
+    emailu na inline stil (`.inner-body a` je specifičnije od `.button`, pa je
+    tekst dobijao boju linka); meni na mobilnom pun, bez stakla, jer tamo stoji
+    preko sadržaja.
 
 1. Testno pokrivanje ključnih tokova (feature testovi po modulu).
 2. Ažuriranje `README.md` i `CLAUDE.md` sa svim naučenim tokom razvoja.

@@ -774,3 +774,33 @@ docker compose -f docker-compose.prod.yml exec scheduler ls -lh storage/backups
 gradient/staklo, panel zvonca i izgled emaila u stvarnom klijentu (Gmail, Outlook)
 nešto što potvrđuje vlasnik — `CLAUDE.md` §6 to i traži kao dio „definition of
 done", i zato se ovdje ne tvrdi da je već potvrđeno.
+
+**Faza 9c — ispravke nakon vlasnikove provjere na produkciji:**
+
+- **Brzo dodavanje je bilo puklo na svakoj stranici.** U komentaru unutar
+  `x-data="{ ... }"` stajalo je `„Sada\"` — HTML atribut ne poznaje `\` escape, pa
+  je taj navodnik **zatvorio atribut** i ostatak Alpine komponente se izlio na
+  stranicu kao vidljiv tekst. Ispravljeno, i pokriveno testovima
+  (`AlpineMarkupTest`): nijedan Blade ne smije sadržavati `\"`, komponenta brzog
+  dodavanja mora biti jedan neprekinut atribut, i u tekstu dokumenta se ne smije
+  pojaviti izvorni kod. Treći test je u prvoj verziji lažno padao jer je tagove
+  skidao regexom, a Alpine atributi sadrže `=>` iz strelica-funkcija — zamijenjen
+  je DOM parserom, koji zna razliku između atributa i teksta.
+- **Originalni logo u emailu.** Prvo je znak bio složen HTML-om i bojama (zbog
+  toga što Gmail izbacuje `<svg>`), ali je izgledao improvizovano. Sada je u
+  emailu **isti znak koji nosi aplikacija**: `public/favicon.svg` rasterizovan u
+  `public/email-logo.png` (144 px, prikazuje se na 36 px radi retina ekrana).
+  Rasterizacija je nužna, ne izbor — SVG (pa i kao `data:` URI) kod većine
+  primalaca ostaje nevidljiv. Uz sliku ostaje i naziv kao tekst, da zaglavlje
+  ostane čitljivo ako klijent blokira slike.
+- **Dugme u emailu je bilo neupotrebljivo** — debeli prsten i tekst koji se gubi.
+  Dva uzroka: Laravelov CSS inliner primjenjuje `.inner-body a`, koje je
+  specifičnije od `.button`, pa je tekst dobijao boju linka (terakota na
+  terakoti); a `border`-trik default teme uz naš `padding` je davao dvostruki
+  okvir. Dugme sada nosi **inline stil** (boja podloge na `<td>` + bijeli tekst na
+  `<a>`) — u emailu je inline jedino što nijedan klijent ne nadjačava; mrtvi CSS
+  je uklonjen.
+- **Meni na mobilnom više nije proziran.** Na uskim ekranima meni stoji *preko*
+  sadržaja, pa je staklo značilo da se tekst menija čita preko teksta stranice.
+  Na tim širinama je podloga puna (svijetla/tamna), dok na desktopu — gdje meni
+  ima svoju kolonu — staklo ostaje.
