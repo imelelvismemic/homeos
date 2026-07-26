@@ -5,7 +5,12 @@ use App\Modules\Tasks\Enums\TaskStatus;
 use App\Modules\Tasks\Models\Task;
 use App\Modules\Tasks\Notifications\TaskAssigned;
 use App\Modules\Tasks\Notifications\TaskDueSoon;
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Notification;
+
+beforeEach(function () {
+    Filament::setCurrentPanel(Filament::getPanel('app'));
+});
 
 it('notifies the assignee when a task is assigned to them', function () {
     [$household, $owner, $members] = makeHousehold(extraMembers: 1);
@@ -59,4 +64,22 @@ it('notifies assignees of tasks due within 24 hours via the scheduler command', 
         fn (TaskDueSoon $n) => $n->task->is($soon),
     );
     Notification::assertSentToTimes($assignee, TaskDueSoon::class, 1);
+});
+
+it('builds task emails in scheduler context, where there is no tenant', function () {
+    [$household, $owner] = makeHousehold();
+
+    $task = Task::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => 'Zadatak iz schedulera',
+        'due_date' => now()->addHours(2),
+    ]);
+
+    // Isti kvar kao kod podsjetnika: scheduler nema "trenutno domaćinstvo", pa
+    // getUrl() bez eksplicitnog tenanta obori sastavljanje emaila.
+    Filament::setTenant(null);
+
+    expect((new TaskAssigned($task))->toMail($owner)->actionUrl)->toContain((string) $household->id);
+    expect((new TaskDueSoon($task))->toMail($owner)->actionUrl)->toContain((string) $household->id);
 });

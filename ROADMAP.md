@@ -706,6 +706,11 @@ bez gubitka podataka.
 - **9a — GOTOVO:** rebrend u „Home OS plus" (naziv i znak iz koda, ne iz `.env`),
   SVG monogram kao logo i favicon, footer s verzijom, `/zdravlje` → `/health`,
   zvonce kao Livewire komponenta koja se osvježava sama.
+- **9a dorada:** footer prepravljen u „© @elvismemic <tekuća godina> · v<verzija>";
+  naziv ispravljen u „HomeOS plus" (razmak je falio u blade-u, pa se prikazivalo
+  „Home OSplus"); **email obavještenja su bila u kvaru** — notifikacije su gradile
+  tenant-scoped URL bez tenanta, pa je u scheduler kontekstu email padao dok je
+  in-app obavijest stizala. Zapisano u `docs/PRAVILA.md` §11.
 - **9b** — jezici bs/en/de (sve što korisnik vidi, uključujući email na jeziku
   primaoca), izbor zastavicama na prijavi i u topbaru.
 - **9c** — finalni UX prolaz na tri širine, sigurnosni pregled, README/CLAUDE.

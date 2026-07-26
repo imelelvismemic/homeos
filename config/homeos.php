@@ -15,7 +15,7 @@ return [
     | tamo (vidi ROADMAP Faza 9).
     */
 
-    'name' => 'Home OS plus',
+    'name' => 'HomeOS plus',
 
     /*
     |--------------------------------------------------------------------------

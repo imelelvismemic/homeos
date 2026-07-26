@@ -163,3 +163,30 @@ taj član odgovorna osoba.
   domaćinstva čim je taj modul uključen — platforma ne poznaje module po imenu.
 - Iznosi u bazi su uvijek `decimal(12,2)`, bez valute u koloni: valuta je
   svojstvo domaćinstva, ne pojedinačnog zapisa.
+
+## 11. Obavještenja se sastavljaju i IZVAN web zahtjeva
+
+Podsjetnici, sažeci i upozorenja nastaju u **konzoli** (scheduler, artisan
+komande), gdje Filament nema „trenutno domaćinstvo" ni prijavljenog korisnika.
+Zato u Notification klasama:
+
+- **Tenant se prosljeđuje eksplicitno**:
+  `Resource::getUrl('edit', ['record' => $model, 'tenant' => $model->household_id])`.
+  Bez toga `getUrl()` puca na nedostajućem `{tenant}` parametru i **cijeli email
+  padne**, dok in-app obavijest ipak stigne (database kanal se izvršava prvi) —
+  simptom je „obavijest vidim, email ne dobijam".
+- Ne oslanjati se na `auth()->user()` ni `Filament::getTenant()`; sve što
+  notifikaciji treba nosi model ili konstruktor.
+
+**Zašto testovi ovo ne uhvate sami:** `Notification::fake()` **nikad ne poziva
+`toMail()`** — provjerava samo da je obavještenje poslano. Zato uz svaki
+`toMail()` koji gradi URL ide i test koji ga **stvarno sastavi** bez tenanta:
+
+```php
+Filament::setTenant(null);                       // scheduler kontekst
+expect((new ReminderDue($r))->toMail($member)->actionUrl)->toContain((string) $r->household_id);
+```
+
+Isti obrazac vrijedi za svaku zamjenu produkcijskog sloja u testu (vidi i vezu
+`DatabaseDumper` iz Faze 8): ako test veže lažnu implementaciju, mora postojati i
+test koji provjerava **pravu**.

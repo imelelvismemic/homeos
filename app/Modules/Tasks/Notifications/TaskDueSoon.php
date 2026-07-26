@@ -20,6 +20,12 @@ class TaskDueSoon extends HouseholdNotification
         return 'task_due_soon';
     }
 
+    /**
+     * Tenant se prosljeđuje EKSPLICITNO: obavještenja nastaju i u konzoli
+     * (scheduler), gdje Filament nema "trenutno domaćinstvo" — bez toga getUrl()
+     * puca na nedostajućem {tenant} parametru, pa email nikad ne ode iako je
+     * in-app obavijest već upisana (database kanal ide prvi).
+     */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
@@ -28,7 +34,7 @@ class TaskDueSoon extends HouseholdNotification
                 'title' => $this->task->title,
                 'when' => $this->task->due_date?->diffForHumans() ?? '',
             ]))
-            ->action(__('tasks.notifications.due_soon.action'), TaskResource::getUrl('edit', ['record' => $this->task]));
+            ->action(__('tasks.notifications.due_soon.action'), TaskResource::getUrl('edit', ['record' => $this->task, 'tenant' => $this->task->household_id]));
     }
 
     /**

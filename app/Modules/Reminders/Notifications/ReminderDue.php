@@ -20,12 +20,18 @@ class ReminderDue extends HouseholdNotification
         return 'reminder_fired';
     }
 
+    /**
+     * Tenant se prosljeđuje EKSPLICITNO: obavještenja nastaju i u konzoli
+     * (scheduler), gdje Filament nema "trenutno domaćinstvo" — bez toga getUrl()
+     * puca na nedostajućem {tenant} parametru, pa email nikad ne ode iako je
+     * in-app obavijest već upisana (database kanal ide prvi).
+     */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
             ->subject(__('reminders.notifications.due.subject'))
             ->line(__('reminders.notifications.due.line', ['title' => $this->reminder->title]))
-            ->action(__('reminders.notifications.due.action'), ReminderResource::getUrl('edit', ['record' => $this->reminder]));
+            ->action(__('reminders.notifications.due.action'), ReminderResource::getUrl('edit', ['record' => $this->reminder, 'tenant' => $this->reminder->household_id]));
     }
 
     /**

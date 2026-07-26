@@ -5,6 +5,7 @@ namespace App\Modules\Reminders\Listeners;
 use App\Modules\Reminders\Events\ReminderFired;
 use App\Modules\Reminders\Notifications\ReminderDue;
 use App\Platform\Models\HouseholdMember;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Auto-discoveran listener: kad podsjetnik okine, obavijesti člana koji ga je
@@ -22,6 +23,18 @@ class NotifyReminderRecipient
             ->where('user_id', $reminder->created_by)
             ->first();
 
-        $member?->notify(new ReminderDue($reminder));
+        if ($member === null) {
+            // Tiho ništa je najgori ishod: podsjetnik okine, a niko ne dobije
+            // obavijest. Dešava se ako autor više nije član tog domaćinstva.
+            Log::warning('Podsjetnik nema kome poslati obavijest', [
+                'reminder_id' => $reminder->getKey(),
+                'household_id' => $reminder->household_id,
+                'created_by' => $reminder->created_by,
+            ]);
+
+            return;
+        }
+
+        $member->notify(new ReminderDue($reminder));
     }
 }

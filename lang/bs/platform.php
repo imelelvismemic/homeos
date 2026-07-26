@@ -98,10 +98,6 @@ return [
         'failed_hint' => 'Provjerite prostor na disku i log aplikacije. Backup se ponovo pokušava sutra u isto vrijeme.',
     ],
 
-    'footer' => [
-        'powered_by' => 'Pokreće',
-    ],
-
     'modules' => [
         'section' => 'Aplikacije',
         'description' => 'Isključena aplikacija nestaje iz menija, s početne strane, iz pretrage, kalendara i brzog dodavanja. Podaci ostaju sačuvani i vraćaju se čim je ponovo uključite.',

@@ -99,3 +99,23 @@ it('fires a reminder straight from the dashboard widget', function () {
     expect($reminder->fresh()->completed_at)->not->toBeNull();
     Notification::assertSentTo($owner, ReminderDue::class);
 });
+
+it('builds the reminder email in scheduler context, where there is no tenant', function () {
+    [$household, $owner] = makeHousehold();
+
+    $reminder = Reminder::create([
+        'household_id' => $household->id,
+        'created_by' => $owner->user_id,
+        'title' => 'Podsjetnik iz schedulera',
+        'due_date' => now()->subMinute(),
+    ]);
+
+    // Scheduler radi u konzoli: panel postoji, ali TENANT nije postavljen.
+    Filament::setTenant(null);
+
+    $mail = (new ReminderDue($reminder))->toMail($owner);
+
+    // Bez eksplicitnog tenanta getUrl() puca na nedostajućem {tenant} parametru,
+    // pa cijeli email padne — in-app obavijest stigne, email nikad.
+    expect($mail->actionUrl)->toContain((string) $household->id);
+});

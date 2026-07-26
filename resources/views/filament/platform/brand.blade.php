@@ -12,6 +12,8 @@
     </svg>
 
     <span class="homeos-display text-lg leading-none text-gray-950 dark:text-white">
-        {{ \Illuminate\Support\Str::beforeLast($name, ' ') }}<span class="text-primary-600 dark:text-primary-400">{{ \Illuminate\Support\Str::afterLast($name, ' ') }}</span>
+        {{-- Zadnja riječ naziva ide u boji teme, ostatak normalno. Razmak MORA
+             biti eksplicitan — bez njega se dijelovi slijepe ("HomeOSplus"). --}}
+        {{ \Illuminate\Support\Str::beforeLast($name, ' ') }}<span class="text-primary-600 dark:text-primary-400"> {{ \Illuminate\Support\Str::afterLast($name, ' ') }}</span>
     </span>
 </span>

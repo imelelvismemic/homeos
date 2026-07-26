@@ -14,7 +14,7 @@ beforeEach(function () {
 it('shows the product name and version from a single source', function () {
     // Naziv i verzija su u kodu (config/homeos.php), ne u .env — inače bi se
     // morali ručno mijenjati na serveru i razišli bi se (Faza 8/9).
-    expect(config('homeos.name'))->toBe('Home OS plus');
+    expect(config('homeos.name'))->toBe('HomeOS plus');
 
     test()->getJson('/health')
         ->assertOk()
@@ -28,9 +28,10 @@ it('renders the brand mark and the footer on a panel page', function () {
 
     $page = test()->get(Dashboard::getUrl(tenant: $household))->assertOk();
 
-    $page->assertSee('Home OS', escape: false);          // wordmark u meniju
-    $page->assertSee('@elvismemic', escape: false);      // footer
-    $page->assertSee('v'.config('homeos.version'), escape: false);
+    $page->assertSee('HomeOS', escape: false);                    // wordmark u meniju
+    $page->assertSee('plus', escape: false);                      // drugi dio, u boji teme
+    // Potpis je doslovan: ©elvismemic v<verzija>
+    $page->assertSee('©elvismemic v'.config('homeos.version'), escape: false);
 });
 
 it('counts unread notifications in the bell and refreshes itself', function () {
