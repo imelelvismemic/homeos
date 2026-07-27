@@ -129,6 +129,25 @@
 
 @layer components {
     /*
+     * Rezerva za starije pretraživače bez podrške za LOGIČKA CSS svojstva.
+     *
+     * Filament bočni meni pozicionira sa `inset-inline-start` (Tailwind `start-0`).
+     * Pretraživači bez te podrške ignorišu pravilo, meni ostane bez horizontalne
+     * koordinate i padne na svoju statičnu poziciju — desno od sadržaja. Prijavljeno
+     * na starijem Chromeu (Ubuntu): meni desno, a dugmad za zatvaranje i pretragu
+     * lijevo, pa cijeli raspored izgleda zrcaljeno.
+     *
+     * Aplikacija je LTR na sva tri jezika (bs/en/de — svi `direction: ltr`), pa je
+     * lijevo ispravno bez izuzetka. U modernim pretraživačima ovo ne mijenja ništa:
+     * `inset-inline-start: 0` u LTR-u i jest `left: 0`. Zatvoreno stanje na mobilnom
+     * radi kroz `transform`, ne kroz koordinate, pa ostaje netaknuto.
+     */
+    .fi-sidebar {
+        left: 0;
+        right: auto;
+    }
+
+    /*
      * Staklena površina — jedna klasa, jedno ponašanje. Sve što treba staklo
      * dobija je kroz `@apply`-slobodan `composes` obrazac: selektori niže samo
      * pozivaju iste varijable, da se efekat ne raspadne na jednom mjestu.
