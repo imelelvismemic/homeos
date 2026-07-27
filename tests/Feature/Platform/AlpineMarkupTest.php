@@ -70,3 +70,23 @@ it('does not leak component source code into the visible page', function () {
     expect($text)->not->toContain('X-CSRF-TOKEN');
     expect($text)->not->toContain('x-on:keydown');
 });
+
+it('closes the sidebar on narrow screens instead of leaving it over the content', function () {
+    $script = File::get(resource_path('views/filament/platform/sidebar-autoclose.blade.php'));
+
+    // Filament pamti stanje menija u localStorage. Zapamćeno "otvoren" sa širokog
+    // ekrana na užem prikazu daje preklapajući panel sa zatamnjenom pozadinom —
+    // stranica izgleda pokvareno već pri učitavanju (prijavljeno na Linuxu s
+    // uvećanim prikazom, gdje skaliranje smanji CSS širinu ispod granice).
+    expect($script)->toContain('alpine:initialized');
+    expect($script)->toContain('livewire:navigated');
+    expect($script)->toContain("narrow.addEventListener('change'");
+
+    // Granica mora biti ISTA kao u temi; na 1024px je CSS bio desktop a skripta
+    // mobilni, pa se ponašanje razilazilo točno na toj širini.
+    expect($script)->toContain('max-width: 1023px');
+    expect($script)->not->toContain('max-width: 1024px');
+
+    $theme = File::get(resource_path('css/filament/app/theme.css'));
+    expect($theme)->toContain('max-width: 1023px');
+});
